@@ -247,7 +247,7 @@
         // ==========================================
         const authGate = document.getElementById('authGate');
         const mainAppWrapper = document.getElementById('mainAppWrapper');
-
+const loginForm = document.getElementById('loginForm');
         const minTripProfitInput = document.getElementById('minTripProfit');
         const targetPayInput = document.getElementById('targetPay');
         const targetHourlyInput = document.getElementById('targetHourly');
@@ -337,13 +337,17 @@
             }
         }
 
-        loginBtn.addEventListener('click', async () => {
+    loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevents the page from reloading
+            
             authMessage.innerText = "Logging in...";
             authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
+            
             const { data, error } = await _supabase.auth.signInWithPassword({
                 email: emailInput.value,
                 password: passwordInput.value,
             });
+            
             if (error) {
                 authMessage.innerText = error.message;
                 authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
