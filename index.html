@@ -53,8 +53,6 @@
             
             <div id="decisionBox" class="p-4 rounded-xl border transition-all duration-300 border-gray-750 relative overflow-hidden bg-cover bg-center bg-no-repeat">
                 <div id="decisionOverlay" class="absolute inset-0 bg-gray-950/90 transition-colors duration-300"></div>
-                
-                <!-- NEW ACCEPT/DECLINE TEXT -->
                 <div id="decisionStatus" class="hidden relative z-10 text-center text-4xl font-black uppercase tracking-widest mt-2 mb-2 drop-shadow-md"></div>
                 
                 <div class="relative z-10 grid grid-cols-2 gap-y-3 gap-x-4 text-left text-xs text-gray-300 mt-2">
@@ -68,7 +66,7 @@
                 <button id="saveTripBtn" class="hidden relative z-10 w-full mt-3 bg-blue-600/90 backdrop-blur hover:bg-blue-500 text-white font-black py-2.5 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all uppercase tracking-widest text-xs">💾 Save Trip</button>
             </div>
 
-            <!-- RESTORED SHIFT PROFILE HEADER -->
+            <!-- SHIFT PROFILE HEADER -->
             <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 flex justify-between items-center mb-2">
                 <div>
                     <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active Barrie Profile</span>
@@ -136,11 +134,11 @@
                 </div>
             </div>
 
-            <!-- SHIFT TRACKER -->
+            <!-- ACTIVE SHIFT TRACKER -->
             <div class="bg-gray-900 rounded-xl border-2 border-gray-700 p-5 mt-6 shadow-lg">
                 <div class="flex justify-between items-end mb-3">
                     <div class="flex-1">
-                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total</span>
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total Profit</span>
                         <span id="shiftTotalDisplay" class="text-2xl font-black text-emerald-400">$0.00</span>
                     </div>
                     <div class="flex-1 text-center border-x border-gray-700 px-2 mx-2">
@@ -157,17 +155,13 @@
                     <div id="shiftProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
 
-                <button id="exportCloudBtn" class="w-full bg-blue-600/90 hover:bg-blue-500 text-white font-black py-3 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-colors text-sm uppercase tracking-widest mb-3 mt-4">☁️ Push Shift to Cloud</button>
-
-                <div class="mt-5 pt-4 border-t border-gray-700">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Odometer Log</span>
-                        <span id="odometerTotalDisplay" class="text-xs font-black text-amber-400">0 KM Logged</span>
+                <div class="mt-4 pt-4 border-t border-gray-700 text-center">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Shift Status</span>
+                        <span class="text-xs font-black text-emerald-400 flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>ACTIVE</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="number" id="startOdometer" placeholder="Start KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <input type="number" id="endOdometer" placeholder="End KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
+                    <p class="text-xs text-gray-400 mb-3">Start Odometer: <span id="displayStartOdo" class="text-white font-bold"></span> KM</p>
+                    <button id="triggerEndShiftBtn" class="w-full bg-rose-600/90 hover:bg-rose-500 text-white font-black py-3.5 rounded-lg border border-rose-400 shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-colors text-sm uppercase tracking-widest">🛑 End Shift & Cloud Sync</button>
                 </div>
             </div>
 
@@ -181,7 +175,66 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- 3. EXPENSE SCANNER MODAL                   -->
+        <!-- START SHIFT MODAL (FORCED)                 -->
+        <!-- ========================================== -->
+        <div id="startShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[70] p-6 flex flex-col justify-center">
+            <div class="bg-gray-850 border border-emerald-500/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                <div class="text-center mb-6">
+                    <span class="text-4xl block mb-2">🚗</span>
+                    <h2 class="text-2xl font-black text-white uppercase tracking-widest">Start Shift</h2>
+                    <p class="text-[10px] text-gray-400 uppercase mt-1 tracking-widest">Log Your Starting Mileage</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-emerald-400 uppercase mb-2 text-center">Current Odometer (KM)</label>
+                        <input type="number" id="startOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-emerald-500 text-center">
+                    </div>
+                    <div class="pt-2">
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Dashboard Photo Proof</label>
+                        <label class="w-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-lg border border-gray-600 cursor-pointer transition-colors">
+                            <span class="mr-2 text-xl">📷</span> Tap to Snap Photo
+                            <input type="file" id="startOdoImage" accept="image/*" capture="environment" class="hidden">
+                        </label>
+                        <p id="startOdoFileName" class="text-[10px] text-emerald-400 text-center mt-2 font-bold hidden">Photo Attached!</p>
+                    </div>
+                    <button id="confirmStartShiftBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-emerald-900/40">🚀 Begin Shift</button>
+                    <p id="startShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- END SHIFT MODAL                            -->
+        <!-- ========================================== -->
+        <div id="endShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[70] p-6 flex flex-col justify-center">
+            <div class="bg-gray-850 border border-rose-500/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(225,29,72,0.2)]">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-black text-white uppercase tracking-widest">End Shift</h2>
+                    <button id="closeEndShiftBtn" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-rose-400 uppercase mb-2 text-center">Final Odometer (KM)</label>
+                        <input type="number" id="endOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-rose-500 text-center">
+                    </div>
+                    <div class="pt-2">
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Final Photo Proof</label>
+                        <label class="w-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-lg border border-gray-600 cursor-pointer transition-colors">
+                            <span class="mr-2 text-xl">📷</span> Tap to Snap Photo
+                            <input type="file" id="endOdoImage" accept="image/*" capture="environment" class="hidden">
+                        </label>
+                        <p id="endOdoFileName" class="text-[10px] text-emerald-400 text-center mt-2 font-bold hidden">Photo Attached!</p>
+                    </div>
+                    <button id="confirmEndShiftBtn" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-rose-900/40">☁️ Sync to Cloud</button>
+                    <p id="endShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- EXPENSE SCANNER MODAL                      -->
         <!-- ========================================== -->
         <div id="expenseModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-50 p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-gray-700 rounded-2xl p-6 shadow-2xl">
@@ -219,7 +272,7 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- 4. TAX & SPREADSHEET DASHBOARD             -->
+        <!-- TAX & SPREADSHEET DASHBOARD                -->
         <!-- ========================================== -->
         <div id="historyModal" class="hidden absolute inset-0 bg-gray-900 z-50 p-4 flex flex-col h-full w-full overflow-hidden">
             <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-700 flex-wrap gap-2 shrink-0 hide-on-print">
@@ -259,18 +312,16 @@
 
                 <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest shrink-0">Shift Ledger</h3>
                 <div id="shiftLedgerContainer" class="overflow-x-auto border border-gray-700 rounded-lg bg-gray-850">
-                    <!-- Shift Spreadsheet Here -->
                 </div>
 
                 <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest shrink-0 mt-6">Expense Ledger</h3>
                 <div id="expenseLedgerContainer" class="overflow-x-auto border border-gray-700 rounded-lg bg-gray-850 mb-6">
-                    <!-- Expense Spreadsheet Here -->
                 </div>
             </div>
         </div>
 
         <!-- ========================================== -->
-        <!-- 5. EDIT SHIFT CLOUD MODAL                  -->
+        <!-- EDIT SHIFT CLOUD MODAL                     -->
         <!-- ========================================== -->
         <div id="editShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[60] p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-gray-700 rounded-2xl p-6 shadow-2xl">
@@ -313,7 +364,7 @@
 
     <script>
         // ==========================================
-        // 1. SUPABASE DATABASE SETUP
+        // 1. SUPABASE SETUP
         // ==========================================
         const { createClient } = supabase;
         const supabaseUrl = 'https://mwujfgdkdjbjoloaqlte.supabase.co';
@@ -352,15 +403,28 @@
         const payPerHourSpan = document.getElementById('payPerHour');
         
         const saveTripBtn = document.getElementById('saveTripBtn');
-        const exportCloudBtn = document.getElementById('exportCloudBtn');
         const shiftTotalDisplay = document.getElementById('shiftTotalDisplay');
         const shiftDistanceDisplay = document.getElementById('shiftDistanceDisplay');
         const shiftCountDisplay = document.getElementById('shiftCountDisplay');
         const shiftProgressBar = document.getElementById('shiftProgressBar');
 
-        const startOdometerInput = document.getElementById('startOdometer');
-        const endOdometerInput = document.getElementById('endOdometer');
-        const odometerTotalDisplay = document.getElementById('odometerTotalDisplay');
+        const displayStartOdo = document.getElementById('displayStartOdo');
+        const triggerEndShiftBtn = document.getElementById('triggerEndShiftBtn');
+
+        const startShiftModal = document.getElementById('startShiftModal');
+        const startOdometerInput = document.getElementById('startOdometerInput');
+        const startOdoImage = document.getElementById('startOdoImage');
+        const startOdoFileName = document.getElementById('startOdoFileName');
+        const confirmStartShiftBtn = document.getElementById('confirmStartShiftBtn');
+        const startShiftMessage = document.getElementById('startShiftMessage');
+
+        const endShiftModal = document.getElementById('endShiftModal');
+        const endOdometerInput = document.getElementById('endOdometerInput');
+        const endOdoImage = document.getElementById('endOdoImage');
+        const endOdoFileName = document.getElementById('endOdoFileName');
+        const confirmEndShiftBtn = document.getElementById('confirmEndShiftBtn');
+        const endShiftMessage = document.getElementById('endShiftMessage');
+        const closeEndShiftBtn = document.getElementById('closeEndShiftBtn');
 
         const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('emailInput');
@@ -406,9 +470,10 @@
         let globalShifts = [];
         let globalExpenses = [];
         let manualOverride = false;
+        const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000;
 
         // ==========================================
-        // 3. AUTHENTICATION LOGIC
+        // 3. AUTHENTICATION & SHIFT CHECKER
         // ==========================================
         async function checkUser() {
             const { data: { session } } = await _supabase.auth.getSession();
@@ -419,7 +484,10 @@
                 userEmailDisplay.innerText = currentUser.email;
                 loadSettings();
                 updateShiftTrackerUI();
-                updateOdometer();
+                await checkActiveShift(); // Check Shift Gate
+                
+                // Set interval to check for 8-hour timeout while app is open
+                setInterval(checkActiveShift, 60000); 
             } else {
                 currentUser = null;
                 authGate.classList.remove('hidden');
@@ -467,7 +535,143 @@
         checkUser();
 
         // ==========================================
-        // 4. EXPENSE SCANNER LOGIC
+        // 4. SHIFT GATE LOGIC (START & AUTO-END)
+        // ==========================================
+        async function checkActiveShift() {
+            const shiftStartTime = localStorage.getItem('shiftStartTime');
+            const shiftStartOdo = localStorage.getItem('shiftStartOdo');
+
+            if (!shiftStartTime || !shiftStartOdo) {
+                startShiftModal.classList.remove('hidden');
+                return;
+            }
+
+            displayStartOdo.innerText = shiftStartOdo;
+            startShiftModal.classList.add('hidden');
+
+            // 8-Hour Auto Checkout Logic
+            if (Date.now() - parseInt(shiftStartTime) > EIGHT_HOURS_MS) {
+                await autoCloseShift();
+            }
+        }
+
+        startOdoImage.addEventListener('change', (e) => { if (e.target.files.length > 0) startOdoFileName.classList.remove('hidden'); });
+
+        confirmStartShiftBtn.addEventListener('click', async () => {
+            const odo = parseFloat(startOdometerInput.value);
+            const file = startOdoImage.files[0];
+
+            if (!odo || odo <= 0) {
+                startShiftMessage.innerText = "Please enter your starting kilometers.";
+                return;
+            }
+
+            confirmStartShiftBtn.innerText = "⏳ Starting Shift...";
+            confirmStartShiftBtn.disabled = true;
+
+            let photoUrl = null;
+            if (file) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${currentUser.id}-START-${Date.now()}.${fileExt}`;
+                const { error } = await _supabase.storage.from('odometers').upload(fileName, file);
+                if (!error) photoUrl = _supabase.storage.from('odometers').getPublicUrl(fileName).data.publicUrl;
+            }
+
+            localStorage.setItem('shiftStartTime', Date.now());
+            localStorage.setItem('shiftStartOdo', odo);
+            if (photoUrl) localStorage.setItem('shiftStartUrl', photoUrl);
+            
+            tripLedger = []; 
+            localStorage.removeItem('tripLedger');
+            updateShiftTrackerUI();
+
+            startShiftModal.classList.add('hidden');
+            displayStartOdo.innerText = odo;
+            
+            confirmStartShiftBtn.innerText = "🚀 Begin Shift";
+            confirmStartShiftBtn.disabled = false;
+        });
+
+        // ==========================================
+        // 5. MANUAL END SHIFT LOGIC
+        // ==========================================
+        triggerEndShiftBtn.addEventListener('click', () => {
+            endShiftModal.classList.remove('hidden');
+            endOdometerInput.value = ""; endOdoImage.value = ""; endOdoFileName.classList.add('hidden');
+        });
+
+        closeEndShiftBtn.addEventListener('click', () => endShiftModal.classList.add('hidden'));
+        endOdoImage.addEventListener('change', (e) => { if (e.target.files.length > 0) endOdoFileName.classList.remove('hidden'); });
+
+        confirmEndShiftBtn.addEventListener('click', async () => {
+            const endOdo = parseFloat(endOdometerInput.value);
+            const startOdo = parseFloat(localStorage.getItem('shiftStartOdo')) || 0;
+            const file = endOdoImage.files[0];
+
+            if (!endOdo || endOdo <= startOdo) {
+                endShiftMessage.innerText = "End Odometer must be higher than Start Odometer.";
+                return;
+            }
+
+            confirmEndShiftBtn.innerText = "⏳ Pushing to Cloud...";
+            confirmEndShiftBtn.disabled = true;
+
+            let endUrl = null;
+            if (file) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${currentUser.id}-END-${Date.now()}.${fileExt}`;
+                const { error } = await _supabase.storage.from('odometers').upload(fileName, file);
+                if (!error) endUrl = _supabase.storage.from('odometers').getPublicUrl(fileName).data.publicUrl;
+            }
+
+            await pushShiftToCloud(startOdo, endOdo, localStorage.getItem('shiftStartUrl'), endUrl);
+
+            endShiftModal.classList.add('hidden');
+            confirmEndShiftBtn.innerText = "☁️ Sync to Cloud";
+            confirmEndShiftBtn.disabled = false;
+        });
+
+        // ==========================================
+        // 6. AUTO END SHIFT LOGIC (8 HOURS)
+        // ==========================================
+        async function autoCloseShift() {
+            alert("⏰ 8 Hours have passed. Your shift has been automatically closed using calculated distances.");
+            
+            const startOdo = parseFloat(localStorage.getItem('shiftStartOdo')) || 0;
+            const shiftDistance = tripLedger.reduce((sum, trip) => sum + (trip.distance || 0), 0);
+            const calculatedEndOdo = startOdo + shiftDistance;
+
+            await pushShiftToCloud(startOdo, calculatedEndOdo, localStorage.getItem('shiftStartUrl'), null);
+        }
+
+        async function pushShiftToCloud(startOdo, endOdo, startUrl, endUrl) {
+            const shiftTotal = tripLedger.reduce((sum, trip) => sum + trip.profit, 0);
+            const shiftDistance = tripLedger.reduce((sum, trip) => sum + (trip.distance || 0), 0);
+            const odoTotal = endOdo > startOdo ? (endOdo - startOdo) : 0;
+            const shiftDate = new Date(parseInt(localStorage.getItem('shiftStartTime'))).toLocaleDateString();
+
+            const { error } = await _supabase.from('delivery_logs').insert([{
+                user_id: currentUser.id, shift_date: shiftDate,
+                total_trips: tripLedger.length, total_profit: shiftTotal, app_miles: shiftDistance,
+                odo_start: startOdo, odo_end: endOdo, odo_total: odoTotal,
+                odo_start_url: startUrl || null, odo_end_url: endUrl || null
+            }]);
+
+            if (error) {
+                alert("Error saving shift: " + error.message);
+            } else {
+                alert("Shift successfully saved to Cloud!");
+                tripLedger = []; localStorage.removeItem('tripLedger');
+                localStorage.removeItem('shiftStartTime');
+                localStorage.removeItem('shiftStartOdo');
+                localStorage.removeItem('shiftStartUrl');
+                updateShiftTrackerUI();
+                startShiftModal.classList.remove('hidden'); // Force new shift
+            }
+        }
+
+        // ==========================================
+        // 7. EXPENSE SCANNER LOGIC
         // ==========================================
         openExpenseScannerBtn.addEventListener('click', () => {
             expenseModal.classList.remove('hidden');
@@ -517,7 +721,7 @@
         });
 
         // ==========================================
-        // 5. TAX DASHBOARD & SPREADSHEET LOGIC
+        // 8. TAX DASHBOARD & SPREADSHEET LOGIC
         // ==========================================
         async function fetchCloudData() {
             document.getElementById('shiftLedgerContainer').innerHTML = '<p class="text-center text-xs font-bold text-gray-500 my-4">⏳ Fetching cloud data...</p>';
@@ -594,6 +798,7 @@
                         <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odo Start</th>
                         <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odo End</th>
                         <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odo Driven (KM)</th>
+                        <th class="py-3 px-3 font-bold text-center hide-on-print">Odo Proof</th>
                         <th class="py-3 px-3 font-bold text-center hide-on-print">Actions</th>
                     </tr>
                 </thead>
@@ -601,13 +806,16 @@
             `;
 
             if (filteredShifts.length === 0) {
-                shiftTableHTML += `<tr><td colspan="9" class="py-4 text-center text-xs text-gray-500 italic">No shifts found for this timeframe.</td></tr>`;
+                shiftTableHTML += `<tr><td colspan="10" class="py-4 text-center text-xs text-gray-500 italic">No shifts found for this timeframe.</td></tr>`;
             } else {
                 filteredShifts.forEach(shift => {
                     const gross = shift.total_profit || 0;
                     const odoTotal = shift.odo_total || 0;
                     const shiftDeduct = odoTotal * deductRate;
                     const net = gross - shiftDeduct;
+
+                    const startProof = shift.odo_start_url ? `<a href="${shift.odo_start_url}" target="_blank" class="text-blue-400 hover:underline">Start</a>` : `<span class="text-gray-600">N/A</span>`;
+                    const endProof = shift.odo_end_url ? `<a href="${shift.odo_end_url}" target="_blank" class="text-blue-400 hover:underline">End</a>` : `<span class="text-gray-600">Auto</span>`;
 
                     shiftTableHTML += `
                         <tr class="hover:bg-gray-800 transition-colors">
@@ -619,6 +827,7 @@
                             <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_start || 0}</td>
                             <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_end || 0}</td>
                             <td class="py-3 px-3 text-center font-bold text-amber-400 border-r border-gray-700/50">${odoTotal}</td>
+                            <td class="py-3 px-3 text-center border-r border-gray-700/50 hide-on-print">${startProof} | ${endProof}</td>
                             <td class="py-3 px-3 text-center space-x-3 hide-on-print">
                                 <button onclick="openEditShift('${shift.id}', '${gross}', '${shift.app_miles || 0}', '${shift.total_trips || 0}', '${shift.odo_start || 0}', '${shift.odo_end || 0}')" class="text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest text-[9px]">Edit</button>
                                 <button onclick="deleteCloudShift('${shift.id}')" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
@@ -747,7 +956,7 @@
         });
 
         // ==========================================
-        // 6. CALCULATOR & TIME PROFILE LOGIC
+        // 9. CALCULATOR & TIME PROFILE LOGIC
         // ==========================================
         function determineTimeProfile() {
             const now = new Date();
@@ -788,8 +997,6 @@
             if (localStorage.getItem('gasCost')) gasCostInput.value = localStorage.getItem('gasCost');
             if (localStorage.getItem('dailyTarget')) dailyTargetInput.value = localStorage.getItem('dailyTarget');
             if (localStorage.getItem('taxDeductRate')) taxDeductRateInput.value = localStorage.getItem('taxDeductRate');
-            if (localStorage.getItem('startOdometer')) startOdometerInput.value = localStorage.getItem('startOdometer');
-            if (localStorage.getItem('endOdometer')) endOdometerInput.value = localStorage.getItem('endOdometer');
 
             manualOverride = localStorage.getItem('manualOverride') === 'true';
             if (manualOverride) {
@@ -800,19 +1007,6 @@
                 targetHourlyInput.value = localStorage.getItem('customHr') || 20.00;
             } else {
                 loadOptimumSettings();
-            }
-        }
-
-        function updateOdometer() {
-            const start = parseFloat(startOdometerInput.value) || 0;
-            const end = parseFloat(endOdometerInput.value) || 0;
-            localStorage.setItem('startOdometer', startOdometerInput.value);
-            localStorage.setItem('endOdometer', endOdometerInput.value);
-            
-            if (start > 0 && end > start) {
-                odometerTotalDisplay.innerText = `${(end - start).toFixed(1)} KM Logged`;
-            } else {
-                odometerTotalDisplay.innerText = `0 KM Logged`;
             }
         }
 
@@ -838,9 +1032,6 @@
             inputSettingsPanel.classList.add('hidden');
             calculate();
         });
-
-        startOdometerInput.addEventListener('input', updateOdometer);
-        endOdometerInput.addEventListener('input', updateOdometer);
 
         function calculate() {
             const gasCost = parseFloat(gasCostInput.value) || 0;
@@ -913,45 +1104,6 @@
                 updateShiftTrackerUI();
                 uberOfferSelect.value = ""; tripDistanceSelect.value = ""; tripDurationSelect.value = ""; calculate();
             }
-        });
-
-        // ==========================================
-        // 7. PUSH SHIFT TO SUPABASE CLOUD
-        // ==========================================
-        exportCloudBtn.addEventListener('click', async () => {
-            if (!currentUser) return;
-            if (tripLedger.length === 0) { alert("No trips to save!"); return; }
-
-            // HARD STOP: MUST HAVE START ODOMETER
-            if (!startOdometerInput.value) {
-                alert("⚠️ Please enter your Start Odometer (KM) before pushing to the cloud.");
-                startOdometerInput.focus();
-                return;
-            }
-
-            exportCloudBtn.innerText = "⏳ Pushing to Cloud...";
-            const shiftTotal = tripLedger.reduce((sum, trip) => sum + trip.profit, 0);
-            const shiftDistance = tripLedger.reduce((sum, trip) => sum + (trip.distance || 0), 0);
-            const startOdo = parseFloat(startOdometerInput.value) || 0;
-            const endOdo = parseFloat(endOdometerInput.value) || 0;
-            const odoTotal = endOdo > startOdo ? (endOdo - startOdo) : 0;
-
-            const { error } = await _supabase.from('delivery_logs').insert([{
-                user_id: currentUser.id, shift_date: new Date().toLocaleDateString(),
-                total_trips: tripLedger.length, total_profit: shiftTotal, app_miles: shiftDistance,
-                odo_start: startOdo, odo_end: endOdo, odo_total: odoTotal
-            }]);
-
-            if (error) {
-                alert("Error saving shift: " + error.message);
-            } else {
-                alert("Shift successfully saved! Daily totals reset.");
-                tripLedger = []; localStorage.removeItem('tripLedger');
-                startOdometerInput.value = ""; endOdometerInput.value = "";
-                localStorage.removeItem('startOdometer'); localStorage.removeItem('endOdometer');
-                updateShiftTrackerUI(); updateOdometer();
-            }
-            exportCloudBtn.innerText = "☁️ Push Shift to Cloud";
         });
 
         [gasCostInput, dailyTargetInput, uberOfferSelect, tripDistanceSelect, tripDurationSelect].forEach(element => {
