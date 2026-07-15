@@ -10,46 +10,46 @@
 
     <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6 space-y-6">
         
-        <!-- 1. DECISION AT THE TOP -->
-        <div id="decisionBox" class="p-6 rounded-xl border text-center transition-all duration-200 bg-gray-950 border-gray-750">
-            <span class="block text-xs font-semibold text-gray-400 uppercase tracking-widest">DECISION</span>
-            <div id="decisionText" class="text-4xl font-black my-2 text-gray-500">ENTER DATA</div>
+        <!-- 1. HIGH-VISIBILITY DECISION AT THE TOP -->
+        <div id="decisionBox" class="p-6 rounded-xl border text-center transition-all duration-300 bg-gray-950 border-gray-750">
+            <span id="decisionLabel" class="block text-xs font-bold text-gray-400 uppercase tracking-widest">DECISION</span>
+            <div id="decisionText" class="text-4xl font-black my-2 text-gray-400">ENTER DATA</div>
             
-            <div class="grid grid-cols-2 gap-2 mt-4 text-left text-xs text-gray-400">
+            <div class="grid grid-cols-2 gap-2 mt-4 text-left text-xs text-gray-300 border-t border-gray-800/50 pt-3">
                 <div>Est. Gas Cost: <span id="estGas" class="font-bold text-white">$0.00</span></div>
                 <div>Est. Net Profit: <span id="netProfit" class="font-bold text-white">$0.00</span></div>
-                <div class="col-span-2 mt-1 pt-1 border-t border-gray-800">Net Pay per KM: <span id="payPerKm" class="font-bold text-white">$0.00/KM</span></div>
+                <div class="col-span-2 mt-1 pt-1 border-t border-gray-800/30">Net Pay per KM: <span id="payPerKm" class="font-bold text-white">$0.00/KM</span></div>
             </div>
         </div>
 
         <hr class="border-gray-700">
 
-        <!-- 2. DROP-DOWN INPUTS -->
-        <div class="space-y-4">
+        <!-- 2. LARGE, EASY-TO-CLICK DROP-DOWN INPUTS (1-100) -->
+        <div class="space-y-5">
             <!-- Uber Offer Dropdown -->
             <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Uber Offer ($)</label>
-                <select id="uberOffer" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-xl font-bold text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none appearance-none">
-                    <option value="">Select Offer Amount</option>
-                    <!-- Generated Options ($3 to $50) -->
+                <label class="block text-sm font-semibold text-gray-300 mb-2">Uber Offer ($)</label>
+                <select id="uberOffer" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
+                    <option value="">Tap to select offer</option>
+                    <!-- Generated Options ($1 to $100) -->
                 </select>
             </div>
 
             <!-- Trip Distance Dropdown -->
             <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Trip Distance (KM)</label>
-                <select id="tripDistance" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-xl font-bold text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none appearance-none">
-                    <option value="">Select Distance</option>
-                    <!-- Generated Options (1 to 40 KM) -->
+                <label class="block text-sm font-semibold text-gray-300 mb-2">Trip Distance (KM)</label>
+                <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
+                    <option value="">Tap to select distance</option>
+                    <!-- Generated Options (1 to 100 KM) -->
                 </select>
             </div>
 
             <!-- Dead Miles Toggle -->
-            <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg border border-gray-700">
-                <span class="text-sm font-medium text-gray-300">Requires empty return trip?</span>
+            <div class="flex items-center justify-between bg-gray-800 p-4 rounded-xl border border-gray-700">
+                <span class="text-sm font-bold text-gray-300">Requires empty return trip?</span>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="deadMiles" class="sr-only peer">
-                    <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
                 </label>
             </div>
         </div>
@@ -80,20 +80,21 @@
         
         const decisionBox = document.getElementById('decisionBox');
         const decisionText = document.getElementById('decisionText');
+        const decisionLabel = document.getElementById('decisionLabel');
         const estGasSpan = document.getElementById('estGas');
         const netProfitSpan = document.getElementById('netProfit');
         const payPerKmSpan = document.getElementById('payPerKm');
 
-        // Dynamically populate Offer Dropdown ($3 to $50 in $1 increments)
-        for (let i = 3; i <= 50; i++) {
+        // Dynamically populate Offer Dropdown ($1 to $100 in $1 increments)
+        for (let i = 1; i <= 100; i++) {
             let opt = document.createElement('option');
             opt.value = i;
             opt.innerHTML = `$${i}.00`;
             uberOfferSelect.appendChild(opt);
         }
 
-        // Dynamically populate Distance Dropdown (1 to 40 KM in 1 KM increments)
-        for (let i = 1; i <= 40; i++) {
+        // Dynamically populate Distance Dropdown (1 to 100 KM in 1 KM increments)
+        for (let i = 1; i <= 100; i++) {
             let opt = document.createElement('option');
             opt.value = i;
             opt.innerHTML = `${i} KM`;
@@ -117,7 +118,8 @@
 
             if (uberOffer <= 0 || tripDistance <= 0) {
                 decisionText.innerText = "ENTER DATA";
-                decisionText.className = "text-4xl font-black my-2 text-gray-500";
+                decisionText.className = "text-4xl font-black my-2 text-gray-400";
+                decisionLabel.className = "block text-xs font-bold text-gray-400 uppercase tracking-widest";
                 decisionBox.className = "p-6 rounded-xl border text-center transition-all duration-200 bg-gray-950 border-gray-750";
                 estGasSpan.innerText = "$0.00";
                 netProfitSpan.innerText = "$0.00";
@@ -138,12 +140,14 @@
             // Make Decision
             if (payPerKm >= targetPay) {
                 decisionText.innerText = "ACCEPT";
-                decisionText.className = "text-4xl font-black my-2 text-emerald-400";
-                decisionBox.className = "p-6 rounded-xl border text-center transition-all duration-200 bg-emerald-950/30 border-emerald-500/50";
+                decisionText.className = "text-4xl font-black my-2 text-white";
+                decisionLabel.className = "block text-xs font-bold text-emerald-200 uppercase tracking-widest";
+                decisionBox.className = "p-6 rounded-xl border-2 text-center transition-all duration-200 bg-emerald-600 border-emerald-400 shadow-lg shadow-emerald-900/30";
             } else {
                 decisionText.innerText = "DECLINE";
-                decisionText.className = "text-4xl font-black my-2 text-rose-400";
-                decisionBox.className = "p-6 rounded-xl border text-center transition-all duration-200 bg-rose-950/30 border-rose-500/50";
+                decisionText.className = "text-4xl font-black my-2 text-white";
+                decisionLabel.className = "block text-xs font-bold text-rose-200 uppercase tracking-widest";
+                decisionBox.className = "p-6 rounded-xl border-2 text-center transition-all duration-200 bg-rose-600 border-rose-400 shadow-lg shadow-rose-900/30";
             }
         }
 
