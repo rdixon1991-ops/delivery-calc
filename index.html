@@ -24,9 +24,7 @@
             </div>
             
             <form id="loginForm" class="space-y-4 mt-8 bg-gray-900 p-5 rounded-xl border border-gray-700 shadow-inner">
-                
                 <input type="email" id="emailInput" name="email" autocomplete="username" placeholder="Driver Email" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
-                
                 <input type="password" id="passwordInput" name="password" autocomplete="current-password" placeholder="Password" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
                 
                 <div class="grid grid-cols-2 gap-3 pt-3">
@@ -67,26 +65,14 @@
                 </button>
             </div>
 
-            <!-- SHIFT PROFILE HEADER -->
-            <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 flex justify-between items-center">
-                <div>
-                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active Barrie Profile</span>
-                    <span id="shiftProfileName" class="text-sm font-black text-emerald-400">Detecting Time...</span>
-                </div>
-                <button id="resetOptimumBtn" class="bg-gray-900 border border-gray-600 text-gray-300 text-xs font-bold py-1 px-3 rounded hover:bg-emerald-900 hover:text-emerald-300 hover:border-emerald-500 transition-colors">
-                    ↺ Load Optimum
-                </button>
-            </div>
-
             <!-- COLLAPSIBLE INPUT SETTINGS -->
             <div>
-                <button id="toggleInputBtn" class="w-full bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-gray-300 font-bold py-3 rounded-xl border border-gray-700 flex justify-between items-center px-5 transition-colors">
-                    <span class="tracking-widest uppercase text-sm">⚙️ TRIPLE-FILTER TARGETS</span>
+                <button id="toggleInputBtn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-xl border border-gray-700 flex justify-between items-center px-5 transition-colors">
+                    <span class="tracking-widest uppercase text-sm">⚙️ SETTINGS & TARGETS</span>
                     <span id="toggleIcon" class="text-xl">▼</span>
                 </button>
                 <div id="inputSettingsPanel" class="hidden bg-gray-900 p-5 rounded-xl border border-gray-700 space-y-4 mt-2 shadow-inner">
                     <div class="space-y-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
-                        <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest mb-2 border-b border-gray-700 pb-1">My Minimum Goals</h3>
                         <div class="flex justify-between items-center">
                             <label class="text-xs font-bold text-gray-400 uppercase">1. Min Profit ($)</label>
                             <input type="number" id="minTripProfit" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
@@ -100,7 +86,7 @@
                             <input type="number" id="targetHourly" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
                         </div>
                         <button id="saveManualTargetsBtn" class="w-full mt-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 rounded transition-colors uppercase tracking-widest">
-                            💾 Save Custom Targets
+                            💾 Save Targets
                         </button>
                     </div>
                     <div class="grid grid-cols-2 gap-3 mt-3">
@@ -113,10 +99,14 @@
                             <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
                         </div>
                     </div>
+                    <!-- TAX DEDUCTION SETTING -->
+                    <div class="pt-3 border-t border-gray-700">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Tax Deduction Rate ($/KM)</label>
+                        <input type="number" id="taxDeductRate" step="0.01" value="0.70" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        <p class="text-[9px] text-gray-500 text-center mt-1">Standard Canadian allowance is roughly $0.70/KM</p>
+                    </div>
                 </div>
             </div>
-
-            <hr class="border-gray-700">
 
             <!-- DROP-DOWN INPUTS -->
             <div class="space-y-4">
@@ -140,13 +130,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="flex items-center justify-between bg-gray-800 p-4 rounded-xl border border-gray-700 mt-2">
-                    <span class="text-sm font-bold text-gray-300">Requires empty return trip?</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="deadMiles" class="sr-only peer">
-                        <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
-                    </label>
-                </div>
             </div>
 
             <!-- SHIFT TRACKER CARD WITH LEDGER & MILEAGE -->
@@ -169,85 +152,119 @@
                 <div class="w-full bg-gray-800 rounded-full h-3 mb-2 border border-gray-700 mt-2">
                     <div id="shiftProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
-                <div class="flex justify-between text-xs font-bold text-gray-400 mb-4">
-                    <span>Goal Progress</span>
-                    <span id="shiftProgressText">0%</span>
-                </div>
 
                 <!-- EXPORT CONTROLS -->
-                <button id="exportCloudBtn" class="w-full bg-blue-600/90 hover:bg-blue-500 text-white font-black py-3 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-colors text-sm uppercase tracking-widest mb-3">
+                <button id="exportCloudBtn" class="w-full bg-blue-600/90 hover:bg-blue-500 text-white font-black py-3 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-colors text-sm uppercase tracking-widest mb-3 mt-4">
                     ☁️ Push Shift to Cloud
                 </button>
-                <div class="grid grid-cols-2 gap-3">
-                    <button id="toggleLedgerBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
-                        📋 Trip Ledger
-                    </button>
-                    <button id="resetShiftBtn" class="bg-gray-800 hover:bg-rose-900/50 text-gray-400 hover:text-rose-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
-                        Reset Shift
-                    </button>
-                </div>
 
                 <!-- ODOMETER LOGGING -->
                 <div class="mt-5 pt-4 border-t border-gray-700">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Odometer Log</span>
-                        <span id="odometerTotalDisplay" class="text-xs font-black text-blue-400">0 KM Logged</span>
+                        <span id="odometerTotalDisplay" class="text-xs font-black text-amber-400">0 KM Logged</span>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Start Shift</label>
-                            <input type="number" id="startOdometer" placeholder="Start KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">End Shift</label>
-                            <input type="number" id="endOdometer" placeholder="End KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600">
-                        </div>
+                        <input type="number" id="startOdometer" placeholder="Start KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" id="endOdometer" placeholder="End KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                </div>
-
-                <!-- Expandable Trip Ledger List -->
-                <div id="tripLedgerPanel" class="hidden mt-4 pt-4 border-t border-gray-700 space-y-2 max-h-48 overflow-y-auto pr-1">
-                    <div id="emptyLedgerMsg" class="text-center text-gray-500 text-xs italic">No trips saved yet.</div>
-                    <ul id="tripList" class="space-y-2"></ul>
                 </div>
             </div>
 
-            <!-- 3. DRIVER ACCOUNT MANAGER -->
-            <div class="mt-6 pt-5 border-t border-gray-700">
-                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col space-y-3 shadow-lg">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <span class="block text-[10px] text-gray-500 uppercase tracking-widest">Logged In As</span>
-                            <span id="userEmailDisplay" class="text-sm font-black text-emerald-400">driver@email.com</span>
-                        </div>
-                        <button id="logoutBtn" class="bg-gray-900 hover:bg-rose-900/40 text-rose-400 hover:text-rose-300 text-[10px] font-bold py-1 px-3 rounded border border-rose-700/50 transition-colors uppercase tracking-widest">
-                            Log Out
-                        </button>
-                    </div>
-                    <!-- NEW CLOUD HISTORY BUTTON -->
-                    <button id="viewHistoryBtn" class="w-full bg-gray-900 hover:bg-gray-800 text-emerald-400 font-bold py-2.5 rounded-lg border border-gray-600 transition-colors text-xs uppercase tracking-widest mt-2">
-                        ☁️ View Cloud History
-                    </button>
-                </div>
+            <!-- ACTIONS MENU -->
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button id="openExpenseScannerBtn" class="bg-amber-700/80 hover:bg-amber-600 text-white font-bold py-3 rounded-lg border border-amber-500 transition-colors text-xs uppercase tracking-widest shadow-lg shadow-amber-900/20">
+                    🧾 Log Expense
+                </button>
+                <button id="viewHistoryBtn" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-300 font-bold py-3 rounded-lg border border-emerald-600 transition-colors text-xs uppercase tracking-widest shadow-lg shadow-emerald-900/20">
+                    📊 Tax Dashboard
+                </button>
             </div>
+            
+            <button id="logoutBtn" class="w-full bg-gray-900 hover:bg-rose-900/40 text-rose-400 hover:text-rose-300 text-[10px] font-bold py-2 rounded border border-rose-700/50 transition-colors uppercase tracking-widest mt-2">
+                Log Out (<span id="userEmailDisplay"></span>)
+            </button>
 
         </div> <!-- End of mainAppWrapper -->
 
         <!-- ========================================== -->
-        <!-- 3. CLOUD HISTORY MODAL (Hidden by default) -->
+        <!-- 3. EXPENSE SCANNER MODAL                   -->
+        <!-- ========================================== -->
+        <div id="expenseModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-50 p-6 flex flex-col justify-center">
+            <div class="bg-gray-850 border border-gray-700 rounded-2xl p-6 shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-black text-amber-400 uppercase tracking-widest">Log Expense</h2>
+                    <button id="closeExpenseBtn" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Category</label>
+                        <select id="expenseCategory" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-3 text-sm font-bold text-white focus:outline-none focus:border-amber-500">
+                            <option value="Car Wash">Car Wash</option>
+                            <option value="Phone Bill">Phone Bill</option>
+                            <option value="Maintenance">Vehicle Maintenance</option>
+                            <option value="Supplies">Supplies / Gear</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Total Cost ($)</label>
+                        <input type="number" id="expenseAmount" step="0.01" placeholder="0.00" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-xl font-black text-white focus:outline-none focus:border-amber-500 text-center">
+                    </div>
+                    
+                    <!-- CAMERA CAPTURE INPUT -->
+                    <div class="pt-2">
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Receipt Scan</label>
+                        <label class="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg cursor-pointer transition-colors shadow-lg shadow-blue-900/30">
+                            <span class="mr-2 text-xl">📷</span> Tap to Scan Receipt
+                            <input type="file" id="receiptImage" accept="image/*" capture="environment" class="hidden">
+                        </label>
+                        <p id="receiptFileName" class="text-[10px] text-emerald-400 text-center mt-2 font-bold hidden">Receipt Attached!</p>
+                    </div>
+
+                    <button id="submitExpenseBtn" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-amber-900/40">
+                        Save Deduction to Cloud
+                    </button>
+                    <p id="expenseMessage" class="text-xs font-bold mt-2 text-center h-4"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 4. TAX & CLOUD DASHBOARD MODAL             -->
         <!-- ========================================== -->
         <div id="historyModal" class="hidden absolute inset-0 bg-gray-900 z-50 p-6 flex flex-col h-full">
             <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-700">
                 <div>
-                    <h2 class="text-xl font-black text-white uppercase tracking-widest">Cloud History</h2>
-                    <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Your Past Shifts</p>
+                    <h2 class="text-xl font-black text-emerald-400 uppercase tracking-widest">Tax Dashboard</h2>
                 </div>
                 <button id="closeHistoryBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-2 px-4 rounded-lg border border-gray-600 transition-colors text-xs uppercase">
                     Close
                 </button>
             </div>
             
-            <div id="historyList" class="flex-1 overflow-y-auto space-y-3 pr-2">
+            <!-- LIVE TAX SUMMARY BOX -->
+            <div class="bg-gray-850 p-4 rounded-xl border border-emerald-900/50 shadow-lg shadow-emerald-900/10 mb-4">
+                <h3 class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center mb-2">Year-to-Date Cloud Summary</h3>
+                <div class="grid grid-cols-2 gap-4 border-b border-gray-700 pb-3 mb-3">
+                    <div class="text-center border-r border-gray-700 pr-2">
+                        <span class="block text-[10px] text-gray-400 uppercase">Gross Profit</span>
+                        <span id="dashGross" class="text-lg font-black text-white">$0.00</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="block text-[10px] text-gray-400 uppercase">Total Deductions</span>
+                        <span id="dashDeductions" class="text-lg font-black text-rose-400">-$0.00</span>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <span class="block text-[10px] text-gray-400 uppercase tracking-widest mb-1">True Net Taxable Income</span>
+                    <span id="dashNet" class="text-3xl font-black text-emerald-400">$0.00</span>
+                </div>
+            </div>
+
+            <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Shift Ledger</h3>
+            <div id="historyList" class="flex-1 overflow-y-auto space-y-3 pr-2 pb-10">
                 <!-- Fetched past shifts will appear here -->
             </div>
         </div>
@@ -270,24 +287,23 @@
         const authGate = document.getElementById('authGate');
         const mainAppWrapper = document.getElementById('mainAppWrapper');
 
+        // Settings & Inputs
         const minTripProfitInput = document.getElementById('minTripProfit');
         const targetPayInput = document.getElementById('targetPay');
         const targetHourlyInput = document.getElementById('targetHourly');
         const dailyTargetInput = document.getElementById('dailyTarget');
         const gasCostInput = document.getElementById('gasCost');
+        const taxDeductRateInput = document.getElementById('taxDeductRate');
         
         const uberOfferSelect = document.getElementById('uberOffer');
         const tripDistanceSelect = document.getElementById('tripDistance');
         const tripDurationSelect = document.getElementById('tripDuration');
-        const deadMilesInput = document.getElementById('deadMiles');
         
         const toggleInputBtn = document.getElementById('toggleInputBtn');
         const inputSettingsPanel = document.getElementById('inputSettingsPanel');
-        const toggleIcon = document.getElementById('toggleIcon');
-        const resetOptimumBtn = document.getElementById('resetOptimumBtn');
         const saveManualTargetsBtn = document.getElementById('saveManualTargetsBtn');
-        const shiftProfileName = document.getElementById('shiftProfileName');
 
+        // Calculator Displays
         const decisionBox = document.getElementById('decisionBox');
         const decisionOverlay = document.getElementById('decisionOverlay');
         const estGasSpan = document.getElementById('estGas');
@@ -295,42 +311,48 @@
         const payPerKmSpan = document.getElementById('payPerKm');
         const payPerHourSpan = document.getElementById('payPerHour');
         
+        // Tracking Displays
         const saveTripBtn = document.getElementById('saveTripBtn');
         const exportCloudBtn = document.getElementById('exportCloudBtn');
-        const toggleLedgerBtn = document.getElementById('toggleLedgerBtn');
-        const resetShiftBtn = document.getElementById('resetShiftBtn');
         const shiftTotalDisplay = document.getElementById('shiftTotalDisplay');
         const shiftDistanceDisplay = document.getElementById('shiftDistanceDisplay');
         const shiftCountDisplay = document.getElementById('shiftCountDisplay');
         const shiftProgressBar = document.getElementById('shiftProgressBar');
-        const shiftProgressText = document.getElementById('shiftProgressText');
-        const tripLedgerPanel = document.getElementById('tripLedgerPanel');
-        const tripList = document.getElementById('tripList');
-        const emptyLedgerMsg = document.getElementById('emptyLedgerMsg');
 
         const startOdometerInput = document.getElementById('startOdometer');
         const endOdometerInput = document.getElementById('endOdometer');
         const odometerTotalDisplay = document.getElementById('odometerTotalDisplay');
 
-        // Auth Elements
+        // Auth
         const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
         const signupBtn = document.getElementById('signupBtn');
-        const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         const userEmailDisplay = document.getElementById('userEmailDisplay');
         const authMessage = document.getElementById('authMessage');
 
-        // Cloud History Elements
+        // Modals
         const viewHistoryBtn = document.getElementById('viewHistoryBtn');
         const historyModal = document.getElementById('historyModal');
         const closeHistoryBtn = document.getElementById('closeHistoryBtn');
         const historyList = document.getElementById('historyList');
+        const dashGross = document.getElementById('dashGross');
+        const dashDeductions = document.getElementById('dashDeductions');
+        const dashNet = document.getElementById('dashNet');
+
+        const openExpenseScannerBtn = document.getElementById('openExpenseScannerBtn');
+        const expenseModal = document.getElementById('expenseModal');
+        const closeExpenseBtn = document.getElementById('closeExpenseBtn');
+        const expenseCategory = document.getElementById('expenseCategory');
+        const expenseAmount = document.getElementById('expenseAmount');
+        const receiptImage = document.getElementById('receiptImage');
+        const receiptFileName = document.getElementById('receiptFileName');
+        const submitExpenseBtn = document.getElementById('submitExpenseBtn');
+        const expenseMessage = document.getElementById('expenseMessage');
 
         // State Variables
         let currentTripProfit = 0; 
-        let manualOverride = localStorage.getItem('manualOverride') === 'true';
         let tripLedger = JSON.parse(localStorage.getItem('tripLedger')) || [];
 
         // ==========================================
@@ -343,16 +365,7 @@
                 authGate.classList.add('hidden');
                 mainAppWrapper.classList.remove('hidden');
                 userEmailDisplay.innerText = currentUser.email;
-                
-                if (manualOverride) {
-                    shiftProfileName.innerText = "Custom Settings";
-                    shiftProfileName.className = "text-sm font-black text-amber-400";
-                    minTripProfitInput.value = localStorage.getItem('customMin') || 5.00;
-                    targetPayInput.value = localStorage.getItem('customKm') || 1.20;
-                    targetHourlyInput.value = localStorage.getItem('customHr') || 20.00;
-                } else {
-                    loadOptimumSettings();
-                }
+                loadSettings();
                 updateShiftTrackerUI();
                 updateOdometer();
             } else {
@@ -364,7 +377,6 @@
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
-            
             authMessage.innerText = "Logging in...";
             authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
             
@@ -384,7 +396,6 @@
                     checkUser();
                 }
             } catch (err) {
-                console.error("Login Error:", err);
                 authMessage.innerText = "Connection error. Try again.";
                 authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
             }
@@ -393,47 +404,16 @@
         signupBtn.addEventListener('click', async () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
-            if(!email || !password) {
-                authMessage.innerText = "Enter an email and password to sign up.";
-                authMessage.className = "text-xs font-bold mt-2 h-4 text-amber-400";
-                return;
-            }
-
+            if(!email || !password) return;
             authMessage.innerText = "Creating account...";
             authMessage.className = "text-xs font-bold mt-2 h-4 text-emerald-400";
-            
-            const { data, error } = await _supabase.auth.signUp({
-                email: email,
-                password: password,
-            });
-            
-            if (error) {
-                authMessage.innerText = error.message;
-                authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
-            } else {
-                authMessage.innerText = "Success! You are now logged in.";
-                emailInput.value = "";
-                passwordInput.value = "";
+            const { data, error } = await _supabase.auth.signUp({ email, password });
+            if (!error) {
+                emailInput.value = ""; passwordInput.value = "";
                 checkUser();
-            }
-        });
-
-        forgotPasswordBtn.addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            if (!email) {
-                authMessage.innerText = "Please enter your email address first.";
-                authMessage.className = "text-xs font-bold mt-2 h-4 text-amber-400";
-                return;
-            }
-            authMessage.innerText = "Sending reset link...";
-            authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
-            const { data, error } = await _supabase.auth.resetPasswordForEmail(email);
-            if (error) {
+            } else {
                 authMessage.innerText = error.message;
                 authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
-            } else {
-                authMessage.innerText = "Reset link sent! Check your email.";
-                authMessage.className = "text-xs font-bold mt-2 h-4 text-emerald-400";
             }
         });
 
@@ -445,40 +425,159 @@
         checkUser();
 
         // ==========================================
-        // 4. CLOUD HISTORY LOGIC (FETCHING DATA)
+        // 4. EXPENSE SCANNER LOGIC
+        // ==========================================
+        openExpenseScannerBtn.addEventListener('click', () => {
+            expenseModal.classList.remove('hidden');
+            expenseAmount.value = "";
+            receiptImage.value = "";
+            receiptFileName.classList.add('hidden');
+            expenseMessage.innerText = "";
+        });
+
+        closeExpenseBtn.addEventListener('click', () => {
+            expenseModal.classList.add('hidden');
+        });
+
+        receiptImage.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                receiptFileName.classList.remove('hidden');
+            }
+        });
+
+        submitExpenseBtn.addEventListener('click', async () => {
+            const amount = parseFloat(expenseAmount.value);
+            const category = expenseCategory.value;
+            const file = receiptImage.files[0];
+
+            if (!amount || amount <= 0) {
+                expenseMessage.innerText = "Please enter a valid amount.";
+                expenseMessage.className = "text-xs font-bold mt-2 text-center h-4 text-amber-400";
+                return;
+            }
+
+            submitExpenseBtn.innerText = "⏳ Uploading to Cloud...";
+            submitExpenseBtn.disabled = true;
+
+            let receiptUrl = null;
+
+            // Handle Image Upload if attached
+            if (file) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
+                
+                const { error: uploadError } = await _supabase.storage.from('receipts').upload(fileName, file);
+                
+                if (uploadError) {
+                    console.error("Upload error:", uploadError);
+                    expenseMessage.innerText = "Error uploading image. Check bucket settings.";
+                    expenseMessage.className = "text-xs font-bold mt-2 text-center h-4 text-rose-400";
+                    submitExpenseBtn.innerText = "Save Deduction to Cloud";
+                    submitExpenseBtn.disabled = false;
+                    return;
+                }
+                
+                receiptUrl = _supabase.storage.from('receipts').getPublicUrl(fileName).data.publicUrl;
+            }
+
+            // Save to database
+            const { error: dbError } = await _supabase.from('other_deductions').insert([{
+                user_id: currentUser.id,
+                expense_date: new Date().toLocaleDateString(),
+                category: category,
+                amount: amount,
+                receipt_url: receiptUrl
+            }]);
+
+            if (dbError) {
+                expenseMessage.innerText = "Error saving deduction data.";
+                expenseMessage.className = "text-xs font-bold mt-2 text-center h-4 text-rose-400";
+            } else {
+                expenseModal.classList.add('hidden');
+                alert("Expense logged successfully to the cloud!");
+            }
+
+            submitExpenseBtn.innerText = "Save Deduction to Cloud";
+            submitExpenseBtn.disabled = false;
+        });
+
+        // ==========================================
+        // 5. TAX DASHBOARD LOGIC
         // ==========================================
         viewHistoryBtn.addEventListener('click', async () => {
             historyModal.classList.remove('hidden');
-            historyList.innerHTML = '<p class="text-center text-xs font-bold text-gray-500 mt-10">⏳ Fetching your past shifts from the cloud...</p>';
+            historyList.innerHTML = '<p class="text-center text-xs font-bold text-gray-500 mt-10">⏳ Calculating taxes & fetching cloud data...</p>';
 
-            const { data, error } = await _supabase
+            const deductRate = parseFloat(taxDeductRateInput.value) || 0.70;
+
+            // Fetch Shifts
+            const { data: shifts, error: shiftError } = await _supabase
                 .from('delivery_logs')
                 .select('*')
                 .eq('user_id', currentUser.id)
                 .order('id', { ascending: false }); 
 
-            if (error) {
-                historyList.innerHTML = `<p class="text-rose-400 text-center text-xs font-bold mt-10">Error: ${error.message}</p>`;
+            // Fetch Custom Deductions
+            const { data: expenses, error: expError } = await _supabase
+                .from('other_deductions')
+                .select('*')
+                .eq('user_id', currentUser.id);
+
+            if (shiftError || expError) {
+                historyList.innerHTML = `<p class="text-rose-400 text-center text-xs font-bold mt-10">Cloud Sync Error.</p>`;
                 return;
             }
 
-            if (!data || data.length === 0) {
-                historyList.innerHTML = '<p class="text-center text-xs text-gray-500 italic mt-10">No shifts saved to the cloud yet.</p>';
+            // Calculate Totals
+            let totalGross = 0;
+            let totalVehicleDeduction = 0;
+            
+            shifts.forEach(shift => {
+                totalGross += shift.total_profit || 0;
+                totalVehicleDeduction += (shift.odo_total || 0) * deductRate;
+            });
+
+            let totalOtherDeductions = 0;
+            if (expenses) {
+                expenses.forEach(exp => {
+                    totalOtherDeductions += parseFloat(exp.amount) || 0;
+                });
+            }
+
+            const grandTotalDeductions = totalVehicleDeduction + totalOtherDeductions;
+            const netTaxable = totalGross - grandTotalDeductions;
+
+            dashGross.innerText = `$${totalGross.toFixed(2)}`;
+            dashDeductions.innerText = `-$${grandTotalDeductions.toFixed(2)}`;
+            dashNet.innerText = `$${netTaxable.toFixed(2)}`;
+
+            if (!shifts || shifts.length === 0) {
+                historyList.innerHTML = '<p class="text-center text-xs text-gray-500 italic mt-10">No completed shifts to display yet.</p>';
                 return;
             }
 
-            historyList.innerHTML = data.map(shift => `
+            // Render Shift List
+            historyList.innerHTML = shifts.map(shift => {
+                const shiftVehDeduct = (shift.odo_total || 0) * deductRate;
+                return `
                 <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-md">
                     <div class="flex justify-between items-center mb-2 border-b border-gray-700 pb-2">
                         <span class="text-xs font-bold text-gray-300 uppercase tracking-widest">${shift.shift_date}</span>
-                        <span class="text-lg font-black text-emerald-400">$${shift.total_profit.toFixed(2)}</span>
+                        <span class="text-lg font-black text-emerald-400">+$${shift.total_profit.toFixed(2)}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 text-[10px] text-gray-400 uppercase tracking-widest">
+                    <div class="grid grid-cols-2 gap-2 text-[10px] text-gray-400 uppercase tracking-widest mb-2">
                         <div>Trips: <span class="text-white font-bold ml-1">${shift.total_trips}</span></div>
-                        <div class="text-right">Distance: <span class="text-white font-bold ml-1">${shift.app_miles} KM</span></div>
+                        <div class="text-right">App Dist: <span class="text-white font-bold ml-1">${shift.app_miles} KM</span></div>
+                    </div>
+                    <div class="bg-gray-900 rounded p-2 border border-gray-700">
+                        <div class="flex justify-between text-[10px] text-gray-500 font-bold uppercase">
+                            <span>Odometer: ${shift.odo_start} &rarr; ${shift.odo_end} (${shift.odo_total}KM)</span>
+                            <span class="text-rose-400">Est. Tax Deduct: -$${shiftVehDeduct.toFixed(2)}</span>
+                        </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         });
 
         closeHistoryBtn.addEventListener('click', () => {
@@ -486,36 +585,17 @@
         });
 
         // ==========================================
-        // 5. CALCULATOR & SHIFT LOGIC
+        // 6. CALCULATOR & ODOMETER LOGIC
         // ==========================================
-        function determineTimeProfile() {
-            const now = new Date();
-            const day = now.getDay(); 
-            const hour = now.getHours(); 
-            
-            let profile = { name: "Off-Peak", min: 4, km: 1.00, hr: 16 };
-            if ((day === 5 || day === 6) && (hour >= 17 && hour < 21)) {
-                profile = { name: "Peak Dinner Rush", min: 6, km: 1.50, hr: 24 };
-            } else if ((day === 5 || day === 6) && (hour >= 22 || hour < 2)) {
-                profile = { name: "Late Night Rush", min: 5, km: 1.20, hr: 22 };
-            } else if ((hour >= 11 && hour < 14) || (hour >= 17 && hour < 21)) {
-                profile = { name: "Standard Rush", min: 5, km: 1.20, hr: 20 };
-            }
-            return profile;
-        }
-
-        function loadOptimumSettings() {
-            const profile = determineTimeProfile();
-            shiftProfileName.innerText = profile.name;
-            shiftProfileName.className = "text-sm font-black text-emerald-400";
-            
-            minTripProfitInput.value = profile.min.toFixed(2);
-            targetPayInput.value = profile.km.toFixed(2);
-            targetHourlyInput.value = profile.hr.toFixed(2);
-            
-            manualOverride = false;
-            localStorage.setItem('manualOverride', 'false');
-            calculate();
+        function loadSettings() {
+            minTripProfitInput.value = localStorage.getItem('customMin') || 5.00;
+            targetPayInput.value = localStorage.getItem('customKm') || 1.20;
+            targetHourlyInput.value = localStorage.getItem('customHr') || 20.00;
+            if (localStorage.getItem('gasCost')) gasCostInput.value = localStorage.getItem('gasCost');
+            if (localStorage.getItem('dailyTarget')) dailyTargetInput.value = localStorage.getItem('dailyTarget');
+            if (localStorage.getItem('taxDeductRate')) taxDeductRateInput.value = localStorage.getItem('taxDeductRate');
+            if (localStorage.getItem('startOdometer')) startOdometerInput.value = localStorage.getItem('startOdometer');
+            if (localStorage.getItem('endOdometer')) endOdometerInput.value = localStorage.getItem('endOdometer');
         }
 
         function updateOdometer() {
@@ -531,6 +611,7 @@
             }
         }
 
+        // Dropdown Generation
         for (let i = 1; i <= 100; i++) {
             let opt = document.createElement('option'); opt.value = i; opt.innerHTML = `$${i}.00`; uberOfferSelect.appendChild(opt);
             let opt2 = document.createElement('option'); opt2.value = i; opt2.innerHTML = `${i} KM`; tripDistanceSelect.appendChild(opt2);
@@ -539,37 +620,16 @@
             let opt = document.createElement('option'); opt.value = i; opt.innerHTML = `${i} Mins`; tripDurationSelect.appendChild(opt);
         }
 
-        if (localStorage.getItem('gasCost')) gasCostInput.value = localStorage.getItem('gasCost');
-        if (localStorage.getItem('dailyTarget')) dailyTargetInput.value = localStorage.getItem('dailyTarget');
-        if (localStorage.getItem('startOdometer')) startOdometerInput.value = localStorage.getItem('startOdometer');
-        if (localStorage.getItem('endOdometer')) endOdometerInput.value = localStorage.getItem('endOdometer');
-
         toggleInputBtn.addEventListener('click', () => {
             inputSettingsPanel.classList.toggle('hidden');
-            toggleIcon.innerText = inputSettingsPanel.classList.contains('hidden') ? '▼' : '▲';
-        });
-
-        toggleLedgerBtn.addEventListener('click', () => {
-            tripLedgerPanel.classList.toggle('hidden');
-        });
-
-        resetOptimumBtn.addEventListener('click', () => {
-            loadOptimumSettings();
-            alert("Settings reset to Optimum for the current time.");
         });
 
         saveManualTargetsBtn.addEventListener('click', () => {
-            manualOverride = true;
-            localStorage.setItem('manualOverride', 'true');
             localStorage.setItem('customMin', minTripProfitInput.value);
             localStorage.setItem('customKm', targetPayInput.value);
             localStorage.setItem('customHr', targetHourlyInput.value);
-            
-            shiftProfileName.innerText = "Custom Settings";
-            shiftProfileName.className = "text-sm font-black text-amber-400";
-            
+            localStorage.setItem('taxDeductRate', taxDeductRateInput.value);
             inputSettingsPanel.classList.add('hidden');
-            toggleIcon.innerText = '▼';
             calculate();
         });
 
@@ -585,81 +645,40 @@
             const uberOffer = parseFloat(uberOfferSelect.value) || 0;
             const tripDistance = parseFloat(tripDistanceSelect.value) || 0;
             const tripDuration = parseFloat(tripDurationSelect.value) || 0;
-            const deadMilesMultiplier = deadMilesInput.checked ? 2 : 1;
 
             localStorage.setItem('gasCost', gasCostInput.value);
             localStorage.setItem('dailyTarget', dailyTargetInput.value);
             updateShiftTrackerUI(); 
 
             if (uberOffer <= 0 || tripDistance <= 0 || tripDuration <= 0) {
-                resetDecisionUI();
+                decisionBox.className = "p-4 rounded-xl border border-gray-750 relative overflow-hidden";
+                decisionOverlay.className = "absolute inset-0 bg-gray-950/90 transition-colors duration-300";
+                saveTripBtn.classList.add('hidden');
                 return;
             }
 
-            const calculationDistance = tripDistance * deadMilesMultiplier;
-            const estGas = calculationDistance * gasCost;
+            const estGas = tripDistance * gasCost;
             currentTripProfit = uberOffer - estGas;
             
             const payPerKm = tripDistance > 0 ? (currentTripProfit / tripDistance) : 0;
-            const totalHours = (tripDuration * deadMilesMultiplier) / 60;
+            const totalHours = tripDuration / 60;
             const payPerHour = totalHours > 0 ? (currentTripProfit / totalHours) : 0;
-            
-            const passedMinProfit = currentTripProfit >= minTripProfit;
-            const passedKm = payPerKm >= targetPayPerKm;
-            const passedHourly = payPerHour >= targetHourly;
-            const passedAll = passedMinProfit && passedKm && passedHourly;
-
-            const getIcon = (passed) => passed ? '<span class="ml-1 text-xs">✅</span>' : '<span class="ml-1 text-xs grayscale opacity-60">❌</span>';
 
             estGasSpan.innerText = `-$${estGas.toFixed(2)}`;
-            netProfitSpan.innerHTML = `$${currentTripProfit.toFixed(2)}` + getIcon(passedMinProfit);
-            payPerKmSpan.innerHTML = `$${payPerKm.toFixed(2)}/KM` + getIcon(passedKm);
-            payPerHourSpan.innerHTML = `$${payPerHour.toFixed(2)}/HR` + getIcon(passedHourly);
+            netProfitSpan.innerHTML = `$${currentTripProfit.toFixed(2)}`;
+            payPerKmSpan.innerHTML = `$${payPerKm.toFixed(2)}/KM`;
+            payPerHourSpan.innerHTML = `$${payPerHour.toFixed(2)}/HR`;
 
             saveTripBtn.classList.remove('hidden');
 
-            if (passedAll) {
-                decisionBox.className = "p-4 rounded-xl border-2 transition-all duration-200 border-emerald-400 shadow-lg shadow-emerald-900/30 relative overflow-hidden bg-cover bg-center bg-no-repeat";
+            if (currentTripProfit >= minTripProfit && payPerKm >= targetPayPerKm && payPerHour >= targetHourly) {
+                decisionBox.className = "p-4 rounded-xl border-2 transition-all duration-200 border-emerald-400 shadow-lg relative overflow-hidden";
                 decisionOverlay.className = "absolute inset-0 bg-emerald-900/85 transition-colors duration-300 backdrop-blur-[2px]";
                 netProfitSpan.className = "font-black text-white block text-lg mt-0";
             } else {
-                decisionBox.className = "p-4 rounded-xl border-2 transition-all duration-200 border-rose-400 shadow-lg shadow-rose-900/30 relative overflow-hidden bg-cover bg-center bg-no-repeat";
+                decisionBox.className = "p-4 rounded-xl border-2 transition-all duration-200 border-rose-400 shadow-lg relative overflow-hidden";
                 decisionOverlay.className = "absolute inset-0 bg-rose-900/85 transition-colors duration-300 backdrop-blur-[2px]";
                 netProfitSpan.className = "font-black text-rose-200 block text-lg mt-0";
-            }
-        }
-
-        function resetDecisionUI() {
-            decisionBox.className = "p-4 rounded-xl border transition-all duration-200 border-gray-750 relative overflow-hidden bg-cover bg-center bg-no-repeat";
-            decisionOverlay.className = "absolute inset-0 bg-gray-950/90 transition-colors duration-300";
-            estGasSpan.innerText = "$0.00";
-            netProfitSpan.innerText = "$0.00";
-            payPerKmSpan.innerText = "$0.00/KM";
-            payPerHourSpan.innerText = "$0.00/HR";
-            saveTripBtn.classList.add('hidden');
-            currentTripProfit = 0;
-        }
-
-        function renderLedger() {
-            tripList.innerHTML = '';
-            
-            if (tripLedger.length === 0) {
-                emptyLedgerMsg.classList.remove('hidden');
-            } else {
-                emptyLedgerMsg.classList.add('hidden');
-                
-                [...tripLedger].reverse().forEach((trip, index) => {
-                    const li = document.createElement('li');
-                    li.className = "flex justify-between items-center bg-gray-800 p-3 rounded-lg border border-gray-700";
-                    li.innerHTML = `
-                        <div>
-                            <span class="text-[10px] text-gray-500 font-bold uppercase block leading-none mb-1">Trip #${tripLedger.length - index} <span class="text-blue-400 ml-1 tracking-normal">• ${trip.distance || 0} KM</span></span>
-                            <span class="text-lg font-black text-emerald-400 leading-none">+$${trip.profit.toFixed(2)}</span>
-                        </div>
-                        <button onclick="deleteTrip(${trip.id})" class="text-rose-400 hover:text-white font-bold text-[10px] uppercase tracking-widest bg-gray-900 hover:bg-rose-600 px-3 py-2 rounded-md border border-gray-600 hover:border-rose-500 transition-colors">Delete</button>
-                    `;
-                    tripList.appendChild(li);
-                });
             }
         }
 
@@ -675,56 +694,33 @@
             
             let progressPercentage = (shiftTotal / dailyTarget) * 100;
             if (progressPercentage > 100) progressPercentage = 100;
-            if (progressPercentage < 0) progressPercentage = 0;
-            
             shiftProgressBar.style.width = `${progressPercentage}%`;
-            shiftProgressText.innerText = `${((shiftTotal / dailyTarget) * 100).toFixed(1)}%`;
-            
-            renderLedger();
         }
 
-        window.deleteTrip = function(id) {
-            if(confirm("Are you sure you want to delete this trip?")) {
-                tripLedger = tripLedger.filter(trip => trip.id !== id);
-                localStorage.setItem('tripLedger', JSON.stringify(tripLedger));
-                updateShiftTrackerUI();
-            }
-        };
-
-        // ==========================================
-        // 6. PUSH TO SUPABASE DATABASE
-        // ==========================================
         saveTripBtn.addEventListener('click', () => {
             if (currentTripProfit !== 0) {
-                const tripDistance = parseFloat(tripDistanceSelect.value) || 0;
-                const deadMilesMultiplier = deadMilesInput.checked ? 2 : 1;
-                const actualDistance = tripDistance * deadMilesMultiplier;
-
-                const newTrip = {
+                tripLedger.push({
                     id: Date.now(),
                     profit: parseFloat(currentTripProfit.toFixed(2)),
-                    distance: actualDistance
-                };
-                
-                tripLedger.push(newTrip);
+                    distance: parseFloat(tripDistanceSelect.value) || 0
+                });
                 localStorage.setItem('tripLedger', JSON.stringify(tripLedger));
-                
                 updateShiftTrackerUI();
-
+                
                 uberOfferSelect.value = "";
                 tripDistanceSelect.value = "";
                 tripDurationSelect.value = "";
-                deadMilesInput.checked = false;
-                
-                resetDecisionUI();
+                calculate();
             }
         });
 
+        // ==========================================
+        // 7. PUSH SHIFT TO SUPABASE CLOUD
+        // ==========================================
         exportCloudBtn.addEventListener('click', async () => {
             if (!currentUser) return;
-
             if (tripLedger.length === 0) {
-                alert("No trips to save! Add some trips to your ledger first.");
+                alert("No trips to save!");
                 return;
             }
 
@@ -738,31 +734,21 @@
 
             const { data, error } = await _supabase
                 .from('delivery_logs')
-                .insert([
-                    {
-                        user_id: currentUser.id,
-                        shift_date: new Date().toLocaleDateString(),
-                        total_trips: tripLedger.length,
-                        total_profit: shiftTotal,
-                        app_miles: shiftDistance,
-                        odo_start: startOdo,
-                        odo_end: endOdo,
-                        odo_total: odoTotal
-                    }
-                ]);
+                .insert([{
+                    user_id: currentUser.id,
+                    shift_date: new Date().toLocaleDateString(),
+                    total_trips: tripLedger.length,
+                    total_profit: shiftTotal,
+                    app_miles: shiftDistance,
+                    odo_start: startOdo,
+                    odo_end: endOdo,
+                    odo_total: odoTotal
+                }]);
 
             if (error) {
-                console.error(error);
                 alert("Error saving shift: " + error.message);
             } else {
-                alert("Shift successfully saved to your secure cloud database!");
-            }
-            
-            exportCloudBtn.innerText = "☁️ Push Shift to Cloud";
-        });
-
-        resetShiftBtn.addEventListener('click', () => {
-            if(confirm("Reset shift totals? Ensure you've pushed your data to the cloud first!")) {
+                alert("Shift successfully saved! Daily totals reset.");
                 tripLedger = [];
                 localStorage.removeItem('tripLedger');
                 startOdometerInput.value = "";
@@ -771,11 +757,12 @@
                 localStorage.removeItem('endOdometer');
                 updateShiftTrackerUI();
                 updateOdometer();
-                tripLedgerPanel.classList.add('hidden');
             }
+            
+            exportCloudBtn.innerText = "☁️ Push Shift to Cloud";
         });
 
-        [gasCostInput, dailyTargetInput, uberOfferSelect, tripDistanceSelect, tripDurationSelect, deadMilesInput].forEach(element => {
+        [gasCostInput, dailyTargetInput, uberOfferSelect, tripDistanceSelect, tripDurationSelect].forEach(element => {
             element.addEventListener('input', calculate);
         });
     </script>
