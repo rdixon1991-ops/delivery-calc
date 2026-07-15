@@ -11,8 +11,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- PDF Export Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Tesseract OCR Library for Image Scanning -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
         @media print {
             body * { visibility: hidden; }
@@ -191,15 +189,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-emerald-400 uppercase mb-2 text-center">Current Odometer (KM)</label>
-                        <input type="number" id="startOdometerInput" placeholder="Auto-fills from scan..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-emerald-500 text-center">
-                    </div>
-                    <div class="pt-2">
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Dashboard Photo Scan</label>
-                        <label class="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg border border-blue-400 cursor-pointer transition-colors shadow-lg shadow-blue-900/40">
-                            <span class="mr-2 text-xl">📷</span> Tap to Scan Dashboard
-                            <input type="file" id="startOdoImage" accept="image/*" capture="environment" class="hidden">
-                        </label>
-                        <p id="startOdoOcrStatus" class="hidden"></p>
+                        <input type="number" id="startOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-emerald-500 text-center">
                     </div>
                     <button id="confirmStartShiftBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-emerald-900/40">🚀 Begin Shift</button>
                     <p id="startShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
@@ -220,15 +210,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-rose-400 uppercase mb-2 text-center">Final Odometer (KM)</label>
-                        <input type="number" id="endOdometerInput" placeholder="Auto-fills from scan..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-rose-500 text-center">
-                    </div>
-                    <div class="pt-2">
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Final Photo Scan</label>
-                        <label class="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg border border-blue-400 cursor-pointer transition-colors shadow-lg shadow-blue-900/40">
-                            <span class="mr-2 text-xl">📷</span> Tap to Scan Dashboard
-                            <input type="file" id="endOdoImage" accept="image/*" capture="environment" class="hidden">
-                        </label>
-                        <p id="endOdoOcrStatus" class="hidden"></p>
+                        <input type="number" id="endOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-rose-500 text-center">
                     </div>
                     <button id="confirmEndShiftBtn" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-rose-900/40">☁️ Sync to Cloud</button>
                     <p id="endShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
@@ -416,15 +398,11 @@
 
         const startShiftModal = document.getElementById('startShiftModal');
         const startOdometerInput = document.getElementById('startOdometerInput');
-        const startOdoImage = document.getElementById('startOdoImage');
-        const startOdoOcrStatus = document.getElementById('startOdoOcrStatus');
         const confirmStartShiftBtn = document.getElementById('confirmStartShiftBtn');
         const startShiftMessage = document.getElementById('startShiftMessage');
 
         const endShiftModal = document.getElementById('endShiftModal');
         const endOdometerInput = document.getElementById('endOdometerInput');
-        const endOdoImage = document.getElementById('endOdoImage');
-        const endOdoOcrStatus = document.getElementById('endOdoOcrStatus');
         const confirmEndShiftBtn = document.getElementById('confirmEndShiftBtn');
         const endShiftMessage = document.getElementById('endShiftMessage');
         const closeEndShiftBtn = document.getElementById('closeEndShiftBtn');
@@ -537,40 +515,7 @@
         checkUser();
 
         // ==========================================
-        // 4. OCR IMAGE SCANNING LOGIC (Glare-Optimized)
-        // ==========================================
-        async function scanOdometerImage(file, inputElement, statusElement) {
-            statusElement.innerText = "🔍 Scanning image for numbers...";
-            statusElement.className = "text-[10px] text-blue-400 text-center mt-2 font-bold block animate-pulse";
-            statusElement.classList.remove('hidden');
-
-            try {
-                // Strict whitelist logic targeting numerical strings only
-                const result = await Tesseract.recognize(file, 'eng', {
-                    tessedit_char_whitelist: '0123456789'
-                });
-                const text = result.data.text;
-                const numbers = text.match(/\d+/g);
-                
-                if (numbers && numbers.length > 0) {
-                    let bestGuess = numbers.reduce((a, b) => a.length > b.length ? a : b);
-                    inputElement.value = parseFloat(bestGuess);
-                    
-                    statusElement.innerText = "✅ Number detected and filled!";
-                    statusElement.className = "text-[10px] text-emerald-400 text-center mt-2 font-bold block";
-                } else {
-                    statusElement.innerText = "⚠️ Scanner struggled. Feel free to type it in.";
-                    statusElement.className = "text-[10px] text-amber-400 text-center mt-2 font-bold block";
-                }
-            } catch (err) {
-                console.error(err);
-                statusElement.innerText = "❌ Scan failed. Please enter manually.";
-                statusElement.className = "text-[10px] text-rose-400 text-center mt-2 font-bold block";
-            }
-        }
-
-        // ==========================================
-        // 5. SHIFT GATE LOGIC (START & AUTO-END)
+        // 4. SHIFT GATE LOGIC (START & AUTO-END)
         // ==========================================
         async function checkActiveShift() {
             const shiftStartTime = localStorage.getItem('shiftStartTime');
@@ -589,15 +534,8 @@
             }
         }
 
-        startOdoImage.addEventListener('change', (e) => { 
-            if (e.target.files.length > 0) {
-                scanOdometerImage(e.target.files[0], startOdometerInput, startOdoOcrStatus);
-            } 
-        });
-
         confirmStartShiftBtn.addEventListener('click', async () => {
             const odo = parseFloat(startOdometerInput.value);
-            const file = startOdoImage.files[0];
 
             if (!odo || odo <= 0) {
                 startShiftMessage.innerText = "Please enter your starting kilometers.";
@@ -607,17 +545,8 @@
             confirmStartShiftBtn.innerText = "⏳ Starting Shift...";
             confirmStartShiftBtn.disabled = true;
 
-            let photoUrl = null;
-            if (file) {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${currentUser.id}-START-${Date.now()}.${fileExt}`;
-                const { error } = await _supabase.storage.from('odometers').upload(fileName, file);
-                if (!error) photoUrl = _supabase.storage.from('odometers').getPublicUrl(fileName).data.publicUrl;
-            }
-
             localStorage.setItem('shiftStartTime', Date.now());
             localStorage.setItem('shiftStartOdo', odo);
-            if (photoUrl) localStorage.setItem('shiftStartUrl', photoUrl);
             
             tripLedger = []; 
             localStorage.removeItem('tripLedger');
@@ -628,30 +557,22 @@
             
             confirmStartShiftBtn.innerText = "🚀 Begin Shift";
             confirmStartShiftBtn.disabled = false;
+            startOdometerInput.value = "";
         });
 
         // ==========================================
-        // 6. MANUAL END SHIFT LOGIC (No Logout Loop)
+        // 5. MANUAL END SHIFT LOGIC (No Logout Loop)
         // ==========================================
         triggerEndShiftBtn.addEventListener('click', () => {
             endShiftModal.classList.remove('hidden');
             endOdometerInput.value = ""; 
-            endOdoImage.value = ""; 
-            endOdoOcrStatus.classList.add('hidden');
         });
 
         closeEndShiftBtn.addEventListener('click', () => endShiftModal.classList.add('hidden'));
         
-        endOdoImage.addEventListener('change', (e) => { 
-            if (e.target.files.length > 0) {
-                scanOdometerImage(e.target.files[0], endOdometerInput, endOdoOcrStatus);
-            } 
-        });
-
         confirmEndShiftBtn.addEventListener('click', async () => {
             const endOdo = parseFloat(endOdometerInput.value);
             const startOdo = parseFloat(localStorage.getItem('shiftStartOdo')) || 0;
-            const file = endOdoImage.files[0];
 
             if (!endOdo || endOdo <= startOdo) {
                 endShiftMessage.innerText = "End Odometer must be higher than Start Odometer.";
@@ -661,15 +582,7 @@
             confirmEndShiftBtn.innerText = "⏳ Pushing to Cloud...";
             confirmEndShiftBtn.disabled = true;
 
-            let endUrl = null;
-            if (file) {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${currentUser.id}-END-${Date.now()}.${fileExt}`;
-                const { error } = await _supabase.storage.from('odometers').upload(fileName, file);
-                if (!error) endUrl = _supabase.storage.from('odometers').getPublicUrl(fileName).data.publicUrl;
-            }
-
-            await pushShiftToCloud(startOdo, endOdo, localStorage.getItem('shiftStartUrl'), endUrl);
+            await pushShiftToCloud(startOdo, endOdo);
 
             endShiftModal.classList.add('hidden');
             confirmEndShiftBtn.innerText = "☁️ Sync to Cloud";
@@ -677,7 +590,7 @@
         });
 
         // ==========================================
-        // 7. AUTO END SHIFT LOGIC (8 HOURS)
+        // 6. AUTO END SHIFT LOGIC (8 HOURS)
         // ==========================================
         async function autoCloseShift() {
             alert("⏰ 8 Hours have passed. Your shift has been automatically closed using calculated distances.");
@@ -686,10 +599,10 @@
             const shiftDistance = tripLedger.reduce((sum, trip) => sum + (trip.distance || 0), 0);
             const calculatedEndOdo = startOdo + shiftDistance;
 
-            await pushShiftToCloud(startOdo, calculatedEndOdo, localStorage.getItem('shiftStartUrl'), null);
+            await pushShiftToCloud(startOdo, calculatedEndOdo);
         }
 
-        async function pushShiftToCloud(startOdo, endOdo, startUrl, endUrl) {
+        async function pushShiftToCloud(startOdo, endOdo) {
             const shiftTotal = tripLedger.reduce((sum, trip) => sum + trip.profit, 0);
             const shiftDistance = tripLedger.reduce((sum, trip) => sum + (trip.distance || 0), 0);
             const odoTotal = endOdo > startOdo ? (endOdo - startOdo) : 0;
@@ -699,7 +612,7 @@
                 user_id: currentUser.id, shift_date: shiftDate,
                 total_trips: tripLedger.length, total_profit: shiftTotal, app_miles: shiftDistance,
                 odo_start: startOdo, odo_end: endOdo, odo_total: odoTotal,
-                odo_start_url: startUrl || null, odo_end_url: endUrl || null
+                odo_start_url: null, odo_end_url: null
             }]);
 
             if (error) {
@@ -711,12 +624,10 @@
                 tripLedger = []; localStorage.removeItem('tripLedger');
                 localStorage.removeItem('shiftStartTime');
                 localStorage.removeItem('shiftStartOdo');
-                localStorage.removeItem('shiftStartUrl');
                 
                 // Update workspace UI without triggering login gates
                 updateShiftTrackerUI();
                 startOdometerInput.value = "";
-                startOdoOcrStatus.classList.add('hidden');
                 
                 // Prompt user to immediately verify or create a clean entry parameters window
                 startShiftModal.classList.remove('hidden'); 
@@ -724,7 +635,7 @@
         }
 
         // ==========================================
-        // 8. EXPENSE SCANNER LOGIC
+        // 7. EXPENSE SCANNER LOGIC
         // ==========================================
         openExpenseScannerBtn.addEventListener('click', () => {
             expenseModal.classList.remove('hidden');
@@ -774,7 +685,7 @@
         });
 
         // ==========================================
-        // 9. TAX DASHBOARD & SPREADSHEET LOGIC
+        // 8. TAX DASHBOARD & SPREADSHEET LOGIC
         // ==========================================
         async function fetchCloudData() {
             document.getElementById('shiftLedgerContainer').innerHTML = '<p class="text-center text-xs font-bold text-gray-500 my-4">⏳ Fetching cloud data...</p>';
@@ -784,7 +695,7 @@
 
             if (shiftError || expError) {
                 const msg = shiftError ? shiftError.message : expError.message;
-                document.getElementById('shiftLedgerContainer').innerHTML = `<p class="text-rose-400 text-center text-xs font-bold my-4">Cloud Sync Error: ${msg}</p>';
+                document.getElementById('shiftLedgerContainer').innerHTML = `<p class="text-rose-400 text-center text-xs font-bold my-4">Cloud Sync Error: ${msg}</p>`;
                 return;
             }
 
@@ -868,7 +779,7 @@
                     const net = gross - shiftDeduct;
 
                     const startProof = shift.odo_start_url ? `<a href="${shift.odo_start_url}" target="_blank" class="text-blue-400 hover:underline">Start</a>` : `<span class="text-gray-600">N/A</span>`;
-                    const endProof = shift.odo_end_url ? `<a href="${shift.odo_end_url}" target="_blank" class="text-blue-400 hover:underline">End</a>` : `<span class="text-gray-600">Auto</span>`;
+                    const endProof = shift.odo_end_url ? `<a href="${shift.odo_end_url}" target="_blank" class="text-blue-400 hover:underline">End</a>` : `<span class="text-gray-600">Manual</span>`;
 
                     shiftTableHTML += `
                         <tr class="hover:bg-gray-800 transition-colors">
@@ -1006,7 +917,7 @@
         });
 
         // ==========================================
-        // 10. CALCULATOR & TIME PROFILE LOGIC
+        // 9. CALCULATOR & TIME PROFILE LOGIC
         // ==========================================
         function determineTimeProfile() {
             const now = new Date();
