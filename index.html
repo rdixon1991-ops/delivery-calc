@@ -52,7 +52,6 @@
             <!-- Hidden Input Panel -->
             <div id="inputSettingsPanel" class="hidden bg-gray-900 p-5 rounded-xl border border-gray-700 space-y-4 mt-2 shadow-inner">
                 
-                <!-- The 3 Core Filters -->
                 <div class="space-y-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
                     <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest mb-2 border-b border-gray-700 pb-1">My Minimum Goals</h3>
                     
@@ -76,7 +75,6 @@
                     </button>
                 </div>
 
-                <!-- Secondary Goals -->
                 <div class="grid grid-cols-2 gap-3 mt-3">
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Daily Target ($)</label>
@@ -94,7 +92,6 @@
 
         <!-- 4. DROP-DOWN INPUTS -->
         <div class="space-y-4">
-            <!-- Uber Offer Dropdown -->
             <div>
                 <label class="block text-sm font-semibold text-gray-300 mb-2">Uber Offer ($)</label>
                 <select id="uberOffer" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
@@ -103,15 +100,12 @@
             </div>
 
             <div class="grid grid-cols-2 gap-3">
-                <!-- Trip Distance Dropdown -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Distance (KM)</label>
                     <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
                         <option value="">KM</option>
                     </select>
                 </div>
-
-                <!-- Trip Duration Dropdown -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Time (Mins)</label>
                     <select id="tripDuration" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
@@ -120,7 +114,6 @@
                 </div>
             </div>
 
-            <!-- Dead Miles Toggle -->
             <div class="flex items-center justify-between bg-gray-800 p-4 rounded-xl border border-gray-700 mt-2">
                 <span class="text-sm font-bold text-gray-300">Requires empty return trip?</span>
                 <label class="relative inline-flex items-center cursor-pointer">
@@ -130,7 +123,7 @@
             </div>
         </div>
 
-        <!-- 5. SHIFT TRACKER CARD -->
+        <!-- 5. SHIFT TRACKER CARD WITH LEDGER -->
         <div class="bg-gray-900 rounded-xl border-2 border-gray-700 p-5 mt-6 shadow-lg">
             <div class="flex justify-between items-end mb-3">
                 <div>
@@ -143,7 +136,6 @@
                 </div>
             </div>
             
-            <!-- Progress Bar -->
             <div class="w-full bg-gray-800 rounded-full h-3 mb-2 border border-gray-700">
                 <div id="shiftProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
@@ -152,34 +144,37 @@
                 <span id="shiftProgressText">0%</span>
             </div>
 
-            <!-- Shift Actions Group -->
             <div class="grid grid-cols-2 gap-3 mt-4">
-                <button id="undoLastBtn" class="bg-gray-800 hover:bg-amber-900/40 text-gray-400 hover:text-amber-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest disabled:opacity-45 disabled:pointer-events-none" disabled>
-                    ↰ Undo Last
+                <button id="toggleLedgerBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
+                    📋 Trip Ledger
                 </button>
                 <button id="resetShiftBtn" class="bg-gray-800 hover:bg-rose-900/50 text-gray-400 hover:text-rose-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
                     Reset Shift
                 </button>
+            </div>
+
+            <!-- Expandable Trip Ledger List -->
+            <div id="tripLedgerPanel" class="hidden mt-4 pt-4 border-t border-gray-700 space-y-2 max-h-48 overflow-y-auto pr-1">
+                <div id="emptyLedgerMsg" class="text-center text-gray-500 text-xs italic">No trips saved yet.</div>
+                <ul id="tripList" class="space-y-2"></ul>
             </div>
         </div>
 
     </div>
 
     <script>
-        // DOM Elements - Inputs
+        // DOM Elements
         const minTripProfitInput = document.getElementById('minTripProfit');
         const targetPayInput = document.getElementById('targetPay');
         const targetHourlyInput = document.getElementById('targetHourly');
         const dailyTargetInput = document.getElementById('dailyTarget');
         const gasCostInput = document.getElementById('gasCost');
         
-        // DOM Elements - Trip Data
         const uberOfferSelect = document.getElementById('uberOffer');
         const tripDistanceSelect = document.getElementById('tripDistance');
         const tripDurationSelect = document.getElementById('tripDuration');
         const deadMilesInput = document.getElementById('deadMiles');
         
-        // DOM Elements - UI Controls
         const toggleInputBtn = document.getElementById('toggleInputBtn');
         const inputSettingsPanel = document.getElementById('inputSettingsPanel');
         const toggleIcon = document.getElementById('toggleIcon');
@@ -187,7 +182,6 @@
         const saveManualTargetsBtn = document.getElementById('saveManualTargetsBtn');
         const shiftProfileName = document.getElementById('shiftProfileName');
 
-        // DOM Elements - Outputs
         const decisionBox = document.getElementById('decisionBox');
         const decisionText = document.getElementById('decisionText');
         const decisionLabel = document.getElementById('decisionLabel');
@@ -196,23 +190,23 @@
         const payPerKmSpan = document.getElementById('payPerKm');
         const payPerHourSpan = document.getElementById('payPerHour');
         
-        // DOM Elements - Tracker
         const saveTripBtn = document.getElementById('saveTripBtn');
-        const undoLastBtn = document.getElementById('undoLastBtn');
+        const toggleLedgerBtn = document.getElementById('toggleLedgerBtn');
         const resetShiftBtn = document.getElementById('resetShiftBtn');
         const shiftTotalDisplay = document.getElementById('shiftTotalDisplay');
         const shiftCountDisplay = document.getElementById('shiftCountDisplay');
         const shiftProgressBar = document.getElementById('shiftProgressBar');
         const shiftProgressText = document.getElementById('shiftProgressText');
+        const tripLedgerPanel = document.getElementById('tripLedgerPanel');
+        const tripList = document.getElementById('tripList');
+        const emptyLedgerMsg = document.getElementById('emptyLedgerMsg');
 
         // State Variables
-        let shiftTotal = parseFloat(localStorage.getItem('shiftTotal')) || 0;
-        let shiftCount = parseInt(localStorage.getItem('shiftCount')) || 0;
         let currentTripProfit = 0; 
         let manualOverride = localStorage.getItem('manualOverride') === 'true';
         
-        // Load trip history array from local storage to allow step-by-step Undos
-        let tripHistory = JSON.parse(localStorage.getItem('tripHistory')) || [];
+        // Ledger acts as the single source of truth. Contains objects: { id: timestamp, profit: value }
+        let tripLedger = JSON.parse(localStorage.getItem('tripLedger')) || [];
 
         // --- TIME OF DAY LOGIC ---
         function determineTimeProfile() {
@@ -224,14 +218,11 @@
 
             if ((day === 5 || day === 6) && (hour >= 17 && hour < 21)) {
                 profile = { name: "Peak Dinner Rush", min: 6, km: 1.50, hr: 24 };
-            }
-            else if ((day === 5 || day === 6) && (hour >= 22 || hour < 2)) {
+            } else if ((day === 5 || day === 6) && (hour >= 22 || hour < 2)) {
                 profile = { name: "Late Night Rush", min: 5, km: 1.20, hr: 22 };
-            }
-            else if ((hour >= 11 && hour < 14) || (hour >= 17 && hour < 21)) {
+            } else if ((hour >= 11 && hour < 14) || (hour >= 17 && hour < 21)) {
                 profile = { name: "Standard Rush", min: 5, km: 1.20, hr: 20 };
             }
-
             return profile;
         }
 
@@ -276,6 +267,10 @@
         toggleInputBtn.addEventListener('click', () => {
             inputSettingsPanel.classList.toggle('hidden');
             toggleIcon.innerText = inputSettingsPanel.classList.contains('hidden') ? '▼' : '▲';
+        });
+
+        toggleLedgerBtn.addEventListener('click', () => {
+            tripLedgerPanel.classList.toggle('hidden');
         });
 
         resetOptimumBtn.addEventListener('click', () => {
@@ -369,8 +364,36 @@
             currentTripProfit = 0;
         }
 
+        function renderLedger() {
+            tripList.innerHTML = '';
+            
+            if (tripLedger.length === 0) {
+                emptyLedgerMsg.classList.remove('hidden');
+            } else {
+                emptyLedgerMsg.classList.add('hidden');
+                
+                // Show newest trips at the top of the list
+                [...tripLedger].reverse().forEach((trip, index) => {
+                    const li = document.createElement('li');
+                    li.className = "flex justify-between items-center bg-gray-800 p-3 rounded-lg border border-gray-700";
+                    li.innerHTML = `
+                        <div>
+                            <span class="text-[10px] text-gray-500 font-bold uppercase block leading-none mb-1">Trip #${tripLedger.length - index}</span>
+                            <span class="text-lg font-black text-emerald-400 leading-none">+$${trip.profit.toFixed(2)}</span>
+                        </div>
+                        <button onclick="deleteTrip(${trip.id})" class="text-rose-400 hover:text-white font-bold text-[10px] uppercase tracking-widest bg-gray-900 hover:bg-rose-600 px-3 py-2 rounded-md border border-gray-600 hover:border-rose-500 transition-colors">Delete</button>
+                    `;
+                    tripList.appendChild(li);
+                });
+            }
+        }
+
         function updateShiftTrackerUI() {
+            // Calculate totals strictly from the ledger
+            const shiftTotal = tripLedger.reduce((sum, trip) => sum + trip.profit, 0);
+            const shiftCount = tripLedger.length;
             const dailyTarget = parseFloat(dailyTargetInput.value) || 1; 
+            
             shiftTotalDisplay.innerText = `$${shiftTotal.toFixed(2)}`;
             shiftCountDisplay.innerText = shiftCount;
             
@@ -380,23 +403,30 @@
             
             shiftProgressBar.style.width = `${progressPercentage}%`;
             shiftProgressText.innerText = `${((shiftTotal / dailyTarget) * 100).toFixed(1)}%`;
-
-            // Enable/Disable undo button based on whether there is history to reverse
-            undoLastBtn.disabled = (tripHistory.length === 0);
+            
+            renderLedger();
         }
+
+        // Action: Delete Specific Trip (Called from HTML button)
+        window.deleteTrip = function(id) {
+            if(confirm("Are you sure you want to delete this trip?")) {
+                tripLedger = tripLedger.filter(trip => trip.id !== id);
+                localStorage.setItem('tripLedger', JSON.stringify(tripLedger));
+                updateShiftTrackerUI();
+            }
+        };
 
         // --- TRACKER ACTIONS ---
         saveTripBtn.addEventListener('click', () => {
             if (currentTripProfit !== 0) {
-                shiftTotal += currentTripProfit;
-                shiftCount += 1;
+                // Save trip as an object with a unique timestamp ID
+                const newTrip = {
+                    id: Date.now(),
+                    profit: parseFloat(currentTripProfit.toFixed(2))
+                };
                 
-                // Add exact profit to memory queue
-                tripHistory.push(parseFloat(currentTripProfit.toFixed(2)));
-                
-                localStorage.setItem('shiftTotal', shiftTotal);
-                localStorage.setItem('shiftCount', shiftCount);
-                localStorage.setItem('tripHistory', JSON.stringify(tripHistory));
+                tripLedger.push(newTrip);
+                localStorage.setItem('tripLedger', JSON.stringify(tripLedger));
                 
                 updateShiftTrackerUI();
 
@@ -409,40 +439,16 @@
             }
         });
 
-        // Action: Undo Last Saved Trip
-        undoLastBtn.addEventListener('click', () => {
-            if (tripHistory.length > 0) {
-                // Get the last trip profit
-                const lastTripProfit = tripHistory.pop();
-                
-                // Subtract values
-                shiftTotal = Math.max(0, shiftTotal - lastTripProfit);
-                shiftCount = Math.max(0, shiftCount - 1);
-                
-                // Save updated state
-                localStorage.setItem('shiftTotal', shiftTotal);
-                localStorage.setItem('shiftCount', shiftCount);
-                localStorage.setItem('tripHistory', JSON.stringify(tripHistory));
-                
-                updateShiftTrackerUI();
-                alert(`Removed last trip worth $${lastTripProfit.toFixed(2)} from your shift total.`);
-            }
-        });
-
-        // Action: Reset Shift
         resetShiftBtn.addEventListener('click', () => {
             if(confirm("Reset shift totals? Ensure you've logged this in your spreadsheet!")) {
-                shiftTotal = 0;
-                shiftCount = 0;
-                tripHistory = [];
-                localStorage.removeItem('shiftTotal');
-                localStorage.removeItem('shiftCount');
-                localStorage.removeItem('tripHistory');
+                tripLedger = [];
+                localStorage.removeItem('tripLedger');
                 updateShiftTrackerUI();
+                tripLedgerPanel.classList.add('hidden');
             }
         });
 
-        // Trigger calculation on any change
+        // Trigger calculation on any input change
         [gasCostInput, dailyTargetInput, uberOfferSelect, tripDistanceSelect, tripDurationSelect, deadMilesInput].forEach(element => {
             element.addEventListener('input', calculate);
         });
