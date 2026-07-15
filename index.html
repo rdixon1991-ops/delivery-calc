@@ -328,30 +328,28 @@ const loginForm = document.getElementById('loginForm');
             }
         }
 
-   // Change this line back to 'click'
-loginBtn.addEventListener('click', async () => {
-    // ... keep the rest of your sign-in code exactly as it is ...
+  // Change this line back to 'click'
+loginBtn.addEventListener('click', async (e) => {
+    e.preventDefault(); // Prevents the page from reloading
+    
+    authMessage.innerText = "Logging in...";
+    authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
+    
+    const { data, error } = await _supabase.auth.signInWithPassword({
+        email: emailInput.value,
+        password: passwordInput.value,
+    });
+    
+    if (error) {
+        authMessage.innerText = error.message;
+        authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
+    } else {
+        authMessage.innerText = "";
+        emailInput.value = "";
+        passwordInput.value = "";
+        checkUser();
+    }
 });
-            e.preventDefault(); // Prevents the page from reloading
-            
-            authMessage.innerText = "Logging in...";
-            authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
-            
-            const { data, error } = await _supabase.auth.signInWithPassword({
-                email: emailInput.value,
-                password: passwordInput.value,
-            });
-            
-            if (error) {
-                authMessage.innerText = error.message;
-                authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
-            } else {
-                authMessage.innerText = "";
-                emailInput.value = "";
-                passwordInput.value = "";
-                checkUser();
-            }
-        });
 
         signupBtn.addEventListener('click', async () => {
             authMessage.innerText = "Creating account...";
