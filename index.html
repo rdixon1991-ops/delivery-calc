@@ -9,6 +9,15 @@
     <meta name="apple-mobile-web-app-title" content="Delivery Calc">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #historyModal, #historyModal * { visibility: visible; }
+            #historyModal { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #111827; }
+            .hide-on-print { display: none !important; }
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4 pb-10 font-sans relative">
 
@@ -87,7 +96,6 @@
                             <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
                         </div>
                     </div>
-                    <!-- TAX DEDUCTION SETTING -->
                     <div class="pt-3 border-t border-gray-700">
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Tax Deduction Rate ($/KM)</label>
                         <input type="number" id="taxDeductRate" step="0.01" value="0.70" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
@@ -166,7 +174,6 @@
                     <h2 class="text-xl font-black text-amber-400 uppercase tracking-widest">Log Expense</h2>
                     <button id="closeExpenseBtn" class="text-gray-400 hover:text-white font-bold text-xl">&times;</button>
                 </div>
-                
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Category</label>
@@ -185,7 +192,7 @@
                     <div class="pt-2">
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Receipt Scan</label>
                         <label class="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg cursor-pointer transition-colors shadow-lg shadow-blue-900/30">
-                            <span class="mr-2 text-xl">📷</span> Tap to Scan Receipt
+                            <span class="mr-2 text-xl">📷</span> Tap to Scan
                             <input type="file" id="receiptImage" accept="image/*" capture="environment" class="hidden">
                         </label>
                         <p id="receiptFileName" class="text-[10px] text-emerald-400 text-center mt-2 font-bold hidden">Receipt Attached!</p>
@@ -199,8 +206,8 @@
         <!-- ========================================== -->
         <!-- 4. TAX & SPREADSHEET DASHBOARD             -->
         <!-- ========================================== -->
-        <div id="historyModal" class="hidden absolute inset-0 bg-gray-900 z-50 p-4 flex flex-col h-full w-full">
-            <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-700 flex-wrap gap-2">
+        <div id="historyModal" class="hidden absolute inset-0 bg-gray-900 z-50 p-4 flex flex-col h-full w-full overflow-hidden">
+            <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-700 flex-wrap gap-2 shrink-0 hide-on-print">
                 <h2 class="text-xl font-black text-emerald-400 uppercase tracking-widest">Tax Dashboard</h2>
                 <div class="flex space-x-2">
                     <select id="taxTimeFilter" class="bg-gray-800 border border-gray-600 text-white text-xs font-bold rounded-lg px-2 py-2 outline-none focus:border-emerald-500">
@@ -210,32 +217,40 @@
                         <option value="month">This Month</option>
                         <option value="year">This Year</option>
                     </select>
+                    <button id="downloadPdfBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-lg border border-blue-500 transition-colors text-xs uppercase">📥 PDF</button>
+                    <button id="printBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-lg border border-blue-500 transition-colors text-xs uppercase">🖨️ Print</button>
                     <button id="closeHistoryBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-2 px-3 rounded-lg border border-gray-600 transition-colors text-xs uppercase">Close</button>
                 </div>
             </div>
             
-            <div class="bg-gray-850 p-4 rounded-xl border border-emerald-900/50 shadow-lg shadow-emerald-900/10 mb-4 shrink-0">
-                <h3 class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center mb-2">Cloud Summary <span id="summaryTimeframeLabel" class="text-emerald-400"></span></h3>
-                <div class="grid grid-cols-2 gap-4 border-b border-gray-700 pb-3 mb-3">
-                    <div class="text-center border-r border-gray-700 pr-2">
-                        <span class="block text-[10px] text-gray-400 uppercase">Gross Profit</span>
-                        <span id="dashGross" class="text-lg font-black text-white">$0.00</span>
+            <div id="printableArea" class="flex-1 overflow-y-auto space-y-4 pb-10 bg-gray-900 px-2 rounded-xl">
+                <div class="bg-gray-850 p-4 rounded-xl border border-emerald-900/50 shadow-lg shadow-emerald-900/10 shrink-0 mt-2">
+                    <h3 class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center mb-2">Cloud Summary <span id="summaryTimeframeLabel" class="text-emerald-400"></span></h3>
+                    <div class="grid grid-cols-2 gap-4 border-b border-gray-700 pb-3 mb-3">
+                        <div class="text-center border-r border-gray-700 pr-2">
+                            <span class="block text-[10px] text-gray-400 uppercase">Gross Profit</span>
+                            <span id="dashGross" class="text-lg font-black text-white">$0.00</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-[10px] text-gray-400 uppercase">Total Deductions</span>
+                            <span id="dashDeductions" class="text-lg font-black text-rose-400">-$0.00</span>
+                        </div>
                     </div>
                     <div class="text-center">
-                        <span class="block text-[10px] text-gray-400 uppercase">Total Deductions</span>
-                        <span id="dashDeductions" class="text-lg font-black text-rose-400">-$0.00</span>
+                        <span class="block text-[10px] text-gray-400 uppercase tracking-widest mb-1">True Net Taxable Income</span>
+                        <span id="dashNet" class="text-3xl font-black text-emerald-400">$0.00</span>
                     </div>
                 </div>
-                <div class="text-center">
-                    <span class="block text-[10px] text-gray-400 uppercase tracking-widest mb-1">True Net Taxable Income</span>
-                    <span id="dashNet" class="text-3xl font-black text-emerald-400">$0.00</span>
-                </div>
-            </div>
 
-            <!-- SPREADSHEET TABLE -->
-            <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 shrink-0">Spreadsheet Ledger</h3>
-            <div id="historyList" class="flex-1 overflow-x-auto overflow-y-auto pb-10 border border-gray-700 rounded-lg bg-gray-850">
-                <!-- Fetched spreadsheet rows will appear here -->
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest shrink-0">Shift Ledger</h3>
+                <div id="shiftLedgerContainer" class="overflow-x-auto border border-gray-700 rounded-lg bg-gray-850">
+                    <!-- Shift Spreadsheet Here -->
+                </div>
+
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest shrink-0 mt-6">Expense Ledger</h3>
+                <div id="expenseLedgerContainer" class="overflow-x-auto border border-gray-700 rounded-lg bg-gray-850 mb-6">
+                    <!-- Expense Spreadsheet Here -->
+                </div>
             </div>
         </div>
 
@@ -339,12 +354,13 @@
         const viewHistoryBtn = document.getElementById('viewHistoryBtn');
         const historyModal = document.getElementById('historyModal');
         const closeHistoryBtn = document.getElementById('closeHistoryBtn');
-        const historyList = document.getElementById('historyList');
         const taxTimeFilter = document.getElementById('taxTimeFilter');
         const summaryTimeframeLabel = document.getElementById('summaryTimeframeLabel');
         const dashGross = document.getElementById('dashGross');
         const dashDeductions = document.getElementById('dashDeductions');
         const dashNet = document.getElementById('dashNet');
+        const printBtn = document.getElementById('printBtn');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
         const openExpenseScannerBtn = document.getElementById('openExpenseScannerBtn');
         const expenseModal = document.getElementById('expenseModal');
@@ -484,14 +500,14 @@
         // 5. TAX DASHBOARD & SPREADSHEET LOGIC
         // ==========================================
         async function fetchCloudData() {
-            historyList.innerHTML = '<p class="text-center text-xs font-bold text-gray-500 mt-10">⏳ Fetching cloud data...</p>';
+            document.getElementById('shiftLedgerContainer').innerHTML = '<p class="text-center text-xs font-bold text-gray-500 my-4">⏳ Fetching cloud data...</p>';
             
             const { data: shifts, error: shiftError } = await _supabase.from('delivery_logs').select('*').eq('user_id', currentUser.id).order('id', { ascending: false }); 
-            const { data: expenses, error: expError } = await _supabase.from('other_deductions').select('*').eq('user_id', currentUser.id);
+            const { data: expenses, error: expError } = await _supabase.from('other_deductions').select('*').eq('user_id', currentUser.id).order('id', { ascending: false });
 
             if (shiftError || expError) {
                 const msg = shiftError ? shiftError.message : expError.message;
-                historyList.innerHTML = `<p class="text-rose-400 text-center text-xs font-bold mt-10">Cloud Sync Error: ${msg}</p>`;
+                document.getElementById('shiftLedgerContainer').innerHTML = `<p class="text-rose-400 text-center text-xs font-bold my-4">Cloud Sync Error: ${msg}</p>`;
                 return;
             }
 
@@ -506,7 +522,6 @@
             const deductRate = parseFloat(taxDeductRateInput.value) || 0.70;
             const now = new Date();
 
-            // Filter Logic
             const filteredShifts = globalShifts.filter(s => {
                 if (filterVal === 'all') return true;
                 const sDate = new Date(s.shift_date);
@@ -533,7 +548,6 @@
                 return true;
             });
 
-            // Calculate Summaries
             let totalGross = 0; let totalVehicleDeduction = 0; let totalOtherDeductions = 0;
             
             filteredShifts.forEach(shift => {
@@ -548,109 +562,160 @@
             dashDeductions.innerText = `-$${grandTotalDeductions.toFixed(2)}`;
             dashNet.innerText = `$${(totalGross - grandTotalDeductions).toFixed(2)}`;
 
-            if (filteredShifts.length === 0) {
-                historyList.innerHTML = '<p class="text-center text-xs text-gray-500 italic mt-10 p-4">No completed shifts for this timeframe.</p>';
-                return;
-            }
-
-            let tableHTML = `
+            // Build Shift Ledger
+            let shiftTableHTML = `
             <table class="w-full text-left text-[11px] whitespace-nowrap min-w-max">
-                <thead class="bg-gray-900 sticky top-0 border-b-2 border-gray-700">
+                <thead class="bg-gray-900 border-b-2 border-gray-700">
                     <tr class="text-gray-300">
                         <th class="py-3 px-3 font-bold border-r border-gray-700">Date</th>
-                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Total Trips</th>
-                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Total Profit ($)</th>
-                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">App Distance (KM)</th>
-                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odometer Start</th>
-                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odometer End</th>
-                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odometer Driven (KM)</th>
-                        <th class="py-3 px-3 font-bold text-center">Actions</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Trips</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Gross ($)</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Net ($)</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">App Dist (KM)</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odo Start</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odo End</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odo Driven (KM)</th>
+                        <th class="py-3 px-3 font-bold text-center hide-on-print">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-700">
             `;
 
-            filteredShifts.forEach(shift => {
-                tableHTML += `
-                    <tr class="hover:bg-gray-800 transition-colors">
-                        <td class="py-3 px-3 border-r border-gray-700/50">${shift.shift_date}</td>
-                        <td class="py-3 px-3 text-center font-bold border-r border-gray-700/50">${shift.total_trips || 0}</td>
-                        <td class="py-3 px-3 text-center font-bold text-emerald-400 border-r border-gray-700/50">$${(shift.total_profit || 0).toFixed(2)}</td>
-                        <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.app_miles || 0}</td>
-                        <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_start || 0}</td>
-                        <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_end || 0}</td>
-                        <td class="py-3 px-3 text-center font-bold text-amber-400 border-r border-gray-700/50">${shift.odo_total || 0}</td>
-                        <td class="py-3 px-3 text-center space-x-3">
-                            <button onclick="openEditShift(${shift.id}, ${shift.total_profit || 0}, ${shift.app_miles || 0}, ${shift.total_trips || 0}, ${shift.odo_start || 0}, ${shift.odo_end || 0})" class="text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest text-[9px]">Edit</button>
-                            <button onclick="deleteCloudShift(${shift.id})" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
+            if (filteredShifts.length === 0) {
+                shiftTableHTML += `<tr><td colspan="9" class="py-4 text-center text-xs text-gray-500 italic">No shifts found for this timeframe.</td></tr>`;
+            } else {
+                filteredShifts.forEach(shift => {
+                    const gross = shift.total_profit || 0;
+                    const odoTotal = shift.odo_total || 0;
+                    const shiftDeduct = odoTotal * deductRate;
+                    const net = gross - shiftDeduct;
 
-            tableHTML += `</tbody></table>`;
-            historyList.innerHTML = tableHTML;
+                    shiftTableHTML += `
+                        <tr class="hover:bg-gray-800 transition-colors">
+                            <td class="py-3 px-3 border-r border-gray-700/50">${shift.shift_date}</td>
+                            <td class="py-3 px-3 text-center font-bold border-r border-gray-700/50">${shift.total_trips || 0}</td>
+                            <td class="py-3 px-3 text-center font-bold text-emerald-400 border-r border-gray-700/50">$${gross.toFixed(2)}</td>
+                            <td class="py-3 px-3 text-center font-black text-blue-400 border-r border-gray-700/50">$${net.toFixed(2)}</td>
+                            <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.app_miles || 0}</td>
+                            <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_start || 0}</td>
+                            <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_end || 0}</td>
+                            <td class="py-3 px-3 text-center font-bold text-amber-400 border-r border-gray-700/50">${odoTotal}</td>
+                            <td class="py-3 px-3 text-center space-x-3 hide-on-print">
+                                <button onclick="openEditShift(${shift.id}, ${gross}, ${shift.app_miles || 0}, ${shift.total_trips || 0}, ${shift.odo_start || 0}, ${shift.odo_end || 0})" class="text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest text-[9px]">Edit</button>
+                                <button onclick="deleteCloudShift(${shift.id})" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            shiftTableHTML += `</tbody></table>`;
+            document.getElementById('shiftLedgerContainer').innerHTML = shiftTableHTML;
+
+            // Build Expense Ledger
+            let expenseTableHTML = `
+            <table class="w-full text-left text-[11px] whitespace-nowrap min-w-max">
+                <thead class="bg-gray-900 border-b-2 border-gray-700">
+                    <tr class="text-gray-300">
+                        <th class="py-3 px-3 font-bold border-r border-gray-700">Date</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Category</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Amount ($)</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700 hide-on-print">Receipt</th>
+                        <th class="py-3 px-3 font-bold text-center hide-on-print">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+            `;
+
+            if (filteredExpenses.length === 0) {
+                expenseTableHTML += `<tr><td colspan="5" class="py-4 text-center text-xs text-gray-500 italic">No expenses found for this timeframe.</td></tr>`;
+            } else {
+                filteredExpenses.forEach(exp => {
+                    const receiptLink = exp.receipt_url ? `<a href="${exp.receipt_url}" target="_blank" class="text-blue-400 hover:underline">View File</a>` : `<span class="text-gray-600">None</span>`;
+                    expenseTableHTML += `
+                        <tr class="hover:bg-gray-800 transition-colors">
+                            <td class="py-3 px-3 border-r border-gray-700/50">${exp.expense_date}</td>
+                            <td class="py-3 px-3 text-center font-bold border-r border-gray-700/50">${exp.category}</td>
+                            <td class="py-3 px-3 text-center font-black text-rose-400 border-r border-gray-700/50">-$${(parseFloat(exp.amount) || 0).toFixed(2)}</td>
+                            <td class="py-3 px-3 text-center border-r border-gray-700/50 hide-on-print">${receiptLink}</td>
+                            <td class="py-3 px-3 text-center space-x-3 hide-on-print">
+                                <button onclick="deleteCloudExpense(${exp.id})" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            expenseTableHTML += `</tbody></table>`;
+            document.getElementById('expenseLedgerContainer').innerHTML = expenseTableHTML;
         }
 
         taxTimeFilter.addEventListener('change', renderSpreadsheet);
-
-        viewHistoryBtn.addEventListener('click', () => {
-            historyModal.classList.remove('hidden');
-            fetchCloudData();
-        });
-
+        viewHistoryBtn.addEventListener('click', () => { historyModal.classList.remove('hidden'); fetchCloudData(); });
         closeHistoryBtn.addEventListener('click', () => historyModal.classList.add('hidden'));
 
-        // Delete Shift Function (Forcing Number ID)
+        // Delete Functions
         window.deleteCloudShift = async (id) => {
-            if (confirm("Permanently delete this shift from the cloud?")) {
-                const cleanId = parseInt(id);
-                const { error } = await _supabase.from('delivery_logs').delete().eq('id', cleanId);
-                if (error) {
-                    alert("Delete Failed: " + error.message);
-                } else {
-                    fetchCloudData(); 
-                }
+            if (confirm("Permanently delete this shift?")) {
+                const { error } = await _supabase.from('delivery_logs').delete().eq('id', parseInt(id));
+                if (error) alert("Delete Failed: " + error.message); else fetchCloudData(); 
             }
         };
 
-        // Open Edit Modal Function
+        window.deleteCloudExpense = async (id) => {
+            if (confirm("Permanently delete this expense?")) {
+                const { error } = await _supabase.from('other_deductions').delete().eq('id', parseInt(id));
+                if (error) alert("Delete Failed: " + error.message); else fetchCloudData(); 
+            }
+        };
+
+        // Export Functions
+        printBtn.addEventListener('click', () => {
+            const hideElements = document.querySelectorAll('.hide-on-print');
+            hideElements.forEach(el => el.style.display = 'none');
+            window.print();
+            hideElements.forEach(el => el.style.display = '');
+        });
+
+        downloadPdfBtn.addEventListener('click', () => {
+            const element = document.getElementById('printableArea');
+            const hideElements = document.querySelectorAll('.hide-on-print');
+            hideElements.forEach(el => el.style.display = 'none');
+            
+            const opt = {
+                margin:       0.5,
+                filename:     `Tax_Ledger_${new Date().toISOString().split('T')[0]}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                hideElements.forEach(el => el.style.display = '');
+            });
+        });
+
+        // Edit Shift Logic
         window.openEditShift = (id, profit, miles, trips, odoStart, odoEnd) => {
-            editShiftId.value = id;
-            editShiftProfit.value = profit;
-            editShiftDist.value = miles;
-            editShiftTrips.value = trips;
-            editShiftOdoStart.value = odoStart;
-            editShiftOdoEnd.value = odoEnd;
+            editShiftId.value = id; editShiftProfit.value = profit; editShiftDist.value = miles;
+            editShiftTrips.value = trips; editShiftOdoStart.value = odoStart; editShiftOdoEnd.value = odoEnd;
             editShiftModal.classList.remove('hidden');
         };
 
         cancelEditBtn.addEventListener('click', () => editShiftModal.classList.add('hidden'));
 
-        // Save Edit Function (Forcing Number ID & Showing Errors)
         saveEditBtn.addEventListener('click', async () => {
             const cleanId = parseInt(editShiftId.value);
             const newOdoStart = parseFloat(editShiftOdoStart.value) || 0;
             const newOdoEnd = parseFloat(editShiftOdoEnd.value) || 0;
-            
             saveEditBtn.innerText = "⏳ Saving...";
             
             const { error } = await _supabase.from('delivery_logs').update({
-                total_profit: parseFloat(editShiftProfit.value) || 0,
-                app_miles: parseFloat(editShiftDist.value) || 0,
-                total_trips: parseInt(editShiftTrips.value) || 0,
-                odo_start: newOdoStart, odo_end: newOdoEnd,
+                total_profit: parseFloat(editShiftProfit.value) || 0, app_miles: parseFloat(editShiftDist.value) || 0,
+                total_trips: parseInt(editShiftTrips.value) || 0, odo_start: newOdoStart, odo_end: newOdoEnd,
                 odo_total: newOdoEnd > newOdoStart ? (newOdoEnd - newOdoStart) : 0
             }).eq('id', cleanId);
 
             saveEditBtn.innerText = "💾 Save";
-
-            if (error) {
-                alert("Edit Failed: " + error.message);
-            } else {
-                editShiftModal.classList.add('hidden');
-                fetchCloudData(); 
-            }
+            if (error) alert("Edit Failed: " + error.message); else { editShiftModal.classList.add('hidden'); fetchCloudData(); }
         });
 
         // ==========================================
@@ -707,7 +772,6 @@
             const minTripProfit = parseFloat(minTripProfitInput.value) || 0;
             const targetPayPerKm = parseFloat(targetPayInput.value) || 0;
             const targetHourly = parseFloat(targetHourlyInput.value) || 0;
-            
             const uberOffer = parseFloat(uberOfferSelect.value) || 0;
             const tripDistance = parseFloat(tripDistanceSelect.value) || 0;
             const tripDuration = parseFloat(tripDurationSelect.value) || 0;
@@ -725,16 +789,13 @@
 
             const estGas = tripDistance * gasCost;
             currentTripProfit = uberOffer - estGas;
-            
             const payPerKm = tripDistance > 0 ? (currentTripProfit / tripDistance) : 0;
-            const totalHours = tripDuration / 60;
-            const payPerHour = totalHours > 0 ? (currentTripProfit / totalHours) : 0;
+            const payPerHour = (tripDuration / 60) > 0 ? (currentTripProfit / (tripDuration / 60)) : 0;
 
             estGasSpan.innerText = `-$${estGas.toFixed(2)}`;
             netProfitSpan.innerHTML = `$${currentTripProfit.toFixed(2)}`;
             payPerKmSpan.innerHTML = `$${payPerKm.toFixed(2)}/KM`;
             payPerHourSpan.innerHTML = `$${payPerHour.toFixed(2)}/HR`;
-
             saveTripBtn.classList.remove('hidden');
 
             if (currentTripProfit >= minTripProfit && payPerKm >= targetPayPerKm && payPerHour >= targetHourly) {
@@ -768,9 +829,7 @@
                 tripLedger.push({ id: Date.now(), profit: parseFloat(currentTripProfit.toFixed(2)), distance: parseFloat(tripDistanceSelect.value) || 0 });
                 localStorage.setItem('tripLedger', JSON.stringify(tripLedger));
                 updateShiftTrackerUI();
-                
-                uberOfferSelect.value = ""; tripDistanceSelect.value = ""; tripDurationSelect.value = "";
-                calculate();
+                uberOfferSelect.value = ""; tripDistanceSelect.value = ""; tripDurationSelect.value = ""; calculate();
             }
         });
 
@@ -782,7 +841,6 @@
             if (tripLedger.length === 0) { alert("No trips to save!"); return; }
 
             exportCloudBtn.innerText = "⏳ Pushing to Cloud...";
-            
             const shiftTotal = tripLedger.reduce((sum, trip) => sum + trip.profit, 0);
             const shiftDistance = tripLedger.reduce((sum, trip) => sum + (trip.distance || 0), 0);
             const startOdo = parseFloat(startOdometerInput.value) || 0;
@@ -795,9 +853,8 @@
                 odo_start: startOdo, odo_end: endOdo, odo_total: odoTotal
             }]);
 
-            if (error) {
-                alert("Error saving shift: " + error.message);
-            } else {
+            if (error) alert("Error saving shift: " + error.message);
+            else {
                 alert("Shift successfully saved! Daily totals reset.");
                 tripLedger = []; localStorage.removeItem('tripLedger');
                 startOdometerInput.value = ""; endOdometerInput.value = "";
