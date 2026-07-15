@@ -10,9 +10,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4 pb-10 font-sans">
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4 pb-10 font-sans relative">
 
-    <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6">
+    <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6 relative overflow-hidden">
         
         <!-- ========================================== -->
         <!-- 1. THE LOGIN GATE (Shows First)            -->
@@ -23,7 +23,6 @@
                 <p class="text-xs text-gray-400 italic mt-2">Secure Driver Login</p>
             </div>
             
-            <!-- Standard form to trigger native Face ID/Keychain -->
             <form id="loginForm" class="space-y-4 mt-8 bg-gray-900 p-5 rounded-xl border border-gray-700 shadow-inner">
                 
                 <input type="email" id="emailInput" name="email" autocomplete="username" placeholder="Driver Email" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
@@ -215,18 +214,44 @@
 
             <!-- 3. DRIVER ACCOUNT MANAGER -->
             <div class="mt-6 pt-5 border-t border-gray-700">
-                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex justify-between items-center shadow-lg">
-                    <div>
-                        <span class="block text-[10px] text-gray-500 uppercase tracking-widest">Logged In As</span>
-                        <span id="userEmailDisplay" class="text-sm font-black text-emerald-400">driver@email.com</span>
+                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col space-y-3 shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="block text-[10px] text-gray-500 uppercase tracking-widest">Logged In As</span>
+                            <span id="userEmailDisplay" class="text-sm font-black text-emerald-400">driver@email.com</span>
+                        </div>
+                        <button id="logoutBtn" class="bg-gray-900 hover:bg-rose-900/40 text-rose-400 hover:text-rose-300 text-[10px] font-bold py-1 px-3 rounded border border-rose-700/50 transition-colors uppercase tracking-widest">
+                            Log Out
+                        </button>
                     </div>
-                    <button id="logoutBtn" class="bg-gray-900 hover:bg-rose-900/40 text-rose-400 hover:text-rose-300 text-xs font-bold py-2 px-4 rounded border border-rose-700/50 transition-colors uppercase tracking-widest">
-                        Log Out
+                    <!-- NEW CLOUD HISTORY BUTTON -->
+                    <button id="viewHistoryBtn" class="w-full bg-gray-900 hover:bg-gray-800 text-emerald-400 font-bold py-2.5 rounded-lg border border-gray-600 transition-colors text-xs uppercase tracking-widest mt-2">
+                        ☁️ View Cloud History
                     </button>
                 </div>
             </div>
 
         </div> <!-- End of mainAppWrapper -->
+
+        <!-- ========================================== -->
+        <!-- 3. CLOUD HISTORY MODAL (Hidden by default) -->
+        <!-- ========================================== -->
+        <div id="historyModal" class="hidden absolute inset-0 bg-gray-900 z-50 p-6 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-700">
+                <div>
+                    <h2 class="text-xl font-black text-white uppercase tracking-widest">Cloud History</h2>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Your Past Shifts</p>
+                </div>
+                <button id="closeHistoryBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-2 px-4 rounded-lg border border-gray-600 transition-colors text-xs uppercase">
+                    Close
+                </button>
+            </div>
+            
+            <div id="historyList" class="flex-1 overflow-y-auto space-y-3 pr-2">
+                <!-- Fetched past shifts will appear here -->
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -297,6 +322,12 @@
         const userEmailDisplay = document.getElementById('userEmailDisplay');
         const authMessage = document.getElementById('authMessage');
 
+        // Cloud History Elements
+        const viewHistoryBtn = document.getElementById('viewHistoryBtn');
+        const historyModal = document.getElementById('historyModal');
+        const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+        const historyList = document.getElementById('historyList');
+
         // State Variables
         let currentTripProfit = 0; 
         let manualOverride = localStorage.getItem('manualOverride') === 'true';
@@ -331,7 +362,6 @@
             }
         }
 
-        // Using form 'submit' to trigger password managers correctly
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             
@@ -412,11 +442,51 @@
             checkUser();
         });
 
-        // Initialize Auth Check
         checkUser();
 
         // ==========================================
-        // 4. CALCULATOR & SHIFT LOGIC
+        // 4. CLOUD HISTORY LOGIC (FETCHING DATA)
+        // ==========================================
+        viewHistoryBtn.addEventListener('click', async () => {
+            historyModal.classList.remove('hidden');
+            historyList.innerHTML = '<p class="text-center text-xs font-bold text-gray-500 mt-10">⏳ Fetching your past shifts from the cloud...</p>';
+
+            const { data, error } = await _supabase
+                .from('delivery_logs')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('id', { ascending: false }); 
+
+            if (error) {
+                historyList.innerHTML = `<p class="text-rose-400 text-center text-xs font-bold mt-10">Error: ${error.message}</p>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                historyList.innerHTML = '<p class="text-center text-xs text-gray-500 italic mt-10">No shifts saved to the cloud yet.</p>';
+                return;
+            }
+
+            historyList.innerHTML = data.map(shift => `
+                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-md">
+                    <div class="flex justify-between items-center mb-2 border-b border-gray-700 pb-2">
+                        <span class="text-xs font-bold text-gray-300 uppercase tracking-widest">${shift.shift_date}</span>
+                        <span class="text-lg font-black text-emerald-400">$${shift.total_profit.toFixed(2)}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-[10px] text-gray-400 uppercase tracking-widest">
+                        <div>Trips: <span class="text-white font-bold ml-1">${shift.total_trips}</span></div>
+                        <div class="text-right">Distance: <span class="text-white font-bold ml-1">${shift.app_miles} KM</span></div>
+                    </div>
+                </div>
+            `).join('');
+        });
+
+        closeHistoryBtn.addEventListener('click', () => {
+            historyModal.classList.add('hidden');
+        });
+
+        // ==========================================
+        // 5. CALCULATOR & SHIFT LOGIC
         // ==========================================
         function determineTimeProfile() {
             const now = new Date();
@@ -621,6 +691,9 @@
             }
         };
 
+        // ==========================================
+        // 6. PUSH TO SUPABASE DATABASE
+        // ==========================================
         saveTripBtn.addEventListener('click', () => {
             if (currentTripProfit !== 0) {
                 const tripDistance = parseFloat(tripDistanceSelect.value) || 0;
@@ -647,9 +720,6 @@
             }
         });
 
-        // ==========================================
-        // 5. PUSH TO SUPABASE DATABASE
-        // ==========================================
         exportCloudBtn.addEventListener('click', async () => {
             if (!currentUser) return;
 
