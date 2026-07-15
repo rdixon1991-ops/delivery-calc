@@ -17,26 +17,35 @@
         <!-- ========================================== -->
         <!-- 1. THE LOGIN GATE (Shows First)            -->
         <!-- ========================================== -->
-       <form id="loginForm" class="space-y-4 mt-8 bg-gray-900 p-5 rounded-xl border border-gray-700 shadow-inner">
-    
-    <!-- Added 'name' attributes which browsers use to detect identity -->
-    <input type="email" id="emailInput" name="email" autocomplete="email" placeholder="Driver Email" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
-    
-    <input type="password" id="passwordInput" name="password" autocomplete="current-password" placeholder="Password" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
-    
-    <div class="grid grid-cols-2 gap-3 pt-3">
-        <!-- Changing the Log In button to be the main form submitter -->
-       <!-- Change type="submit" back to type="button" -->
-<button type="button" id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-emerald-900/20">
-    Log In
-</button>
-        <!-- Signup remains a button so it doesn't trigger a form submit -->
-        <button type="button" id="signupBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest">
-            Sign Up
-        </button>
-    </div>
-    ...
-</form>
+        <div id="authGate" class="space-y-6 py-6 text-center">
+            <div>
+                <h1 class="text-3xl font-black text-emerald-400 uppercase tracking-widest">Delivery Calc</h1>
+                <p class="text-xs text-gray-400 italic mt-2">Secure Driver Login</p>
+            </div>
+            
+            <!-- Standard form to trigger native Face ID/Keychain -->
+            <form id="loginForm" class="space-y-4 mt-8 bg-gray-900 p-5 rounded-xl border border-gray-700 shadow-inner">
+                
+                <input type="email" id="emailInput" name="email" autocomplete="username" placeholder="Driver Email" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
+                
+                <input type="password" id="passwordInput" name="password" autocomplete="current-password" placeholder="Password" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
+                
+                <div class="grid grid-cols-2 gap-3 pt-3">
+                    <button type="submit" id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-emerald-900/20">
+                        Log In
+                    </button>
+                    <button type="button" id="signupBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest">
+                        Sign Up
+                    </button>
+                </div>
+                
+                <button type="button" id="forgotPasswordBtn" class="w-full text-blue-400 hover:text-blue-300 text-[10px] font-bold pt-4 transition-colors uppercase tracking-widest">
+                    Forgot Password?
+                </button>
+                
+                <p id="authMessage" class="text-xs font-bold mt-2 h-4 text-emerald-400"></p>
+            </form>
+        </div>
 
         <!-- ========================================== -->
         <!-- 2. THE MAIN APP (Hidden until logged in)   -->
@@ -226,10 +235,7 @@
         // ==========================================
         const { createClient } = supabase;
         const supabaseUrl = 'https://mwujfgdkdjbjoloaqlte.supabase.co';
-        
-        // PASTE YOUR sb_publishable API KEY HERE:
         const supabaseKey = 'sb_publishable_Tku9uo6gKgLKFnW9ug0hSg_pRKIAuwH'; 
-        
         const _supabase = createClient(supabaseUrl, supabaseKey);
         let currentUser = null;
 
@@ -238,7 +244,7 @@
         // ==========================================
         const authGate = document.getElementById('authGate');
         const mainAppWrapper = document.getElementById('mainAppWrapper');
-const loginForm = document.getElementById('loginForm');
+
         const minTripProfitInput = document.getElementById('minTripProfit');
         const targetPayInput = document.getElementById('targetPay');
         const targetHourlyInput = document.getElementById('targetHourly');
@@ -282,9 +288,9 @@ const loginForm = document.getElementById('loginForm');
         const odometerTotalDisplay = document.getElementById('odometerTotalDisplay');
 
         // Auth Elements
+        const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
-        const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
         const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -297,18 +303,16 @@ const loginForm = document.getElementById('loginForm');
         let tripLedger = JSON.parse(localStorage.getItem('tripLedger')) || [];
 
         // ==========================================
-        // 3. AUTHENTICATION LOGIC (THE LOGIN GATE)
+        // 3. AUTHENTICATION LOGIC
         // ==========================================
         async function checkUser() {
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 currentUser = session.user;
-                // Hide Login, Show App
                 authGate.classList.add('hidden');
                 mainAppWrapper.classList.remove('hidden');
                 userEmailDisplay.innerText = currentUser.email;
                 
-                // Initialize calculators when logged in
                 if (manualOverride) {
                     shiftProfileName.innerText = "Custom Settings";
                     shiftProfileName.className = "text-sm font-black text-amber-400";
@@ -322,42 +326,57 @@ const loginForm = document.getElementById('loginForm');
                 updateOdometer();
             } else {
                 currentUser = null;
-                // Show Login, Hide App
                 authGate.classList.remove('hidden');
                 mainAppWrapper.classList.add('hidden');
             }
         }
 
-  // Change this line back to 'click'
-332    loginBtn.addEventListener('click', async (e) => {
-333        e.preventDefault(); 
-334
-335        authMessage.innerText = "Logging in...";
-336        authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
-337
-338        const { data, error } = await _supabase.auth.signInWithPassword({
-339            email: emailInput.value,
-340            password: passwordInput.value,
-341        });
-342
-343        if (error) {
-344            authMessage.innerText = error.message;
-345            authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
-346        } else {
-347            authMessage.innerText = "";
-348            emailInput.value = "";
-349            passwordInput.value = "";
-350            checkUser();
-351        }
-352    }); // <--- THIS IS THE CLOSING BRACE YOU NEED
+        // Using form 'submit' to trigger password managers correctly
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            
+            authMessage.innerText = "Logging in...";
+            authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
+            
+            try {
+                const { data, error } = await _supabase.auth.signInWithPassword({
+                    email: emailInput.value,
+                    password: passwordInput.value,
+                });
+                
+                if (error) {
+                    authMessage.innerText = error.message;
+                    authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
+                } else {
+                    authMessage.innerText = "";
+                    emailInput.value = "";
+                    passwordInput.value = "";
+                    checkUser();
+                }
+            } catch (err) {
+                console.error("Login Error:", err);
+                authMessage.innerText = "Connection error. Try again.";
+                authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
+            }
+        });
 
         signupBtn.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            if(!email || !password) {
+                authMessage.innerText = "Enter an email and password to sign up.";
+                authMessage.className = "text-xs font-bold mt-2 h-4 text-amber-400";
+                return;
+            }
+
             authMessage.innerText = "Creating account...";
             authMessage.className = "text-xs font-bold mt-2 h-4 text-emerald-400";
+            
             const { data, error } = await _supabase.auth.signUp({
-                email: emailInput.value,
-                password: passwordInput.value,
+                email: email,
+                password: password,
             });
+            
             if (error) {
                 authMessage.innerText = error.message;
                 authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
@@ -393,7 +412,7 @@ const loginForm = document.getElementById('loginForm');
             checkUser();
         });
 
-        // Initialize Auth Check on Page Load
+        // Initialize Auth Check
         checkUser();
 
         // ==========================================
