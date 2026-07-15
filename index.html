@@ -131,7 +131,7 @@
                     <span id="shiftTotalDisplay" class="text-2xl font-black text-emerald-400">$0.00</span>
                 </div>
                 <div class="flex-1 text-center border-x border-gray-700 px-2 mx-2">
-                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Driven</span>
+                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">App Miles</span>
                     <span id="shiftDistanceDisplay" class="text-xl font-black text-blue-400">0 KM</span>
                 </div>
                 <div class="flex-1 text-right">
@@ -155,6 +155,24 @@
                 <button id="resetShiftBtn" class="bg-gray-800 hover:bg-rose-900/50 text-gray-400 hover:text-rose-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
                     Reset Shift
                 </button>
+            </div>
+
+            <!-- ODOMETER LOGGING -->
+            <div class="mt-5 pt-4 border-t border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Odometer Log</span>
+                    <span id="odometerTotalDisplay" class="text-xs font-black text-blue-400">0 KM Logged</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Start Shift</label>
+                        <input type="number" id="startOdometer" placeholder="Start KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">End Shift</label>
+                        <input type="number" id="endOdometer" placeholder="End KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600">
+                    </div>
+                </div>
             </div>
 
             <!-- Expandable Trip Ledger List -->
@@ -205,6 +223,10 @@
         const tripList = document.getElementById('tripList');
         const emptyLedgerMsg = document.getElementById('emptyLedgerMsg');
 
+        const startOdometerInput = document.getElementById('startOdometer');
+        const endOdometerInput = document.getElementById('endOdometer');
+        const odometerTotalDisplay = document.getElementById('odometerTotalDisplay');
+
         // State Variables
         let currentTripProfit = 0; 
         let manualOverride = localStorage.getItem('manualOverride') === 'true';
@@ -242,6 +264,19 @@
             calculate();
         }
 
+        function updateOdometer() {
+            const start = parseFloat(startOdometerInput.value) || 0;
+            const end = parseFloat(endOdometerInput.value) || 0;
+            localStorage.setItem('startOdometer', startOdometerInput.value);
+            localStorage.setItem('endOdometer', endOdometerInput.value);
+            
+            if (start > 0 && end > start) {
+                odometerTotalDisplay.innerText = `${(end - start).toFixed(1)} KM Logged`;
+            } else {
+                odometerTotalDisplay.innerText = `0 KM Logged`;
+            }
+        }
+
         // --- INITIALIZATION ---
         for (let i = 1; i <= 100; i++) {
             let opt = document.createElement('option'); opt.value = i; opt.innerHTML = `$${i}.00`; uberOfferSelect.appendChild(opt);
@@ -253,6 +288,8 @@
 
         if (localStorage.getItem('gasCost')) gasCostInput.value = localStorage.getItem('gasCost');
         if (localStorage.getItem('dailyTarget')) dailyTargetInput.value = localStorage.getItem('dailyTarget');
+        if (localStorage.getItem('startOdometer')) startOdometerInput.value = localStorage.getItem('startOdometer');
+        if (localStorage.getItem('endOdometer')) endOdometerInput.value = localStorage.getItem('endOdometer');
 
         if (manualOverride) {
             shiftProfileName.innerText = "Custom Settings";
@@ -264,6 +301,7 @@
             loadOptimumSettings();
         }
         updateShiftTrackerUI();
+        updateOdometer();
 
         // --- EVENT HANDLERS ---
         toggleInputBtn.addEventListener('click', () => {
@@ -294,6 +332,9 @@
             toggleIcon.innerText = '▼';
             calculate();
         });
+
+        startOdometerInput.addEventListener('input', updateOdometer);
+        endOdometerInput.addEventListener('input', updateOdometer);
 
         // --- CORE CALCULATOR LOGIC ---
         function calculate() {
@@ -442,7 +483,12 @@
             if(confirm("Reset shift totals? Ensure you've logged this in your spreadsheet!")) {
                 tripLedger = [];
                 localStorage.removeItem('tripLedger');
+                startOdometerInput.value = "";
+                endOdometerInput.value = "";
+                localStorage.removeItem('startOdometer');
+                localStorage.removeItem('endOdometer');
                 updateShiftTrackerUI();
+                updateOdometer();
                 tripLedgerPanel.classList.add('hidden');
             }
         });
