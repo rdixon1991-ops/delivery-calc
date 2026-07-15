@@ -15,10 +15,8 @@
         
         <!-- 1. COMPACT DECISION BOX WITH LOGO BACKGROUND -->
         <div id="decisionBox" class="p-4 rounded-xl border transition-all duration-300 border-gray-750 relative overflow-hidden bg-[url('icon.svg')] bg-cover bg-center bg-no-repeat">
-            <!-- Glass Tint Overlay -->
             <div id="decisionOverlay" class="absolute inset-0 bg-gray-950/90 transition-colors duration-300"></div>
 
-            <!-- Content -->
             <div class="relative z-10 grid grid-cols-2 gap-y-3 gap-x-4 text-left text-xs text-gray-300">
                 <div>Est. Gas Cost: <span id="estGas" class="font-bold text-gray-400 block text-sm mt-1">$0.00</span></div>
                 <div>Current Trip Profit: <span id="netProfit" class="font-black text-white block text-lg mt-0">$0.00</span></div>
@@ -29,7 +27,6 @@
                 </div>
             </div>
             
-            <!-- Save Action -->
             <button id="saveTripBtn" class="hidden relative z-10 w-full mt-3 bg-blue-600/90 backdrop-blur hover:bg-blue-500 text-white font-black py-2.5 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all uppercase tracking-widest text-xs">
                 💾 Save Trip
             </button>
@@ -53,7 +50,6 @@
                 <span id="toggleIcon" class="text-xl">▼</span>
             </button>
 
-            <!-- Hidden Input Panel -->
             <div id="inputSettingsPanel" class="hidden bg-gray-900 p-5 rounded-xl border border-gray-700 space-y-4 mt-2 shadow-inner">
                 
                 <div class="space-y-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
@@ -127,20 +123,24 @@
             </div>
         </div>
 
-        <!-- 5. SHIFT TRACKER CARD WITH LEDGER -->
+        <!-- 5. SHIFT TRACKER CARD WITH LEDGER & MILEAGE -->
         <div class="bg-gray-900 rounded-xl border-2 border-gray-700 p-5 mt-6 shadow-lg">
             <div class="flex justify-between items-end mb-3">
-                <div>
-                    <span class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Shift Running Total</span>
-                    <span id="shiftTotalDisplay" class="text-3xl font-black text-emerald-400">$0.00</span>
+                <div class="flex-1">
+                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total</span>
+                    <span id="shiftTotalDisplay" class="text-2xl font-black text-emerald-400">$0.00</span>
                 </div>
-                <div class="text-right">
-                    <span class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Trips</span>
+                <div class="flex-1 text-center border-x border-gray-700 px-2 mx-2">
+                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Driven</span>
+                    <span id="shiftDistanceDisplay" class="text-xl font-black text-blue-400">0 KM</span>
+                </div>
+                <div class="flex-1 text-right">
+                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Trips</span>
                     <span id="shiftCountDisplay" class="text-2xl font-black text-white">0</span>
                 </div>
             </div>
             
-            <div class="w-full bg-gray-800 rounded-full h-3 mb-2 border border-gray-700">
+            <div class="w-full bg-gray-800 rounded-full h-3 mb-2 border border-gray-700 mt-2">
                 <div id="shiftProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
             <div class="flex justify-between text-xs font-bold text-gray-400">
@@ -197,6 +197,7 @@
         const toggleLedgerBtn = document.getElementById('toggleLedgerBtn');
         const resetShiftBtn = document.getElementById('resetShiftBtn');
         const shiftTotalDisplay = document.getElementById('shiftTotalDisplay');
+        const shiftDistanceDisplay = document.getElementById('shiftDistanceDisplay');
         const shiftCountDisplay = document.getElementById('shiftCountDisplay');
         const shiftProgressBar = document.getElementById('shiftProgressBar');
         const shiftProgressText = document.getElementById('shiftProgressText');
@@ -372,7 +373,7 @@
                     li.className = "flex justify-between items-center bg-gray-800 p-3 rounded-lg border border-gray-700";
                     li.innerHTML = `
                         <div>
-                            <span class="text-[10px] text-gray-500 font-bold uppercase block leading-none mb-1">Trip #${tripLedger.length - index}</span>
+                            <span class="text-[10px] text-gray-500 font-bold uppercase block leading-none mb-1">Trip #${tripLedger.length - index} <span class="text-blue-400 ml-1 tracking-normal">• ${trip.distance || 0} KM</span></span>
                             <span class="text-lg font-black text-emerald-400 leading-none">+$${trip.profit.toFixed(2)}</span>
                         </div>
                         <button onclick="deleteTrip(${trip.id})" class="text-rose-400 hover:text-white font-bold text-[10px] uppercase tracking-widest bg-gray-900 hover:bg-rose-600 px-3 py-2 rounded-md border border-gray-600 hover:border-rose-500 transition-colors">Delete</button>
@@ -384,10 +385,12 @@
 
         function updateShiftTrackerUI() {
             const shiftTotal = tripLedger.reduce((sum, trip) => sum + trip.profit, 0);
+            const shiftDistance = tripLedger.reduce((sum, trip) => sum + (trip.distance || 0), 0);
             const shiftCount = tripLedger.length;
             const dailyTarget = parseFloat(dailyTargetInput.value) || 1; 
             
             shiftTotalDisplay.innerText = `$${shiftTotal.toFixed(2)}`;
+            shiftDistanceDisplay.innerText = `${shiftDistance} KM`;
             shiftCountDisplay.innerText = shiftCount;
             
             let progressPercentage = (shiftTotal / dailyTarget) * 100;
@@ -411,9 +414,14 @@
         // --- TRACKER ACTIONS ---
         saveTripBtn.addEventListener('click', () => {
             if (currentTripProfit !== 0) {
+                const tripDistance = parseFloat(tripDistanceSelect.value) || 0;
+                const deadMilesMultiplier = deadMilesInput.checked ? 2 : 1;
+                const actualDistance = tripDistance * deadMilesMultiplier;
+
                 const newTrip = {
                     id: Date.now(),
-                    profit: parseFloat(currentTripProfit.toFixed(2))
+                    profit: parseFloat(currentTripProfit.toFixed(2)),
+                    distance: actualDistance
                 };
                 
                 tripLedger.push(newTrip);
