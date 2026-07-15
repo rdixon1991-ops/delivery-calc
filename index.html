@@ -329,27 +329,27 @@ const loginForm = document.getElementById('loginForm');
         }
 
   // Change this line back to 'click'
-loginBtn.addEventListener('click', async (e) => {
-    e.preventDefault(); // Prevents the page from reloading
-    
-    authMessage.innerText = "Logging in...";
-    authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
-    
-    const { data, error } = await _supabase.auth.signInWithPassword({
-        email: emailInput.value,
-        password: passwordInput.value,
-    });
-    
-    if (error) {
-        authMessage.innerText = error.message;
-        authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
-    } else {
-        authMessage.innerText = "";
-        emailInput.value = "";
-        passwordInput.value = "";
-        checkUser();
-    }
-});
+332    loginBtn.addEventListener('click', async (e) => {
+333        e.preventDefault(); 
+334
+335        authMessage.innerText = "Logging in...";
+336        authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
+337
+338        const { data, error } = await _supabase.auth.signInWithPassword({
+339            email: emailInput.value,
+340            password: passwordInput.value,
+341        });
+342
+343        if (error) {
+344            authMessage.innerText = error.message;
+345            authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
+346        } else {
+347            authMessage.innerText = "";
+348            emailInput.value = "";
+349            passwordInput.value = "";
+350            checkUser();
+351        }
+352    }); // <--- THIS IS THE CLOSING BRACE YOU NEED
 
         signupBtn.addEventListener('click', async () => {
             authMessage.innerText = "Creating account...";
