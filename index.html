@@ -9,7 +9,10 @@
     <meta name="apple-mobile-web-app-title" content="Delivery Calc">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- PDF Export Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Tesseract OCR Library for Image Scanning -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
         @media print {
             body * { visibility: hidden; }
@@ -188,15 +191,15 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-emerald-400 uppercase mb-2 text-center">Current Odometer (KM)</label>
-                        <input type="number" id="startOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-emerald-500 text-center">
+                        <input type="number" id="startOdometerInput" placeholder="Auto-fills from scan..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-emerald-500 text-center">
                     </div>
                     <div class="pt-2">
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Dashboard Photo Proof</label>
-                        <label class="w-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-lg border border-gray-600 cursor-pointer transition-colors">
-                            <span class="mr-2 text-xl">📷</span> Tap to Snap Photo
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Dashboard Photo Scan</label>
+                        <label class="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg border border-blue-400 cursor-pointer transition-colors shadow-lg shadow-blue-900/40">
+                            <span class="mr-2 text-xl">📷</span> Tap to Scan Dashboard
                             <input type="file" id="startOdoImage" accept="image/*" capture="environment" class="hidden">
                         </label>
-                        <p id="startOdoFileName" class="text-[10px] text-emerald-400 text-center mt-2 font-bold hidden">Photo Attached!</p>
+                        <p id="startOdoOcrStatus" class="hidden"></p>
                     </div>
                     <button id="confirmStartShiftBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-emerald-900/40">🚀 Begin Shift</button>
                     <p id="startShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
@@ -217,15 +220,15 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-rose-400 uppercase mb-2 text-center">Final Odometer (KM)</label>
-                        <input type="number" id="endOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-rose-500 text-center">
+                        <input type="number" id="endOdometerInput" placeholder="Auto-fills from scan..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-rose-500 text-center">
                     </div>
                     <div class="pt-2">
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Final Photo Proof</label>
-                        <label class="w-full flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white font-bold py-4 rounded-lg border border-gray-600 cursor-pointer transition-colors">
-                            <span class="mr-2 text-xl">📷</span> Tap to Snap Photo
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Final Photo Scan</label>
+                        <label class="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg border border-blue-400 cursor-pointer transition-colors shadow-lg shadow-blue-900/40">
+                            <span class="mr-2 text-xl">📷</span> Tap to Scan Dashboard
                             <input type="file" id="endOdoImage" accept="image/*" capture="environment" class="hidden">
                         </label>
-                        <p id="endOdoFileName" class="text-[10px] text-emerald-400 text-center mt-2 font-bold hidden">Photo Attached!</p>
+                        <p id="endOdoOcrStatus" class="hidden"></p>
                     </div>
                     <button id="confirmEndShiftBtn" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-rose-900/40">☁️ Sync to Cloud</button>
                     <p id="endShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
@@ -414,14 +417,14 @@
         const startShiftModal = document.getElementById('startShiftModal');
         const startOdometerInput = document.getElementById('startOdometerInput');
         const startOdoImage = document.getElementById('startOdoImage');
-        const startOdoFileName = document.getElementById('startOdoFileName');
+        const startOdoOcrStatus = document.getElementById('startOdoOcrStatus');
         const confirmStartShiftBtn = document.getElementById('confirmStartShiftBtn');
         const startShiftMessage = document.getElementById('startShiftMessage');
 
         const endShiftModal = document.getElementById('endShiftModal');
         const endOdometerInput = document.getElementById('endOdometerInput');
         const endOdoImage = document.getElementById('endOdoImage');
-        const endOdoFileName = document.getElementById('endOdoFileName');
+        const endOdoOcrStatus = document.getElementById('endOdoOcrStatus');
         const confirmEndShiftBtn = document.getElementById('confirmEndShiftBtn');
         const endShiftMessage = document.getElementById('endShiftMessage');
         const closeEndShiftBtn = document.getElementById('closeEndShiftBtn');
@@ -484,9 +487,8 @@
                 userEmailDisplay.innerText = currentUser.email;
                 loadSettings();
                 updateShiftTrackerUI();
-                await checkActiveShift(); // Check Shift Gate
+                await checkActiveShift(); 
                 
-                // Set interval to check for 8-hour timeout while app is open
                 setInterval(checkActiveShift, 60000); 
             } else {
                 currentUser = null;
@@ -535,7 +537,40 @@
         checkUser();
 
         // ==========================================
-        // 4. SHIFT GATE LOGIC (START & AUTO-END)
+        // 4. OCR IMAGE SCANNING LOGIC
+        // ==========================================
+        async function scanOdometerImage(file, inputElement, statusElement) {
+            statusElement.innerText = "🔍 Scanning image for numbers...";
+            statusElement.className = "text-[10px] text-blue-400 text-center mt-2 font-bold block animate-pulse";
+            statusElement.classList.remove('hidden');
+
+            try {
+                const result = await Tesseract.recognize(file, 'eng');
+                const text = result.data.text;
+                
+                // Find all numeric blocks (ignoring letters)
+                const numbers = text.match(/\d+[.,]?\d*/g);
+                
+                if (numbers && numbers.length > 0) {
+                    // Usually the odometer is the longest continuous string of numbers on the dash
+                    let bestGuess = numbers.reduce((a, b) => a.length > b.length ? a : b).replace(/,/g, '');
+                    inputElement.value = parseFloat(bestGuess);
+                    
+                    statusElement.innerText = "✅ Number detected and filled!";
+                    statusElement.className = "text-[10px] text-emerald-400 text-center mt-2 font-bold block";
+                } else {
+                    statusElement.innerText = "⚠️ Could not read number clearly. Please type it in manually.";
+                    statusElement.className = "text-[10px] text-amber-400 text-center mt-2 font-bold block";
+                }
+            } catch (err) {
+                console.error(err);
+                statusElement.innerText = "❌ Scan failed. Please enter manually.";
+                statusElement.className = "text-[10px] text-rose-400 text-center mt-2 font-bold block";
+            }
+        }
+
+        // ==========================================
+        // 5. SHIFT GATE LOGIC (START & AUTO-END)
         // ==========================================
         async function checkActiveShift() {
             const shiftStartTime = localStorage.getItem('shiftStartTime');
@@ -549,13 +584,16 @@
             displayStartOdo.innerText = shiftStartOdo;
             startShiftModal.classList.add('hidden');
 
-            // 8-Hour Auto Checkout Logic
             if (Date.now() - parseInt(shiftStartTime) > EIGHT_HOURS_MS) {
                 await autoCloseShift();
             }
         }
 
-        startOdoImage.addEventListener('change', (e) => { if (e.target.files.length > 0) startOdoFileName.classList.remove('hidden'); });
+        startOdoImage.addEventListener('change', (e) => { 
+            if (e.target.files.length > 0) {
+                scanOdometerImage(e.target.files[0], startOdometerInput, startOdoOcrStatus);
+            } 
+        });
 
         confirmStartShiftBtn.addEventListener('click', async () => {
             const odo = parseFloat(startOdometerInput.value);
@@ -593,15 +631,22 @@
         });
 
         // ==========================================
-        // 5. MANUAL END SHIFT LOGIC
+        // 6. MANUAL END SHIFT LOGIC
         // ==========================================
         triggerEndShiftBtn.addEventListener('click', () => {
             endShiftModal.classList.remove('hidden');
-            endOdometerInput.value = ""; endOdoImage.value = ""; endOdoFileName.classList.add('hidden');
+            endOdometerInput.value = ""; 
+            endOdoImage.value = ""; 
+            endOdoOcrStatus.classList.add('hidden');
         });
 
         closeEndShiftBtn.addEventListener('click', () => endShiftModal.classList.add('hidden'));
-        endOdoImage.addEventListener('change', (e) => { if (e.target.files.length > 0) endOdoFileName.classList.remove('hidden'); });
+        
+        endOdoImage.addEventListener('change', (e) => { 
+            if (e.target.files.length > 0) {
+                scanOdometerImage(e.target.files[0], endOdometerInput, endOdoOcrStatus);
+            } 
+        });
 
         confirmEndShiftBtn.addEventListener('click', async () => {
             const endOdo = parseFloat(endOdometerInput.value);
@@ -632,7 +677,7 @@
         });
 
         // ==========================================
-        // 6. AUTO END SHIFT LOGIC (8 HOURS)
+        // 7. AUTO END SHIFT LOGIC (8 HOURS)
         // ==========================================
         async function autoCloseShift() {
             alert("⏰ 8 Hours have passed. Your shift has been automatically closed using calculated distances.");
@@ -666,12 +711,14 @@
                 localStorage.removeItem('shiftStartOdo');
                 localStorage.removeItem('shiftStartUrl');
                 updateShiftTrackerUI();
-                startShiftModal.classList.remove('hidden'); // Force new shift
+                startShiftModal.classList.remove('hidden'); 
+                startOdometerInput.value = "";
+                startOdoOcrStatus.classList.add('hidden');
             }
         }
 
         // ==========================================
-        // 7. EXPENSE SCANNER LOGIC
+        // 8. EXPENSE SCANNER LOGIC
         // ==========================================
         openExpenseScannerBtn.addEventListener('click', () => {
             expenseModal.classList.remove('hidden');
@@ -721,7 +768,7 @@
         });
 
         // ==========================================
-        // 8. TAX DASHBOARD & SPREADSHEET LOGIC
+        // 9. TAX DASHBOARD & SPREADSHEET LOGIC
         // ==========================================
         async function fetchCloudData() {
             document.getElementById('shiftLedgerContainer').innerHTML = '<p class="text-center text-xs font-bold text-gray-500 my-4">⏳ Fetching cloud data...</p>';
@@ -879,7 +926,6 @@
         viewHistoryBtn.addEventListener('click', () => { historyModal.classList.remove('hidden'); fetchCloudData(); });
         closeHistoryBtn.addEventListener('click', () => historyModal.classList.add('hidden'));
 
-        // SAFELY DELETING WITH TEXT STRINGS TO PREVENT ID TRUNCATION
         window.deleteCloudShift = async (id) => {
             if (confirm("Permanently delete this shift?")) {
                 const { error, data } = await _supabase.from('delivery_logs').delete().eq('id', id).select();
@@ -900,7 +946,6 @@
             }
         };
 
-        // Export Functions
         printBtn.addEventListener('click', () => {
             const hideElements = document.querySelectorAll('.hide-on-print');
             hideElements.forEach(el => el.style.display = 'none');
@@ -926,7 +971,6 @@
             });
         });
 
-        // Edit Shift Logic
         window.openEditShift = (id, profit, miles, trips, odoStart, odoEnd) => {
             editShiftId.value = id; 
             editShiftProfit.value = parseFloat(profit) || 0; 
@@ -956,7 +1000,7 @@
         });
 
         // ==========================================
-        // 9. CALCULATOR & TIME PROFILE LOGIC
+        // 10. CALCULATOR & TIME PROFILE LOGIC
         // ==========================================
         function determineTimeProfile() {
             const now = new Date();
