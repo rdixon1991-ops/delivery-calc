@@ -29,14 +29,57 @@
         <!-- ========================================== -->
         <div id="authGate" class="space-y-6 py-6 text-center">
             
-            <!-- CUSTOM TREBSY LOGO & BRANDING -->
+            <!-- CUSTOM TREBSY SVG LOGO -->
             <div class="mb-8 flex flex-col items-center">
-                <img src="ChatGPT Image May 20, 2026, 07_02_35 PM.ico" alt="Trebsy Logo" class="w-24 h-24 mx-auto mb-4 rounded-full shadow-[0_0_25px_rgba(34,197,94,0.3)] border border-gray-700">
+                <svg class="w-32 h-32 mx-auto mb-4 drop-shadow-[0_0_20px_rgba(34,197,94,0.3)]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Dark Brushed Metal Background -->
+                        <radialGradient id="metalBg" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#475569" />
+                            <stop offset="70%" stop-color="#0f172a" />
+                            <stop offset="100%" stop-color="#020617" />
+                        </radialGradient>
+                        <!-- Chrome Lettering -->
+                        <linearGradient id="chromeText" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="35%" stop-color="#94a3b8"/>
+                            <stop offset="50%" stop-color="#1e293b"/>
+                            <stop offset="65%" stop-color="#cbd5e1"/>
+                            <stop offset="100%" stop-color="#f8fafc"/>
+                        </linearGradient>
+                        <!-- Neon Green Glow -->
+                        <filter id="neonGreen" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
 
-                <h1 class="text-4xl font-black uppercase tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] pb-1 flex items-baseline justify-center">
-                    <span class="bg-gradient-to-b from-gray-100 via-gray-300 to-gray-500 text-transparent bg-clip-text">OdoTrack Pro</span>
-                    <span class="text-[12px] text-emerald-400 font-bold lowercase tracking-normal ml-2 drop-shadow-md">by trebsy</span>
-                </h1>
+                    <!-- Outer Chrome Bezel -->
+                    <circle cx="100" cy="100" r="96" fill="#0f172a" stroke="url(#chromeText)" stroke-width="4" filter="drop-shadow(0px 10px 10px rgba(0,0,0,0.8))"/>
+                    
+                    <!-- Neon Green Ring -->
+                    <circle cx="100" cy="100" r="88" fill="none" stroke="#22c55e" stroke-width="3" filter="url(#neonGreen)"/>
+                    
+                    <!-- Inner Metallic Plate -->
+                    <circle cx="100" cy="100" r="84" fill="url(#metalBg)"/>
+
+                    <!-- "OdoTrack" Text -->
+                    <text x="100" y="85" font-family="sans-serif" font-weight="900" font-size="24" fill="url(#chromeText)" text-anchor="middle" letter-spacing="0.5" filter="drop-shadow(0px 4px 4px rgba(0,0,0,0.8))">ODOTRACK</text>
+                    
+                    <!-- "PRO" in Glowing Neon -->
+                    <text x="75" y="125" font-family="sans-serif" font-weight="900" font-size="32" fill="#22c55e" text-anchor="middle" filter="url(#neonGreen)">PRO</text>
+                    
+                    <!-- "by trebsy" positioned to the right -->
+                    <text x="120" y="125" font-family="sans-serif" font-style="italic" font-weight="bold" font-size="12" fill="url(#chromeText)" text-anchor="start" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.8))">by trebsy</text>
+
+                    <!-- Abstract Speedometer Needle -->
+                    <path d="M 50 160 Q 100 130 150 160" fill="none" stroke="url(#chromeText)" stroke-width="5" stroke-linecap="round"/>
+                    <polygon points="100,165 96,175 100,135 104,175" fill="#22c55e" filter="url(#neonGreen)"/>
+                </svg>
+
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] mt-1 drop-shadow-md">Professional Logbook</p>
             </div>
             
@@ -659,10 +702,12 @@
             } else {
                 alert("Shift successfully saved to Cloud!");
                 
+                // Clear local shift state
                 tripLedger = []; localStorage.removeItem('tripLedger');
                 localStorage.removeItem('shiftStartTime');
                 localStorage.removeItem('shiftStartOdo');
                 
+                // Update workspace UI and stay on home screen
                 updateShiftTrackerUI();
                 updateShiftStateUI();
             }
