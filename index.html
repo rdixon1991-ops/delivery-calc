@@ -6,7 +6,7 @@
     <title>Delivery Profit Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4">
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4 pb-10">
 
     <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6 space-y-5">
         
@@ -17,17 +17,18 @@
             
             <div class="grid grid-cols-2 gap-y-3 gap-x-4 mt-4 text-left text-xs text-gray-300 border-t border-gray-800/50 pt-4">
                 <div>Est. Gas Cost: <span id="estGas" class="font-bold text-gray-400 block text-sm mt-1">$0.00</span></div>
-                <div>Total Trip Profit: <span id="netProfit" class="font-black text-white block text-lg mt-0">$0.00</span></div>
+                <div>Current Trip Profit: <span id="netProfit" class="font-black text-white block text-lg mt-0">$0.00</span></div>
                 
                 <div class="col-span-2 pt-2 border-t border-gray-800/50 grid grid-cols-2 gap-2">
                     <div>Pay per KM: <span id="payPerKm" class="font-bold text-white block mt-1">$0.00/KM</span></div>
                     <div>Est. Hourly: <span id="payPerHour" class="font-bold text-white block mt-1">$0.00/HR</span></div>
                 </div>
-                
-                <div class="col-span-2 pt-2 border-t border-gray-800/50 text-center">
-                    Daily Goal Progress: <span id="targetProgress" class="font-bold text-white ml-1">0%</span>
-                </div>
             </div>
+            
+            <!-- Save Action -->
+            <button id="saveTripBtn" class="hidden w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-lg border-2 border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all uppercase tracking-widest text-sm">
+                💾 Save Trip to Shift
+            </button>
         </div>
 
         <!-- 2. COLLAPSIBLE INPUT SETTINGS BUTTON -->
@@ -83,7 +84,6 @@
                 <label class="block text-sm font-semibold text-gray-300 mb-2">Uber Offer ($)</label>
                 <select id="uberOffer" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
                     <option value="">Tap to select offer</option>
-                    <!-- Generated Options ($1 to $100) -->
                 </select>
             </div>
 
@@ -93,7 +93,6 @@
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Distance (KM)</label>
                     <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
                         <option value="">KM</option>
-                        <!-- Generated Options (1 to 100 KM) -->
                     </select>
                 </div>
 
@@ -102,7 +101,6 @@
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Time (Mins)</label>
                     <select id="tripDuration" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
                         <option value="">Mins</option>
-                        <!-- Generated Options (5 to 120 Mins) -->
                     </select>
                 </div>
             </div>
@@ -115,6 +113,33 @@
                     <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
                 </label>
             </div>
+        </div>
+
+        <!-- 4. SHIFT TRACKER CARD -->
+        <div class="bg-gray-900 rounded-xl border-2 border-gray-700 p-5 mt-6 shadow-lg">
+            <div class="flex justify-between items-end mb-3">
+                <div>
+                    <span class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Shift Running Total</span>
+                    <span id="shiftTotalDisplay" class="text-3xl font-black text-emerald-400">$0.00</span>
+                </div>
+                <div class="text-right">
+                    <span class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Trips</span>
+                    <span id="shiftCountDisplay" class="text-2xl font-black text-white">0</span>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-800 rounded-full h-3 mb-2 border border-gray-700">
+                <div id="shiftProgressBar" class="bg-emerald-500 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-xs font-bold text-gray-400">
+                <span>Goal Progress</span>
+                <span id="shiftProgressText">0%</span>
+            </div>
+
+            <button id="resetShiftBtn" class="w-full mt-4 bg-gray-800 hover:bg-rose-900/50 text-gray-400 hover:text-rose-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
+                Reset Shift
+            </button>
         </div>
 
     </div>
@@ -143,7 +168,18 @@
         const netProfitSpan = document.getElementById('netProfit');
         const payPerKmSpan = document.getElementById('payPerKm');
         const payPerHourSpan = document.getElementById('payPerHour');
-        const targetProgressSpan = document.getElementById('targetProgress');
+        
+        const saveTripBtn = document.getElementById('saveTripBtn');
+        const resetShiftBtn = document.getElementById('resetShiftBtn');
+        const shiftTotalDisplay = document.getElementById('shiftTotalDisplay');
+        const shiftCountDisplay = document.getElementById('shiftCountDisplay');
+        const shiftProgressBar = document.getElementById('shiftProgressBar');
+        const shiftProgressText = document.getElementById('shiftProgressText');
+
+        // State Variables for Shift
+        let shiftTotal = parseFloat(localStorage.getItem('shiftTotal')) || 0;
+        let shiftCount = parseInt(localStorage.getItem('shiftCount')) || 0;
+        let currentTripProfit = 0; // Holds valid profit before saving
 
         // Toggle Input Panel Logic
         toggleInputBtn.addEventListener('click', () => {
@@ -165,15 +201,16 @@
             if (localStorage.getItem(id)) document.getElementById(id).value = localStorage.getItem(id);
         });
 
+        // Update Tracker UI on load
+        updateShiftTrackerUI();
+
         function calculate() {
-            // Get Target Inputs
             const gasCost = parseFloat(gasCostInput.value) || 0;
             const minTripProfit = parseFloat(minTripProfitInput.value) || 0;
             const targetPayPerKm = parseFloat(targetPayInput.value) || 0;
             const targetHourly = parseFloat(targetHourlyInput.value) || 0;
             const dailyTarget = parseFloat(dailyTargetInput.value) || 0;
             
-            // Get Trip Inputs
             const uberOffer = parseFloat(uberOfferSelect.value) || 0;
             const tripDistance = parseFloat(tripDistanceSelect.value) || 0;
             const tripDuration = parseFloat(tripDurationSelect.value) || 0;
@@ -183,68 +220,111 @@
             ['gasCost', 'minTripProfit', 'targetPay', 'targetHourly', 'dailyTarget'].forEach(id => {
                 localStorage.setItem(id, document.getElementById(id).value);
             });
+            updateShiftTrackerUI(); // Recalculate progress bar if daily target changed
 
-            // Prevent calculation until all core data is entered
             if (uberOffer <= 0 || tripDistance <= 0 || tripDuration <= 0) {
-                decisionText.innerText = "ENTER DATA";
-                decisionText.className = "text-4xl font-black my-2 text-gray-400";
-                decisionLabel.className = "block text-xs font-bold text-gray-400 uppercase tracking-widest";
-                decisionBox.className = "p-6 rounded-xl border text-center transition-all duration-200 bg-gray-950 border-gray-750";
-                estGasSpan.innerText = "$0.00";
-                netProfitSpan.innerText = "$0.00";
-                payPerKmSpan.innerText = "$0.00/KM";
-                payPerHourSpan.innerText = "$0.00/HR";
-                targetProgressSpan.innerText = "0%";
+                resetDecisionUI();
                 return;
             }
 
             // Math Calculations
             const calculationDistance = tripDistance * deadMilesMultiplier;
             const estGas = calculationDistance * gasCost;
-            const netProfit = uberOffer - estGas;
+            currentTripProfit = uberOffer - estGas;
             
-            const payPerKm = tripDistance > 0 ? (netProfit / tripDistance) : 0;
+            const payPerKm = tripDistance > 0 ? (currentTripProfit / tripDistance) : 0;
             const totalHours = (tripDuration * deadMilesMultiplier) / 60;
-            const payPerHour = totalHours > 0 ? (netProfit / totalHours) : 0;
+            const payPerHour = totalHours > 0 ? (currentTripProfit / totalHours) : 0;
             
             // Triple-Filter Pass/Fail Checks
-            const passedMinProfit = netProfit >= minTripProfit;
+            const passedMinProfit = currentTripProfit >= minTripProfit;
             const passedKm = payPerKm >= targetPayPerKm;
             const passedHourly = payPerHour >= targetHourly;
             const passedAll = passedMinProfit && passedKm && passedHourly;
 
-            // Calculate Daily Target Progress
-            let progressText = "0%";
-            if (dailyTarget > 0 && netProfit > 0) {
-                const progressPercentage = (netProfit / dailyTarget) * 100;
-                progressText = `+${progressPercentage.toFixed(1)}%`;
-            }
-
-            // Status Emojis
             const getIcon = (passed) => passed ? '<span class="ml-1 text-xs">✅</span>' : '<span class="ml-1 text-xs grayscale opacity-60">❌</span>';
 
             // Update UI Strings
             estGasSpan.innerText = `-$${estGas.toFixed(2)}`;
-            netProfitSpan.innerHTML = `$${netProfit.toFixed(2)}` + getIcon(passedMinProfit);
+            netProfitSpan.innerHTML = `$${currentTripProfit.toFixed(2)}` + getIcon(passedMinProfit);
             payPerKmSpan.innerHTML = `$${payPerKm.toFixed(2)}/KM` + getIcon(passedKm);
             payPerHourSpan.innerHTML = `$${payPerHour.toFixed(2)}/HR` + getIcon(passedHourly);
-            targetProgressSpan.innerText = progressText;
+
+            // Show Save Button since data is valid
+            saveTripBtn.classList.remove('hidden');
 
             // Make Final Decision
             if (passedAll) {
                 decisionText.innerText = "ACCEPT";
                 decisionText.className = "text-4xl font-black my-2 text-white";
                 decisionLabel.className = "block text-xs font-bold text-emerald-200 uppercase tracking-widest";
-                decisionBox.className = "p-6 rounded-xl border-2 text-center transition-all duration-200 bg-emerald-600 border-emerald-400 shadow-lg shadow-emerald-900/30";
+                decisionBox.className = "p-6 rounded-xl border-2 text-center transition-all duration-200 bg-emerald-600 border-emerald-400 shadow-lg shadow-emerald-900/30 pb-4";
                 netProfitSpan.className = "font-black text-white block text-lg mt-0";
             } else {
                 decisionText.innerText = "DECLINE";
                 decisionText.className = "text-4xl font-black my-2 text-white";
                 decisionLabel.className = "block text-xs font-bold text-rose-200 uppercase tracking-widest";
-                decisionBox.className = "p-6 rounded-xl border-2 text-center transition-all duration-200 bg-rose-600 border-rose-400 shadow-lg shadow-rose-900/30";
+                decisionBox.className = "p-6 rounded-xl border-2 text-center transition-all duration-200 bg-rose-600 border-rose-400 shadow-lg shadow-rose-900/30 pb-4";
                 netProfitSpan.className = "font-black text-rose-200 block text-lg mt-0";
             }
         }
+
+        function resetDecisionUI() {
+            decisionText.innerText = "ENTER DATA";
+            decisionText.className = "text-4xl font-black my-2 text-gray-400";
+            decisionLabel.className = "block text-xs font-bold text-gray-400 uppercase tracking-widest";
+            decisionBox.className = "p-6 rounded-xl border text-center transition-all duration-200 bg-gray-950 border-gray-750";
+            estGasSpan.innerText = "$0.00";
+            netProfitSpan.innerText = "$0.00";
+            payPerKmSpan.innerText = "$0.00/KM";
+            payPerHourSpan.innerText = "$0.00/HR";
+            saveTripBtn.classList.add('hidden');
+            currentTripProfit = 0;
+        }
+
+        function updateShiftTrackerUI() {
+            const dailyTarget = parseFloat(dailyTargetInput.value) || 1; // avoid / 0
+            shiftTotalDisplay.innerText = `$${shiftTotal.toFixed(2)}`;
+            shiftCountDisplay.innerText = shiftCount;
+            
+            let progressPercentage = (shiftTotal / dailyTarget) * 100;
+            if (progressPercentage > 100) progressPercentage = 100;
+            if (progressPercentage < 0) progressPercentage = 0;
+            
+            shiftProgressBar.style.width = `${progressPercentage}%`;
+            shiftProgressText.innerText = `${((shiftTotal / dailyTarget) * 100).toFixed(1)}%`;
+        }
+
+        // Action: Save Trip
+        saveTripBtn.addEventListener('click', () => {
+            if (currentTripProfit !== 0) {
+                shiftTotal += currentTripProfit;
+                shiftCount += 1;
+                localStorage.setItem('shiftTotal', shiftTotal);
+                localStorage.setItem('shiftCount', shiftCount);
+                
+                updateShiftTrackerUI();
+
+                // Clear dropdowns for next order
+                uberOfferSelect.value = "";
+                tripDistanceSelect.value = "";
+                tripDurationSelect.value = "";
+                deadMilesInput.checked = false;
+                
+                resetDecisionUI();
+            }
+        });
+
+        // Action: Reset Shift
+        resetShiftBtn.addEventListener('click', () => {
+            if(confirm("Are you sure you want to reset your shift totals? Make sure you logged them in your spreadsheet!")) {
+                shiftTotal = 0;
+                shiftCount = 0;
+                localStorage.removeItem('shiftTotal');
+                localStorage.removeItem('shiftCount');
+                updateShiftTrackerUI();
+            }
+        });
 
         // Event Listeners
         [gasCostInput, minTripProfitInput, targetPayInput, targetHourlyInput, dailyTargetInput, uberOfferSelect, tripDistanceSelect, tripDurationSelect, deadMilesInput].forEach(element => {
