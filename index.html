@@ -8,228 +8,226 @@
     <link rel="apple-touch-icon" href="icon.svg">
     <meta name="apple-mobile-web-app-title" content="Delivery Calc">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Import Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4 pb-10 font-sans">
 
-    <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6 space-y-5">
+    <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6">
         
-        <!-- 1. COMPACT DECISION BOX -->
-        <div id="decisionBox" class="p-4 rounded-xl border transition-all duration-300 border-gray-750 relative overflow-hidden bg-cover bg-center bg-no-repeat">
-            <div id="decisionOverlay" class="absolute inset-0 bg-gray-950/90 transition-colors duration-300"></div>
-
-            <div class="relative z-10 grid grid-cols-2 gap-y-3 gap-x-4 text-left text-xs text-gray-300">
-                <div>Est. Gas Cost: <span id="estGas" class="font-bold text-gray-400 block text-sm mt-1">$0.00</span></div>
-                <div>Current Trip Profit: <span id="netProfit" class="font-black text-white block text-lg mt-0">$0.00</span></div>
-                
-                <div class="col-span-2 pt-2 border-t border-gray-800/50 grid grid-cols-2 gap-2">
-                    <div>Pay per KM: <span id="payPerKm" class="font-bold text-white block mt-1">$0.00/KM</span></div>
-                    <div>Est. Hourly: <span id="payPerHour" class="font-bold text-white block mt-1">$0.00/HR</span></div>
-                </div>
+        <!-- ========================================== -->
+        <!-- 1. THE LOGIN GATE (Shows First)            -->
+        <!-- ========================================== -->
+        <div id="authGate" class="space-y-6 py-6 text-center">
+            <div>
+                <h1 class="text-3xl font-black text-emerald-400 uppercase tracking-widest">Delivery Calc</h1>
+                <p class="text-xs text-gray-400 italic mt-2">Secure Driver Login</p>
             </div>
             
-            <button id="saveTripBtn" class="hidden relative z-10 w-full mt-3 bg-blue-600/90 backdrop-blur hover:bg-blue-500 text-white font-black py-2.5 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all uppercase tracking-widest text-xs">
-                💾 Save Trip
-            </button>
-        </div>
-
-        <!-- 2. SHIFT PROFILE HEADER -->
-        <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 flex justify-between items-center">
-            <div>
-                <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active Barrie Profile</span>
-                <span id="shiftProfileName" class="text-sm font-black text-emerald-400">Detecting Time...</span>
-            </div>
-            <button id="resetOptimumBtn" class="bg-gray-900 border border-gray-600 text-gray-300 text-xs font-bold py-1 px-3 rounded hover:bg-emerald-900 hover:text-emerald-300 hover:border-emerald-500 transition-colors">
-                ↺ Load Optimum
-            </button>
-        </div>
-
-        <!-- 3. COLLAPSIBLE INPUT SETTINGS -->
-        <div>
-            <button id="toggleInputBtn" class="w-full bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-gray-300 font-bold py-3 rounded-xl border border-gray-700 flex justify-between items-center px-5 transition-colors">
-                <span class="tracking-widest uppercase text-sm">⚙️ TRIPLE-FILTER TARGETS</span>
-                <span id="toggleIcon" class="text-xl">▼</span>
-            </button>
-
-            <div id="inputSettingsPanel" class="hidden bg-gray-900 p-5 rounded-xl border border-gray-700 space-y-4 mt-2 shadow-inner">
-                <div class="space-y-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
-                    <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest mb-2 border-b border-gray-700 pb-1">My Minimum Goals</h3>
-                    <div class="flex justify-between items-center">
-                        <label class="text-xs font-bold text-gray-400 uppercase">1. Min Profit ($)</label>
-                        <input type="number" id="minTripProfit" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <label class="text-xs font-bold text-gray-400 uppercase">2. Target ($/KM)</label>
-                        <input type="number" id="targetPay" step="0.10" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <label class="text-xs font-bold text-gray-400 uppercase">3. Wage ($/HR)</label>
-                        <input type="number" id="targetHourly" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                    </div>
-                    <button id="saveManualTargetsBtn" class="w-full mt-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 rounded transition-colors uppercase tracking-widest">
-                        💾 Save Custom Targets
+            <div class="space-y-4 mt-8 bg-gray-900 p-5 rounded-xl border border-gray-700 shadow-inner">
+                <input type="email" id="emailInput" placeholder="Driver Email" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
+                <input type="password" id="passwordInput" placeholder="Password" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
+                
+                <div class="grid grid-cols-2 gap-3 pt-3">
+                    <button id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-emerald-900/20">
+                        Log In
+                    </button>
+                    <button id="signupBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest">
+                        Sign Up
                     </button>
                 </div>
-                <div class="grid grid-cols-2 gap-3 mt-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Daily Target ($)</label>
-                        <input type="number" id="dailyTarget" step="5.00" value="100.00" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Gas Cost ($/KM)</label>
-                        <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                    </div>
-                </div>
+                
+                <button id="forgotPasswordBtn" class="w-full text-blue-400 hover:text-blue-300 text-[10px] font-bold pt-4 transition-colors uppercase tracking-widest">
+                    Forgot Password?
+                </button>
+                
+                <p id="authMessage" class="text-xs font-bold mt-2 h-4 text-emerald-400"></p>
             </div>
         </div>
 
-        <hr class="border-gray-700">
-
-        <!-- 4. DROP-DOWN INPUTS -->
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-semibold text-gray-300 mb-2">Uber Offer ($)</label>
-                <select id="uberOffer" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
-                    <option value="">Tap to select offer</option>
-                </select>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">Distance (KM)</label>
-                    <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
-                        <option value="">KM</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">Time (Mins)</label>
-                    <select id="tripDuration" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
-                        <option value="">Mins</option>
-                    </select>
-                </div>
-            </div>
-            <div class="flex items-center justify-between bg-gray-800 p-4 rounded-xl border border-gray-700 mt-2">
-                <span class="text-sm font-bold text-gray-300">Requires empty return trip?</span>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="deadMiles" class="sr-only peer">
-                    <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
-                </label>
-            </div>
-        </div>
-
-        <!-- 5. SHIFT TRACKER CARD WITH LEDGER & MILEAGE -->
-        <div class="bg-gray-900 rounded-xl border-2 border-gray-700 p-5 mt-6 shadow-lg">
-            <div class="flex justify-between items-end mb-3">
-                <div class="flex-1">
-                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total</span>
-                    <span id="shiftTotalDisplay" class="text-2xl font-black text-emerald-400">$0.00</span>
-                </div>
-                <div class="flex-1 text-center border-x border-gray-700 px-2 mx-2">
-                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">App Miles</span>
-                    <span id="shiftDistanceDisplay" class="text-xl font-black text-blue-400">0 KM</span>
-                </div>
-                <div class="flex-1 text-right">
-                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Trips</span>
-                    <span id="shiftCountDisplay" class="text-2xl font-black text-white">0</span>
-                </div>
-            </div>
+        <!-- ========================================== -->
+        <!-- 2. THE MAIN APP (Hidden until logged in)   -->
+        <!-- ========================================== -->
+        <div id="mainAppWrapper" class="hidden space-y-5">
             
-            <div class="w-full bg-gray-800 rounded-full h-3 mb-2 border border-gray-700 mt-2">
-                <div id="shiftProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
-            <div class="flex justify-between text-xs font-bold text-gray-400 mb-4">
-                <span>Goal Progress</span>
-                <span id="shiftProgressText">0%</span>
-            </div>
-
-            <!-- EXPORT CONTROLS -->
-            <button id="exportCloudBtn" class="w-full bg-blue-600/90 hover:bg-blue-500 text-white font-black py-3 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-colors text-sm uppercase tracking-widest mb-3">
-                ☁️ Push Shift to Cloud
-            </button>
-            <div class="grid grid-cols-2 gap-3">
-                <button id="toggleLedgerBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
-                    📋 Trip Ledger
-                </button>
-                <button id="resetShiftBtn" class="bg-gray-800 hover:bg-rose-900/50 text-gray-400 hover:text-rose-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
-                    Reset Shift
+            <!-- COMPACT DECISION BOX -->
+            <div id="decisionBox" class="p-4 rounded-xl border transition-all duration-300 border-gray-750 relative overflow-hidden bg-cover bg-center bg-no-repeat">
+                <div id="decisionOverlay" class="absolute inset-0 bg-gray-950/90 transition-colors duration-300"></div>
+                <div class="relative z-10 grid grid-cols-2 gap-y-3 gap-x-4 text-left text-xs text-gray-300">
+                    <div>Est. Gas Cost: <span id="estGas" class="font-bold text-gray-400 block text-sm mt-1">$0.00</span></div>
+                    <div>Current Trip Profit: <span id="netProfit" class="font-black text-white block text-lg mt-0">$0.00</span></div>
+                    <div class="col-span-2 pt-2 border-t border-gray-800/50 grid grid-cols-2 gap-2">
+                        <div>Pay per KM: <span id="payPerKm" class="font-bold text-white block mt-1">$0.00/KM</span></div>
+                        <div>Est. Hourly: <span id="payPerHour" class="font-bold text-white block mt-1">$0.00/HR</span></div>
+                    </div>
+                </div>
+                <button id="saveTripBtn" class="hidden relative z-10 w-full mt-3 bg-blue-600/90 backdrop-blur hover:bg-blue-500 text-white font-black py-2.5 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all uppercase tracking-widest text-xs">
+                    💾 Save Trip
                 </button>
             </div>
 
-            <!-- ODOMETER LOGGING -->
-            <div class="mt-5 pt-4 border-t border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Odometer Log</span>
-                    <span id="odometerTotalDisplay" class="text-xs font-black text-blue-400">0 KM Logged</span>
+            <!-- SHIFT PROFILE HEADER -->
+            <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 flex justify-between items-center">
+                <div>
+                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active Barrie Profile</span>
+                    <span id="shiftProfileName" class="text-sm font-black text-emerald-400">Detecting Time...</span>
+                </div>
+                <button id="resetOptimumBtn" class="bg-gray-900 border border-gray-600 text-gray-300 text-xs font-bold py-1 px-3 rounded hover:bg-emerald-900 hover:text-emerald-300 hover:border-emerald-500 transition-colors">
+                    ↺ Load Optimum
+                </button>
+            </div>
+
+            <!-- COLLAPSIBLE INPUT SETTINGS -->
+            <div>
+                <button id="toggleInputBtn" class="w-full bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-gray-300 font-bold py-3 rounded-xl border border-gray-700 flex justify-between items-center px-5 transition-colors">
+                    <span class="tracking-widest uppercase text-sm">⚙️ TRIPLE-FILTER TARGETS</span>
+                    <span id="toggleIcon" class="text-xl">▼</span>
+                </button>
+                <div id="inputSettingsPanel" class="hidden bg-gray-900 p-5 rounded-xl border border-gray-700 space-y-4 mt-2 shadow-inner">
+                    <div class="space-y-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                        <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest mb-2 border-b border-gray-700 pb-1">My Minimum Goals</h3>
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-bold text-gray-400 uppercase">1. Min Profit ($)</label>
+                            <input type="number" id="minTripProfit" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-bold text-gray-400 uppercase">2. Target ($/KM)</label>
+                            <input type="number" id="targetPay" step="0.10" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-bold text-gray-400 uppercase">3. Wage ($/HR)</label>
+                            <input type="number" id="targetHourly" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        </div>
+                        <button id="saveManualTargetsBtn" class="w-full mt-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 rounded transition-colors uppercase tracking-widest">
+                            💾 Save Custom Targets
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mt-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Daily Target ($)</label>
+                            <input type="number" id="dailyTarget" step="5.00" value="100.00" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Gas Cost ($/KM)</label>
+                            <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-gray-700">
+
+            <!-- DROP-DOWN INPUTS -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Uber Offer ($)</label>
+                    <select id="uberOffer" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
+                        <option value="">Tap to select offer</option>
+                    </select>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Start Shift</label>
-                        <input type="number" id="startOdometer" placeholder="Start KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Distance (KM)</label>
+                        <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
+                            <option value="">KM</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">End Shift</label>
-                        <input type="number" id="endOdometer" placeholder="End KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Time (Mins)</label>
+                        <select id="tripDuration" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
+                            <option value="">Mins</option>
+                        </select>
                     </div>
+                </div>
+                <div class="flex items-center justify-between bg-gray-800 p-4 rounded-xl border border-gray-700 mt-2">
+                    <span class="text-sm font-bold text-gray-300">Requires empty return trip?</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="deadMiles" class="sr-only peer">
+                        <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
                 </div>
             </div>
 
-            <!-- Expandable Trip Ledger List -->
-            <div id="tripLedgerPanel" class="hidden mt-4 pt-4 border-t border-gray-700 space-y-2 max-h-48 overflow-y-auto pr-1">
-                <div id="emptyLedgerMsg" class="text-center text-gray-500 text-xs italic">No trips saved yet.</div>
-                <ul id="tripList" class="space-y-2"></ul>
-            </div>
-        </div>
-
-        <!-- 6. DRIVER ACCOUNT & AUTH PANEL -->
-        <div class="mt-6">
-            <button id="toggleAuthBtn" class="w-full text-gray-500 hover:text-gray-300 font-bold py-2 flex justify-center items-center transition-colors text-[10px] uppercase tracking-widest">
-                👤 Driver Account Portal
-            </button>
-
-            <div id="authPanel" class="hidden bg-gray-900 p-5 rounded-xl border border-gray-700 space-y-4 mt-2 shadow-inner text-center">
+            <!-- SHIFT TRACKER CARD WITH LEDGER & MILEAGE -->
+            <div class="bg-gray-900 rounded-xl border-2 border-gray-700 p-5 mt-6 shadow-lg">
+                <div class="flex justify-between items-end mb-3">
+                    <div class="flex-1">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total</span>
+                        <span id="shiftTotalDisplay" class="text-2xl font-black text-emerald-400">$0.00</span>
+                    </div>
+                    <div class="flex-1 text-center border-x border-gray-700 px-2 mx-2">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">App Miles</span>
+                        <span id="shiftDistanceDisplay" class="text-xl font-black text-blue-400">0 KM</span>
+                    </div>
+                    <div class="flex-1 text-right">
+                        <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Trips</span>
+                        <span id="shiftCountDisplay" class="text-2xl font-black text-white">0</span>
+                    </div>
+                </div>
                 
-                <!-- Logged Out View -->
-                <!-- Logged Out View -->
-                <div id="loggedOutView" class="space-y-3">
-                    <p class="text-xs text-gray-400 italic mb-4">Log in to securely backup your shifts to the cloud.</p>
-                    <input type="email" id="emailInput" placeholder="Driver Email" class="w-full bg-gray-950 border border-gray-700 rounded py-2 px-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                    <input type="password" id="passwordInput" placeholder="Password" class="w-full bg-gray-950 border border-gray-700 rounded py-2 px-3 text-sm text-white focus:outline-none focus:border-emerald-500">
-                    
-                    <div class="grid grid-cols-2 gap-3 pt-2">
-                        <button id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-2 rounded transition-colors uppercase tracking-widest">
-                            Log In
-                        </button>
-                        <button id="signupBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 rounded transition-colors uppercase tracking-widest">
-                            Sign Up
-                        </button>
-                    </div>
-                    
-                    <!-- NEW FORGOT PASSWORD BUTTON -->
-                    <button id="forgotPasswordBtn" class="w-full text-blue-400 hover:text-blue-300 text-[10px] font-bold mt-1 transition-colors uppercase tracking-widest">
-                        Forgot Password?
-                    </button>
-                    
-                    <p id="authMessage" class="text-xs font-bold mt-2 h-4 text-emerald-400"></p>
+                <div class="w-full bg-gray-800 rounded-full h-3 mb-2 border border-gray-700 mt-2">
+                    <div id="shiftProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-xs font-bold text-gray-400 mb-4">
+                    <span>Goal Progress</span>
+                    <span id="shiftProgressText">0%</span>
                 </div>
 
-                <!-- Logged In View -->
-                <div id="loggedInView" class="hidden space-y-3">
-                    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
+                <!-- EXPORT CONTROLS -->
+                <button id="exportCloudBtn" class="w-full bg-blue-600/90 hover:bg-blue-500 text-white font-black py-3 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-colors text-sm uppercase tracking-widest mb-3">
+                    ☁️ Push Shift to Cloud
+                </button>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="toggleLedgerBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
+                        📋 Trip Ledger
+                    </button>
+                    <button id="resetShiftBtn" class="bg-gray-800 hover:bg-rose-900/50 text-gray-400 hover:text-rose-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
+                        Reset Shift
+                    </button>
+                </div>
+
+                <!-- ODOMETER LOGGING -->
+                <div class="mt-5 pt-4 border-t border-gray-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Odometer Log</span>
+                        <span id="odometerTotalDisplay" class="text-xs font-black text-blue-400">0 KM Logged</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Start Shift</label>
+                            <input type="number" id="startOdometer" placeholder="Start KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">End Shift</label>
+                            <input type="number" id="endOdometer" placeholder="End KM" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expandable Trip Ledger List -->
+                <div id="tripLedgerPanel" class="hidden mt-4 pt-4 border-t border-gray-700 space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <div id="emptyLedgerMsg" class="text-center text-gray-500 text-xs italic">No trips saved yet.</div>
+                    <ul id="tripList" class="space-y-2"></ul>
+                </div>
+            </div>
+
+            <!-- 3. DRIVER ACCOUNT MANAGER -->
+            <div class="mt-6 pt-5 border-t border-gray-700">
+                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex justify-between items-center shadow-lg">
+                    <div>
                         <span class="block text-[10px] text-gray-500 uppercase tracking-widest">Logged In As</span>
                         <span id="userEmailDisplay" class="text-sm font-black text-emerald-400">driver@email.com</span>
                     </div>
-                    <button id="logoutBtn" class="w-full bg-rose-900/40 hover:bg-rose-800 text-rose-400 hover:text-white text-xs font-bold py-2 rounded border border-rose-700/50 transition-colors uppercase tracking-widest">
+                    <button id="logoutBtn" class="bg-gray-900 hover:bg-rose-900/40 text-rose-400 hover:text-rose-300 text-xs font-bold py-2 px-4 rounded border border-rose-700/50 transition-colors uppercase tracking-widest">
                         Log Out
                     </button>
                 </div>
-
             </div>
-        </div>
 
+        </div> <!-- End of mainAppWrapper -->
     </div>
 
     <script>
-       // ==========================================
+        // ==========================================
         // 1. SUPABASE DATABASE SETUP
         // ==========================================
         const { createClient } = supabase;
@@ -244,6 +242,9 @@
         // ==========================================
         // 2. DOM ELEMENTS
         // ==========================================
+        const authGate = document.getElementById('authGate');
+        const mainAppWrapper = document.getElementById('mainAppWrapper');
+
         const minTripProfitInput = document.getElementById('minTripProfit');
         const targetPayInput = document.getElementById('targetPay');
         const targetHourlyInput = document.getElementById('targetHourly');
@@ -287,14 +288,11 @@
         const odometerTotalDisplay = document.getElementById('odometerTotalDisplay');
 
         // Auth Elements
-        const toggleAuthBtn = document.getElementById('toggleAuthBtn');
-        const authPanel = document.getElementById('authPanel');
-        const loggedOutView = document.getElementById('loggedOutView');
-        const loggedInView = document.getElementById('loggedInView');
         const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
         const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
+        const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         const userEmailDisplay = document.getElementById('userEmailDisplay');
         const authMessage = document.getElementById('authMessage');
@@ -305,19 +303,34 @@
         let tripLedger = JSON.parse(localStorage.getItem('tripLedger')) || [];
 
         // ==========================================
-        // 3. AUTHENTICATION LOGIC
+        // 3. AUTHENTICATION LOGIC (THE LOGIN GATE)
         // ==========================================
         async function checkUser() {
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 currentUser = session.user;
-                loggedOutView.classList.add('hidden');
-                loggedInView.classList.remove('hidden');
+                // Hide Login, Show App
+                authGate.classList.add('hidden');
+                mainAppWrapper.classList.remove('hidden');
                 userEmailDisplay.innerText = currentUser.email;
+                
+                // Initialize calculators when logged in
+                if (manualOverride) {
+                    shiftProfileName.innerText = "Custom Settings";
+                    shiftProfileName.className = "text-sm font-black text-amber-400";
+                    minTripProfitInput.value = localStorage.getItem('customMin') || 5.00;
+                    targetPayInput.value = localStorage.getItem('customKm') || 1.20;
+                    targetHourlyInput.value = localStorage.getItem('customHr') || 20.00;
+                } else {
+                    loadOptimumSettings();
+                }
+                updateShiftTrackerUI();
+                updateOdometer();
             } else {
                 currentUser = null;
-                loggedOutView.classList.remove('hidden');
-                loggedInView.classList.add('hidden');
+                // Show Login, Hide App
+                authGate.classList.remove('hidden');
+                mainAppWrapper.classList.add('hidden');
             }
         }
 
@@ -357,16 +370,31 @@
             }
         });
 
+        forgotPasswordBtn.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            if (!email) {
+                authMessage.innerText = "Please enter your email address first.";
+                authMessage.className = "text-xs font-bold mt-2 h-4 text-amber-400";
+                return;
+            }
+            authMessage.innerText = "Sending reset link...";
+            authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
+            const { data, error } = await _supabase.auth.resetPasswordForEmail(email);
+            if (error) {
+                authMessage.innerText = error.message;
+                authMessage.className = "text-xs font-bold mt-2 h-4 text-rose-400";
+            } else {
+                authMessage.innerText = "Reset link sent! Check your email.";
+                authMessage.className = "text-xs font-bold mt-2 h-4 text-emerald-400";
+            }
+        });
+
         logoutBtn.addEventListener('click', async () => {
             await _supabase.auth.signOut();
             checkUser();
         });
 
-        toggleAuthBtn.addEventListener('click', () => {
-            authPanel.classList.toggle('hidden');
-        });
-
-        // Initialize Auth Check
+        // Initialize Auth Check on Page Load
         checkUser();
 
         // ==========================================
@@ -378,7 +406,6 @@
             const hour = now.getHours(); 
             
             let profile = { name: "Off-Peak", min: 4, km: 1.00, hr: 16 };
-
             if ((day === 5 || day === 6) && (hour >= 17 && hour < 21)) {
                 profile = { name: "Peak Dinner Rush", min: 6, km: 1.50, hr: 24 };
             } else if ((day === 5 || day === 6) && (hour >= 22 || hour < 2)) {
@@ -428,18 +455,6 @@
         if (localStorage.getItem('dailyTarget')) dailyTargetInput.value = localStorage.getItem('dailyTarget');
         if (localStorage.getItem('startOdometer')) startOdometerInput.value = localStorage.getItem('startOdometer');
         if (localStorage.getItem('endOdometer')) endOdometerInput.value = localStorage.getItem('endOdometer');
-
-        if (manualOverride) {
-            shiftProfileName.innerText = "Custom Settings";
-            shiftProfileName.className = "text-sm font-black text-amber-400";
-            minTripProfitInput.value = localStorage.getItem('customMin') || 5.00;
-            targetPayInput.value = localStorage.getItem('customKm') || 1.20;
-            targetHourlyInput.value = localStorage.getItem('customHr') || 20.00;
-        } else {
-            loadOptimumSettings();
-        }
-        updateShiftTrackerUI();
-        updateOdometer();
 
         toggleInputBtn.addEventListener('click', () => {
             inputSettingsPanel.classList.toggle('hidden');
@@ -618,11 +633,7 @@
         // 5. PUSH TO SUPABASE DATABASE
         // ==========================================
         exportCloudBtn.addEventListener('click', async () => {
-            if (!currentUser) {
-                alert("You must be logged into your Driver Account to save shifts to the cloud. Open the portal at the bottom of the screen!");
-                authPanel.classList.remove('hidden');
-                return;
-            }
+            if (!currentUser) return;
 
             if (tripLedger.length === 0) {
                 alert("No trips to save! Add some trips to your ledger first.");
