@@ -29,34 +29,15 @@
         <!-- ========================================== -->
         <div id="authGate" class="space-y-6 py-6 text-center">
             
-            <!-- NEW METALLIC LOGO & BRANDING -->
-            <div class="mb-8">
-                <svg class="w-20 h-20 mx-auto mb-4 drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#e2e8f0" />
-                            <stop offset="40%" stop-color="#94a3b8" />
-                            <stop offset="60%" stop-color="#f8fafc" />
-                            <stop offset="100%" stop-color="#64748b" />
-                        </linearGradient>
-                        <linearGradient id="metalRing" x1="100%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#cbd5e1" />
-                            <stop offset="50%" stop-color="#475569" />
-                            <stop offset="100%" stop-color="#f1f5f9" />
-                        </linearGradient>
-                    </defs>
-                    <!-- Outer Ring -->
-                    <circle cx="50" cy="50" r="45" stroke="url(#metalRing)" stroke-width="8" />
-                    <!-- Inner Dial -->
-                    <path d="M 20 50 A 30 30 0 0 1 80 50" stroke="url(#metalGrad)" stroke-width="4" stroke-dasharray="4 6" fill="none"/>
-                    <!-- Needle -->
-                    <path d="M 50 55 L 75 35" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
-                    <!-- Center Pivot -->
-                    <circle cx="50" cy="55" r="6" fill="url(#metalGrad)" />
-                </svg>
+            <!-- CUSTOM TREBSY LOGO & BRANDING -->
+            <div class="mb-8 flex flex-col items-center">
+                <img src="ChatGPT Image May 20, 2026, 07_02_35 PM.ico" alt="Trebsy Logo" class="w-24 h-24 mx-auto mb-4 rounded-full shadow-[0_0_25px_rgba(34,197,94,0.3)] border border-gray-700">
 
-                <h1 class="text-4xl font-black uppercase tracking-widest bg-gradient-to-b from-gray-100 via-gray-300 to-gray-500 text-transparent bg-clip-text drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] pb-1">OdoTrack Pro</h1>
-                <p class="text-[10px] text-blue-300 font-bold uppercase tracking-[0.3em] mt-1 drop-shadow-md">Professional Logbook</p>
+                <h1 class="text-4xl font-black uppercase tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] pb-1 flex items-baseline justify-center">
+                    <span class="bg-gradient-to-b from-gray-100 via-gray-300 to-gray-500 text-transparent bg-clip-text">OdoTrack Pro</span>
+                    <span class="text-[12px] text-emerald-400 font-bold lowercase tracking-normal ml-2 drop-shadow-md">by trebsy</span>
+                </h1>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] mt-1 drop-shadow-md">Professional Logbook</p>
             </div>
             
             <form id="loginForm" class="space-y-4 bg-gray-900 p-5 rounded-xl border border-gray-700 shadow-inner">
@@ -223,7 +204,7 @@
                     
                     <button id="confirmStartShiftBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-lg mt-2 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-blue-900/40">🚀 Begin Shift</button>
                     
-                    <!-- NEW RESUME BUTTON -->
+                    <!-- RESUME BUTTON -->
                     <button id="skipStartShiftBtn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-lg mt-2 transition-colors uppercase tracking-widest text-xs border border-gray-600 shadow-inner">⏭️ Resume App (Home)</button>
                     
                     <p id="startShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
@@ -428,7 +409,6 @@
         const shiftProgressBar = document.getElementById('shiftProgressBar');
 
         const shiftStatusBadge = document.getElementById('shiftStatusBadge');
-        const shiftStatusDot = document.getElementById('shiftStatusDot');
         const displayStartOdo = document.getElementById('displayStartOdo');
         const triggerStartShiftBtn = document.getElementById('triggerStartShiftBtn');
         const triggerEndShiftBtn = document.getElementById('triggerEndShiftBtn');
@@ -504,7 +484,6 @@
                 loadSettings();
                 updateShiftTrackerUI();
                 
-                // Only pop modal on initial app load if no shift is active
                 const shiftStartTime = localStorage.getItem('shiftStartTime');
                 if (!shiftStartTime) {
                     startShiftModal.classList.remove('hidden');
@@ -566,7 +545,6 @@
             const shiftStartOdo = localStorage.getItem('shiftStartOdo');
 
             if (shiftStartTime && shiftStartOdo) {
-                // Shift is Active
                 shiftStatusBadge.className = "text-xs font-black text-emerald-400 flex items-center";
                 shiftStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>ACTIVE';
                 displayStartOdo.innerText = shiftStartOdo;
@@ -574,7 +552,6 @@
                 triggerStartShiftBtn.classList.add('hidden');
                 triggerEndShiftBtn.classList.remove('hidden');
             } else {
-                // Shift is Inactive
                 shiftStatusBadge.className = "text-xs font-black text-gray-500 flex items-center";
                 shiftStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-gray-500 mr-2"></span>INACTIVE';
                 displayStartOdo.innerText = "Not Started";
@@ -682,12 +659,10 @@
             } else {
                 alert("Shift successfully saved to Cloud!");
                 
-                // Clear local shift state
                 tripLedger = []; localStorage.removeItem('tripLedger');
                 localStorage.removeItem('shiftStartTime');
                 localStorage.removeItem('shiftStartOdo');
                 
-                // Update workspace UI and stay on home screen
                 updateShiftTrackerUI();
                 updateShiftStateUI();
             }
