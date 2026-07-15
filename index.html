@@ -8,24 +8,59 @@
 </head>
 <body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6 space-y-6">
+    <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6 space-y-5">
         
         <!-- 1. HIGH-VISIBILITY DECISION AT THE TOP -->
         <div id="decisionBox" class="p-6 rounded-xl border text-center transition-all duration-300 bg-gray-950 border-gray-750">
             <span id="decisionLabel" class="block text-xs font-bold text-gray-400 uppercase tracking-widest">DECISION</span>
             <div id="decisionText" class="text-4xl font-black my-2 text-gray-400">ENTER DATA</div>
             
-            <div class="grid grid-cols-2 gap-2 mt-4 text-left text-xs text-gray-300 border-t border-gray-800/50 pt-3">
-                <div>Est. Gas Cost: <span id="estGas" class="font-bold text-white">$0.00</span></div>
-                <div>Est. Net Profit: <span id="netProfit" class="font-bold text-white">$0.00</span></div>
-                <div class="col-span-2 mt-1 pt-1 border-t border-gray-800/30">Net Pay per KM: <span id="payPerKm" class="font-bold text-white">$0.00/KM</span></div>
+            <div class="grid grid-cols-2 gap-y-3 gap-x-4 mt-4 text-left text-xs text-gray-300 border-t border-gray-800/50 pt-4">
+                <div>Est. Gas Cost: <span id="estGas" class="font-bold text-white block text-sm mt-1">$0.00</span></div>
+                <div>Total Trip Profit: <span id="netProfit" class="font-black text-emerald-400 block text-lg mt-0">$0.00</span></div>
+                
+                <div class="col-span-2 pt-2 border-t border-gray-800/50 grid grid-cols-2 gap-2">
+                    <div>Pay per KM: <span id="payPerKm" class="font-bold text-white block mt-1">$0.00/KM</span></div>
+                    <div>Est. Hourly: <span id="payPerHour" class="font-bold text-white block mt-1">$0.00/HR</span></div>
+                </div>
+                
+                <div class="col-span-2 pt-2 border-t border-gray-800/50 text-center">
+                    Daily Goal Progress: <span id="targetProgress" class="font-bold text-white ml-1">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. COLLAPSIBLE INPUT SETTINGS BUTTON -->
+        <div>
+            <button id="toggleInputBtn" class="w-full bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-gray-300 font-bold py-3 rounded-xl border border-gray-700 flex justify-between items-center px-5 transition-colors">
+                <span class="tracking-widest uppercase text-sm">⚙️ INPUT SETTINGS</span>
+                <span id="toggleIcon" class="text-xl">▼</span>
+            </button>
+
+            <!-- Hidden Input Panel -->
+            <div id="inputSettingsPanel" class="hidden bg-gray-900 p-5 rounded-xl border border-gray-700 space-y-4 mt-2 shadow-inner">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Target Pay ($/KM)</label>
+                    <input type="number" id="targetPay" step="0.10" value="1.50" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-lg font-black text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Net Target for the Day ($)</label>
+                    <input type="number" id="dailyTarget" step="5.00" value="100.00" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-lg font-black text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">My Vehicle Gas Cost ($/KM)</label>
+                    <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-lg font-bold text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
             </div>
         </div>
 
         <hr class="border-gray-700">
 
-        <!-- 2. LARGE, EASY-TO-CLICK DROP-DOWN INPUTS (1-100) -->
-        <div class="space-y-5">
+        <!-- 3. LARGE, EASY-TO-CLICK DROP-DOWN INPUTS -->
+        <div class="space-y-4">
             <!-- Uber Offer Dropdown -->
             <div>
                 <label class="block text-sm font-semibold text-gray-300 mb-2">Uber Offer ($)</label>
@@ -35,36 +70,33 @@
                 </select>
             </div>
 
-            <!-- Trip Distance Dropdown -->
-            <div>
-                <label class="block text-sm font-semibold text-gray-300 mb-2">Trip Distance (KM)</label>
-                <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
-                    <option value="">Tap to select distance</option>
-                    <!-- Generated Options (1 to 100 KM) -->
-                </select>
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Trip Distance Dropdown -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Distance (KM)</label>
+                    <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
+                        <option value="">KM</option>
+                        <!-- Generated Options (1 to 100 KM) -->
+                    </select>
+                </div>
+
+                <!-- Trip Duration Dropdown -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Time (Mins)</label>
+                    <select id="tripDuration" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
+                        <option value="">Mins</option>
+                        <!-- Generated Options (5 to 120 Mins) -->
+                    </select>
+                </div>
             </div>
 
             <!-- Dead Miles Toggle -->
-            <div class="flex items-center justify-between bg-gray-800 p-4 rounded-xl border border-gray-700">
+            <div class="flex items-center justify-between bg-gray-800 p-4 rounded-xl border border-gray-700 mt-2">
                 <span class="text-sm font-bold text-gray-300">Requires empty return trip?</span>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="deadMiles" class="sr-only peer">
                     <div class="w-14 h-8 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
                 </label>
-            </div>
-        </div>
-
-        <hr class="border-gray-700">
-
-        <!-- Constants (Saved to Local Storage) -->
-        <div class="grid grid-cols-2 gap-4 bg-gray-800 p-3 rounded-xl border border-gray-750">
-            <div>
-                <label class="block text-xs font-semibold text-gray-400 uppercase">Gas Cost ($/KM)</label>
-                <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-transparent text-lg font-bold text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 rounded px-1">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-400 uppercase">Target ($/KM)</label>
-                <input type="number" id="targetPay" step="0.10" value="1.50" class="w-full bg-transparent text-lg font-bold text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 rounded px-1">
             </div>
         </div>
 
@@ -74,18 +106,36 @@
         // DOM Elements
         const gasCostInput = document.getElementById('gasCost');
         const targetPayInput = document.getElementById('targetPay');
+        const dailyTargetInput = document.getElementById('dailyTarget');
         const uberOfferSelect = document.getElementById('uberOffer');
         const tripDistanceSelect = document.getElementById('tripDistance');
+        const tripDurationSelect = document.getElementById('tripDuration');
         const deadMilesInput = document.getElementById('deadMiles');
         
+        const toggleInputBtn = document.getElementById('toggleInputBtn');
+        const inputSettingsPanel = document.getElementById('inputSettingsPanel');
+        const toggleIcon = document.getElementById('toggleIcon');
+
         const decisionBox = document.getElementById('decisionBox');
         const decisionText = document.getElementById('decisionText');
         const decisionLabel = document.getElementById('decisionLabel');
         const estGasSpan = document.getElementById('estGas');
         const netProfitSpan = document.getElementById('netProfit');
         const payPerKmSpan = document.getElementById('payPerKm');
+        const payPerHourSpan = document.getElementById('payPerHour');
+        const targetProgressSpan = document.getElementById('targetProgress');
 
-        // Dynamically populate Offer Dropdown ($1 to $100 in $1 increments)
+        // Toggle Input Panel Logic
+        toggleInputBtn.addEventListener('click', () => {
+            inputSettingsPanel.classList.toggle('hidden');
+            if (inputSettingsPanel.classList.contains('hidden')) {
+                toggleIcon.innerText = '▼';
+            } else {
+                toggleIcon.innerText = '▲';
+            }
+        });
+
+        // Dynamically populate Offer Dropdown ($1 to $100)
         for (let i = 1; i <= 100; i++) {
             let opt = document.createElement('option');
             opt.value = i;
@@ -93,7 +143,7 @@
             uberOfferSelect.appendChild(opt);
         }
 
-        // Dynamically populate Distance Dropdown (1 to 100 KM in 1 KM increments)
+        // Dynamically populate Distance Dropdown (1 to 100 KM)
         for (let i = 1; i <= 100; i++) {
             let opt = document.createElement('option');
             opt.value = i;
@@ -101,22 +151,34 @@
             tripDistanceSelect.appendChild(opt);
         }
 
-        // Load saved values
+        // Dynamically populate Duration Dropdown (5 to 120 minutes)
+        for (let i = 5; i <= 120; i += 5) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.innerHTML = `${i} Mins`;
+            tripDurationSelect.appendChild(opt);
+        }
+
+        // Load saved settings from local storage
         if (localStorage.getItem('gasCost')) gasCostInput.value = localStorage.getItem('gasCost');
         if (localStorage.getItem('targetPay')) targetPayInput.value = localStorage.getItem('targetPay');
+        if (localStorage.getItem('dailyTarget')) dailyTargetInput.value = localStorage.getItem('dailyTarget');
 
         function calculate() {
             const gasCost = parseFloat(gasCostInput.value) || 0;
             const targetPay = parseFloat(targetPayInput.value) || 0;
+            const dailyTarget = parseFloat(dailyTargetInput.value) || 0;
             const uberOffer = parseFloat(uberOfferSelect.value) || 0;
             const tripDistance = parseFloat(tripDistanceSelect.value) || 0;
+            const tripDuration = parseFloat(tripDurationSelect.value) || 0;
             const deadMilesMultiplier = deadMilesInput.checked ? 2 : 1;
 
-            // Save settings
+            // Save user settings locally
             localStorage.setItem('gasCost', gasCost);
             localStorage.setItem('targetPay', targetPay);
+            localStorage.setItem('dailyTarget', dailyTarget);
 
-            if (uberOffer <= 0 || tripDistance <= 0) {
+            if (uberOffer <= 0 || tripDistance <= 0 || tripDuration <= 0) {
                 decisionText.innerText = "ENTER DATA";
                 decisionText.className = "text-4xl font-black my-2 text-gray-400";
                 decisionLabel.className = "block text-xs font-bold text-gray-400 uppercase tracking-widest";
@@ -124,18 +186,33 @@
                 estGasSpan.innerText = "$0.00";
                 netProfitSpan.innerText = "$0.00";
                 payPerKmSpan.innerText = "$0.00/KM";
+                payPerHourSpan.innerText = "$0.00/HR";
+                targetProgressSpan.innerText = "0%";
                 return;
             }
 
-            // Math
-            const estGas = tripDistance * gasCost * deadMilesMultiplier;
+            // Math Calculations
+            const calculationDistance = tripDistance * deadMilesMultiplier;
+            const estGas = calculationDistance * gasCost;
             const netProfit = uberOffer - estGas;
+            
             const payPerKm = tripDistance > 0 ? (netProfit / tripDistance) : 0;
+            const totalHours = (tripDuration * deadMilesMultiplier) / 60;
+            const payPerHour = totalHours > 0 ? (netProfit / totalHours) : 0;
+            
+            // Calculate Daily Target Progress
+            let progressText = "0%";
+            if (dailyTarget > 0 && netProfit > 0) {
+                const progressPercentage = (netProfit / dailyTarget) * 100;
+                progressText = `+${progressPercentage.toFixed(1)}%`;
+            }
 
-            // Update UI Card Values
-            estGasSpan.innerText = `$${estGas.toFixed(2)}`;
+            // Update UI
+            estGasSpan.innerText = `-$${estGas.toFixed(2)}`;
             netProfitSpan.innerText = `$${netProfit.toFixed(2)}`;
             payPerKmSpan.innerText = `$${payPerKm.toFixed(2)}/KM`;
+            payPerHourSpan.innerText = `$${payPerHour.toFixed(2)}/HR`;
+            targetProgressSpan.innerText = progressText;
 
             // Make Decision
             if (payPerKm >= targetPay) {
@@ -152,7 +229,7 @@
         }
 
         // Event Listeners
-        [gasCostInput, targetPayInput, uberOfferSelect, tripDistanceSelect, deadMilesInput].forEach(element => {
+        [gasCostInput, targetPayInput, dailyTargetInput, uberOfferSelect, tripDistanceSelect, tripDurationSelect, deadMilesInput].forEach(element => {
             element.addEventListener('input', calculate);
         });
     </script>
