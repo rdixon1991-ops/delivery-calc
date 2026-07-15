@@ -26,9 +26,10 @@
     
     <div class="grid grid-cols-2 gap-3 pt-3">
         <!-- Changing the Log In button to be the main form submitter -->
-        <button type="submit" id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-emerald-900/20">
-            Log In
-        </button>
+       <!-- Change type="submit" back to type="button" -->
+<button type="button" id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-emerald-900/20">
+    Log In
+</button>
         <!-- Signup remains a button so it doesn't trigger a form submit -->
         <button type="button" id="signupBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest">
             Sign Up
@@ -327,7 +328,10 @@ const loginForm = document.getElementById('loginForm');
             }
         }
 
-    loginForm.addEventListener('submit', async (e) => {
+   // Change this line back to 'click'
+loginBtn.addEventListener('click', async () => {
+    // ... keep the rest of your sign-in code exactly as it is ...
+});
             e.preventDefault(); // Prevents the page from reloading
             
             authMessage.innerText = "Logging in...";
