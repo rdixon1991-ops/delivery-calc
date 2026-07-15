@@ -189,10 +189,15 @@
     </div>
 
     <script>
-        // ==========================================
+       // ==========================================
         // PASTE YOUR GOOGLE SCRIPT URL BELOW
         // ==========================================
-        const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbztcnQUBvxGw9YrkFpp9c130MdQjkbyEyk3CploKJLVHRqHVw98X6_waDoGdIPFO-MS/exec";
+        const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfyc...[the rest of your link].../exec";
+
+        // ==========================================
+        // PASTE YOUR PUBLIC SPREADSHEET URL BELOW
+        // ==========================================
+        const GOOGLE_SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/13m70NoqXBp1BsMsZr_Iv6FA8O-lkJ9oDMXb0fTQQd2g/edit?usp=sharing";
 
         // DOM Elements
         const minTripProfitInput = document.getElementById('minTripProfit');
@@ -546,6 +551,15 @@
         // Trigger calculation on any input change
         [gasCostInput, dailyTargetInput, uberOfferSelect, tripDistanceSelect, tripDurationSelect, deadMilesInput].forEach(element => {
             element.addEventListener('input', calculate);
+        });
+// Action: Open the external Google Spreadsheet in a new tab
+        const openSheetBtn = document.getElementById('openSheetBtn');
+        openSheetBtn.addEventListener('click', () => {
+            if (GOOGLE_SPREADSHEET_URL === "YOUR_PUBLIC_SPREADSHEET_URL_HERE") {
+                alert("Please add your Spreadsheet URL to the code before using this feature!");
+                return;
+            }
+            window.open(GOOGLE_SPREADSHEET_URL, '_blank');
         });
     </script>
 </body>
