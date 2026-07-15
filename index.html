@@ -537,7 +537,7 @@
         checkUser();
 
         // ==========================================
-        // 4. OCR IMAGE SCANNING LOGIC
+        // 4. OCR IMAGE SCANNING LOGIC (Glare-Optimized)
         // ==========================================
         async function scanOdometerImage(file, inputElement, statusElement) {
             statusElement.innerText = "🔍 Scanning image for numbers...";
@@ -545,21 +545,21 @@
             statusElement.classList.remove('hidden');
 
             try {
-                const result = await Tesseract.recognize(file, 'eng');
+                // Strict whitelist logic targeting numerical strings only
+                const result = await Tesseract.recognize(file, 'eng', {
+                    tessedit_char_whitelist: '0123456789'
+                });
                 const text = result.data.text;
-                
-                // Find all numeric blocks (ignoring letters)
-                const numbers = text.match(/\d+[.,]?\d*/g);
+                const numbers = text.match(/\d+/g);
                 
                 if (numbers && numbers.length > 0) {
-                    // Usually the odometer is the longest continuous string of numbers on the dash
-                    let bestGuess = numbers.reduce((a, b) => a.length > b.length ? a : b).replace(/,/g, '');
+                    let bestGuess = numbers.reduce((a, b) => a.length > b.length ? a : b);
                     inputElement.value = parseFloat(bestGuess);
                     
                     statusElement.innerText = "✅ Number detected and filled!";
                     statusElement.className = "text-[10px] text-emerald-400 text-center mt-2 font-bold block";
                 } else {
-                    statusElement.innerText = "⚠️ Could not read number clearly. Please type it in manually.";
+                    statusElement.innerText = "⚠️ Scanner struggled. Feel free to type it in.";
                     statusElement.className = "text-[10px] text-amber-400 text-center mt-2 font-bold block";
                 }
             } catch (err) {
@@ -631,7 +631,7 @@
         });
 
         // ==========================================
-        // 6. MANUAL END SHIFT LOGIC
+        // 6. MANUAL END SHIFT LOGIC (No Logout Loop)
         // ==========================================
         triggerEndShiftBtn.addEventListener('click', () => {
             endShiftModal.classList.remove('hidden');
@@ -705,15 +705,21 @@
             if (error) {
                 alert("Error saving shift: " + error.message);
             } else {
-                alert("Shift successfully saved to Cloud!");
+                alert("Shift successfully saved to Cloud! Calculator has reset for your next workspace entry.");
+                
+                // Clear local shift state
                 tripLedger = []; localStorage.removeItem('tripLedger');
                 localStorage.removeItem('shiftStartTime');
                 localStorage.removeItem('shiftStartOdo');
                 localStorage.removeItem('shiftStartUrl');
+                
+                // Update workspace UI without triggering login gates
                 updateShiftTrackerUI();
-                startShiftModal.classList.remove('hidden'); 
                 startOdometerInput.value = "";
                 startOdoOcrStatus.classList.add('hidden');
+                
+                // Prompt user to immediately verify or create a clean entry parameters window
+                startShiftModal.classList.remove('hidden'); 
             }
         }
 
@@ -778,7 +784,7 @@
 
             if (shiftError || expError) {
                 const msg = shiftError ? shiftError.message : expError.message;
-                document.getElementById('shiftLedgerContainer').innerHTML = `<p class="text-rose-400 text-center text-xs font-bold my-4">Cloud Sync Error: ${msg}</p>`;
+                document.getElementById('shiftLedgerContainer').innerHTML = `<p class="text-rose-400 text-center text-xs font-bold my-4">Cloud Sync Error: ${msg}</p>';
                 return;
             }
 
