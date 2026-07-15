@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barrie Delivery Calculator</title>
+    <title>OdoTrack Pro</title>
     <link rel="icon" type="image/svg+xml" href="icon.svg">
     <link rel="apple-touch-icon" href="icon.svg">
-    <meta name="apple-mobile-web-app-title" content="Delivery Calc">
+    <meta name="apple-mobile-web-app-title" content="OdoTrack Pro">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- PDF Export Library -->
@@ -28,22 +28,48 @@
         <!-- 1. THE LOGIN GATE                          -->
         <!-- ========================================== -->
         <div id="authGate" class="space-y-6 py-6 text-center">
-            <div>
-                <h1 class="text-3xl font-black text-emerald-400 uppercase tracking-widest">Delivery Calc</h1>
-                <p class="text-xs text-gray-400 italic mt-2">Secure Driver Login</p>
+            
+            <!-- NEW METALLIC LOGO & BRANDING -->
+            <div class="mb-8">
+                <svg class="w-20 h-20 mx-auto mb-4 drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#e2e8f0" />
+                            <stop offset="40%" stop-color="#94a3b8" />
+                            <stop offset="60%" stop-color="#f8fafc" />
+                            <stop offset="100%" stop-color="#64748b" />
+                        </linearGradient>
+                        <linearGradient id="metalRing" x1="100%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#cbd5e1" />
+                            <stop offset="50%" stop-color="#475569" />
+                            <stop offset="100%" stop-color="#f1f5f9" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Outer Ring -->
+                    <circle cx="50" cy="50" r="45" stroke="url(#metalRing)" stroke-width="8" />
+                    <!-- Inner Dial -->
+                    <path d="M 20 50 A 30 30 0 0 1 80 50" stroke="url(#metalGrad)" stroke-width="4" stroke-dasharray="4 6" fill="none"/>
+                    <!-- Needle -->
+                    <path d="M 50 55 L 75 35" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
+                    <!-- Center Pivot -->
+                    <circle cx="50" cy="55" r="6" fill="url(#metalGrad)" />
+                </svg>
+
+                <h1 class="text-4xl font-black uppercase tracking-widest bg-gradient-to-b from-gray-100 via-gray-300 to-gray-500 text-transparent bg-clip-text drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] pb-1">OdoTrack Pro</h1>
+                <p class="text-[10px] text-blue-300 font-bold uppercase tracking-[0.3em] mt-1 drop-shadow-md">Professional Logbook</p>
             </div>
             
-            <form id="loginForm" class="space-y-4 mt-8 bg-gray-900 p-5 rounded-xl border border-gray-700 shadow-inner">
-                <input type="email" id="emailInput" name="email" autocomplete="username" placeholder="Driver Email" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
-                <input type="password" id="passwordInput" name="password" autocomplete="current-password" placeholder="Password" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
+            <form id="loginForm" class="space-y-4 bg-gray-900 p-5 rounded-xl border border-gray-700 shadow-inner">
+                <input type="email" id="emailInput" name="email" autocomplete="username" placeholder="Driver Email" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-blue-500">
+                <input type="password" id="passwordInput" name="password" autocomplete="current-password" placeholder="Password" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-blue-500">
                 
                 <div class="grid grid-cols-2 gap-3 pt-3">
-                    <button type="submit" id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-emerald-900/20">Log In</button>
+                    <button type="submit" id="loginBtn" class="bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-blue-900/20">Log In</button>
                     <button type="button" id="signupBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest">Sign Up</button>
                 </div>
                 
                 <button type="button" id="forgotPasswordBtn" class="w-full text-blue-400 hover:text-blue-300 text-[10px] font-bold pt-4 transition-colors uppercase tracking-widest">Forgot Password?</button>
-                <p id="authMessage" class="text-xs font-bold mt-2 h-4 text-emerald-400"></p>
+                <p id="authMessage" class="text-xs font-bold mt-2 h-4 text-blue-400"></p>
             </form>
         </div>
 
@@ -70,10 +96,10 @@
             <!-- SHIFT PROFILE HEADER -->
             <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 flex justify-between items-center mb-2">
                 <div>
-                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active Barrie Profile</span>
-                    <span id="shiftProfileName" class="text-sm font-black text-emerald-400">Detecting Time...</span>
+                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active Profile</span>
+                    <span id="shiftProfileName" class="text-sm font-black text-blue-400">Detecting Time...</span>
                 </div>
-                <button id="resetOptimumBtn" class="bg-gray-900 border border-gray-600 text-gray-300 text-[10px] font-bold py-1.5 px-3 rounded hover:bg-emerald-900 hover:text-emerald-300 hover:border-emerald-500 transition-colors uppercase tracking-widest">
+                <button id="resetOptimumBtn" class="bg-gray-900 border border-gray-600 text-gray-300 text-[10px] font-bold py-1.5 px-3 rounded hover:bg-blue-900 hover:text-blue-300 hover:border-blue-500 transition-colors uppercase tracking-widest">
                     ↺ Optimum
                 </button>
             </div>
@@ -88,31 +114,31 @@
                     <div class="space-y-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
                         <div class="flex justify-between items-center">
                             <label class="text-xs font-bold text-gray-400 uppercase">1. Min Profit ($)</label>
-                            <input type="number" id="minTripProfit" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                            <input type="number" id="minTripProfit" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500">
                         </div>
                         <div class="flex justify-between items-center">
                             <label class="text-xs font-bold text-gray-400 uppercase">2. Target ($/KM)</label>
-                            <input type="number" id="targetPay" step="0.10" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                            <input type="number" id="targetPay" step="0.10" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500">
                         </div>
                         <div class="flex justify-between items-center">
                             <label class="text-xs font-bold text-gray-400 uppercase">3. Wage ($/HR)</label>
-                            <input type="number" id="targetHourly" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                            <input type="number" id="targetHourly" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500">
                         </div>
                         <button id="saveManualTargetsBtn" class="w-full mt-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 rounded transition-colors uppercase tracking-widest">💾 Save Targets</button>
                     </div>
                     <div class="grid grid-cols-2 gap-3 mt-3">
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Daily Target ($)</label>
-                            <input type="number" id="dailyTarget" step="5.00" value="100.00" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                            <input type="number" id="dailyTarget" step="5.00" value="100.00" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Gas Cost ($/KM)</label>
-                            <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                            <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500">
                         </div>
                     </div>
                     <div class="pt-3 border-t border-gray-700">
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Tax Deduction Rate ($/KM)</label>
-                        <input type="number" id="taxDeductRate" step="0.01" value="0.70" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                        <input type="number" id="taxDeductRate" step="0.01" value="0.70" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-blue-500">
                         <p class="text-[9px] text-gray-500 text-center mt-1">Standard Canadian allowance is roughly $0.70/KM</p>
                     </div>
                 </div>
@@ -121,16 +147,16 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Uber Offer ($)</label>
-                    <select id="uberOffer" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">Tap to select offer</option></select>
+                    <select id="uberOffer" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-blue-500 focus:border-blue-500 focus:outline-none appearance-none cursor-pointer"><option value="">Tap to select offer</option></select>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">Distance (KM)</label>
-                        <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">KM</option></select>
+                        <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-blue-500 focus:border-blue-500 focus:outline-none appearance-none cursor-pointer"><option value="">KM</option></select>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">Time (Mins)</label>
-                        <select id="tripDuration" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">Mins</option></select>
+                        <select id="tripDuration" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-blue-500 focus:border-blue-500 focus:outline-none appearance-none cursor-pointer"><option value="">Mins</option></select>
                     </div>
                 </div>
             </div>
@@ -140,11 +166,11 @@
                 <div class="flex justify-between items-end mb-3">
                     <div class="flex-1">
                         <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total Profit</span>
-                        <span id="shiftTotalDisplay" class="text-2xl font-black text-emerald-400">$0.00</span>
+                        <span id="shiftTotalDisplay" class="text-2xl font-black text-blue-400">$0.00</span>
                     </div>
                     <div class="flex-1 text-center border-x border-gray-700 px-2 mx-2">
                         <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">App Miles</span>
-                        <span id="shiftDistanceDisplay" class="text-xl font-black text-blue-400">0 KM</span>
+                        <span id="shiftDistanceDisplay" class="text-xl font-black text-blue-300">0 KM</span>
                     </div>
                     <div class="flex-1 text-right">
                         <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Trips</span>
@@ -153,16 +179,19 @@
                 </div>
                 
                 <div class="w-full bg-gray-800 rounded-full h-3 mb-2 border border-gray-700 mt-2">
-                    <div id="shiftProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    <div id="shiftProgressBar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
 
                 <div class="mt-4 pt-4 border-t border-gray-700 text-center">
                     <div class="flex justify-between items-center mb-3">
                         <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Shift Status</span>
-                        <span class="text-xs font-black text-emerald-400 flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>ACTIVE</span>
+                        <span id="shiftStatusBadge" class="text-xs font-black text-gray-500 flex items-center"><span id="shiftStatusDot" class="w-2 h-2 rounded-full bg-gray-500 mr-2"></span>INACTIVE</span>
                     </div>
-                    <p class="text-xs text-gray-400 mb-3">Start Odometer: <span id="displayStartOdo" class="text-white font-bold"></span> KM</p>
-                    <button id="triggerEndShiftBtn" class="w-full bg-rose-600/90 hover:bg-rose-500 text-white font-black py-3.5 rounded-lg border border-rose-400 shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-colors text-sm uppercase tracking-widest">🛑 End Shift & Cloud Sync</button>
+                    <p class="text-xs text-gray-400 mb-3" id="displayStartOdoContainer">Start Odometer: <span id="displayStartOdo" class="text-white font-bold">Not Started</span></p>
+                    
+                    <!-- DYNAMIC SHIFT BUTTONS -->
+                    <button id="triggerStartShiftBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3.5 rounded-lg border border-blue-500 shadow-lg shadow-blue-900/30 transition-colors text-sm uppercase tracking-widest">🚀 Start Shift</button>
+                    <button id="triggerEndShiftBtn" class="hidden w-full bg-rose-600/90 hover:bg-rose-500 text-white font-black py-3.5 rounded-lg border border-rose-400 shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-colors text-sm uppercase tracking-widest">🛑 End Shift & Sync</button>
                 </div>
             </div>
 
@@ -176,10 +205,10 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- START SHIFT MODAL (FORCED)                 -->
+        <!-- START SHIFT MODAL                          -->
         <!-- ========================================== -->
         <div id="startShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[70] p-6 flex flex-col justify-center">
-            <div class="bg-gray-850 border border-emerald-500/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+            <div class="bg-gray-850 border border-blue-500/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
                 <div class="text-center mb-6">
                     <span class="text-4xl block mb-2">🚗</span>
                     <h2 class="text-2xl font-black text-white uppercase tracking-widest">Start Shift</h2>
@@ -188,10 +217,15 @@
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-emerald-400 uppercase mb-2 text-center">Current Odometer (KM)</label>
-                        <input type="number" id="startOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-emerald-500 text-center">
+                        <label class="block text-xs font-bold text-blue-400 uppercase mb-2 text-center">Current Odometer (KM)</label>
+                        <input type="number" id="startOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-gray-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-blue-500 text-center">
                     </div>
-                    <button id="confirmStartShiftBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-emerald-900/40">🚀 Begin Shift</button>
+                    
+                    <button id="confirmStartShiftBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-lg mt-2 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-blue-900/40">🚀 Begin Shift</button>
+                    
+                    <!-- NEW RESUME BUTTON -->
+                    <button id="skipStartShiftBtn" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-lg mt-2 transition-colors uppercase tracking-widest text-xs border border-gray-600 shadow-inner">⏭️ Resume App (Home)</button>
+                    
                     <p id="startShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
                 </div>
             </div>
@@ -261,9 +295,9 @@
         <!-- ========================================== -->
         <div id="historyModal" class="hidden absolute inset-0 bg-gray-900 z-50 p-4 flex flex-col h-full w-full overflow-hidden">
             <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-700 flex-wrap gap-2 shrink-0 hide-on-print">
-                <h2 class="text-xl font-black text-emerald-400 uppercase tracking-widest">Tax Dashboard</h2>
+                <h2 class="text-xl font-black text-blue-400 uppercase tracking-widest">Tax Dashboard</h2>
                 <div class="flex space-x-2">
-                    <select id="taxTimeFilter" class="bg-gray-800 border border-gray-600 text-white text-xs font-bold rounded-lg px-2 py-2 outline-none focus:border-emerald-500">
+                    <select id="taxTimeFilter" class="bg-gray-800 border border-gray-600 text-white text-xs font-bold rounded-lg px-2 py-2 outline-none focus:border-blue-500">
                         <option value="all">All-Time</option>
                         <option value="day">Today</option>
                         <option value="week">Past 7 Days</option>
@@ -277,8 +311,8 @@
             </div>
             
             <div id="printableArea" class="flex-1 overflow-y-auto space-y-4 pb-10 bg-gray-900 px-2 rounded-xl">
-                <div class="bg-gray-850 p-4 rounded-xl border border-emerald-900/50 shadow-lg shadow-emerald-900/10 shrink-0 mt-2">
-                    <h3 class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center mb-2">Cloud Summary <span id="summaryTimeframeLabel" class="text-emerald-400"></span></h3>
+                <div class="bg-gray-850 p-4 rounded-xl border border-blue-900/50 shadow-lg shadow-blue-900/10 shrink-0 mt-2">
+                    <h3 class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center mb-2">Cloud Summary <span id="summaryTimeframeLabel" class="text-blue-400"></span></h3>
                     <div class="grid grid-cols-2 gap-4 border-b border-gray-700 pb-3 mb-3">
                         <div class="text-center border-r border-gray-700 pr-2">
                             <span class="block text-[10px] text-gray-400 uppercase">Gross Profit</span>
@@ -393,12 +427,16 @@
         const shiftCountDisplay = document.getElementById('shiftCountDisplay');
         const shiftProgressBar = document.getElementById('shiftProgressBar');
 
+        const shiftStatusBadge = document.getElementById('shiftStatusBadge');
+        const shiftStatusDot = document.getElementById('shiftStatusDot');
         const displayStartOdo = document.getElementById('displayStartOdo');
+        const triggerStartShiftBtn = document.getElementById('triggerStartShiftBtn');
         const triggerEndShiftBtn = document.getElementById('triggerEndShiftBtn');
 
         const startShiftModal = document.getElementById('startShiftModal');
         const startOdometerInput = document.getElementById('startOdometerInput');
         const confirmStartShiftBtn = document.getElementById('confirmStartShiftBtn');
+        const skipStartShiftBtn = document.getElementById('skipStartShiftBtn');
         const startShiftMessage = document.getElementById('startShiftMessage');
 
         const endShiftModal = document.getElementById('endShiftModal');
@@ -454,7 +492,7 @@
         const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000;
 
         // ==========================================
-        // 3. AUTHENTICATION & SHIFT CHECKER
+        // 3. AUTHENTICATION & INITIALIZATION
         // ==========================================
         async function checkUser() {
             const { data: { session } } = await _supabase.auth.getSession();
@@ -465,9 +503,15 @@
                 userEmailDisplay.innerText = currentUser.email;
                 loadSettings();
                 updateShiftTrackerUI();
-                await checkActiveShift(); 
                 
-                setInterval(checkActiveShift, 60000); 
+                // Only pop modal on initial app load if no shift is active
+                const shiftStartTime = localStorage.getItem('shiftStartTime');
+                if (!shiftStartTime) {
+                    startShiftModal.classList.remove('hidden');
+                }
+                updateShiftStateUI();
+                
+                setInterval(checkActiveShiftTimeout, 60000); 
             } else {
                 currentUser = null;
                 authGate.classList.remove('hidden');
@@ -515,26 +559,50 @@
         checkUser();
 
         // ==========================================
-        // 4. SHIFT GATE LOGIC (START & AUTO-END)
+        // 4. SHIFT STATE UI CONTROLLER
         // ==========================================
-        async function checkActiveShift() {
+        function updateShiftStateUI() {
             const shiftStartTime = localStorage.getItem('shiftStartTime');
             const shiftStartOdo = localStorage.getItem('shiftStartOdo');
 
-            if (!shiftStartTime || !shiftStartOdo) {
-                startShiftModal.classList.remove('hidden');
-                return;
+            if (shiftStartTime && shiftStartOdo) {
+                // Shift is Active
+                shiftStatusBadge.className = "text-xs font-black text-emerald-400 flex items-center";
+                shiftStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>ACTIVE';
+                displayStartOdo.innerText = shiftStartOdo;
+                
+                triggerStartShiftBtn.classList.add('hidden');
+                triggerEndShiftBtn.classList.remove('hidden');
+            } else {
+                // Shift is Inactive
+                shiftStatusBadge.className = "text-xs font-black text-gray-500 flex items-center";
+                shiftStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-gray-500 mr-2"></span>INACTIVE';
+                displayStartOdo.innerText = "Not Started";
+                
+                triggerStartShiftBtn.classList.remove('hidden');
+                triggerEndShiftBtn.classList.add('hidden');
             }
+        }
 
-            displayStartOdo.innerText = shiftStartOdo;
-            startShiftModal.classList.add('hidden');
-
-            if (Date.now() - parseInt(shiftStartTime) > EIGHT_HOURS_MS) {
+        async function checkActiveShiftTimeout() {
+            const shiftStartTime = localStorage.getItem('shiftStartTime');
+            if (shiftStartTime && Date.now() - parseInt(shiftStartTime) > EIGHT_HOURS_MS) {
                 await autoCloseShift();
             }
         }
 
-        confirmStartShiftBtn.addEventListener('click', async () => {
+        // ==========================================
+        // 5. START SHIFT LOGIC & RESUME
+        // ==========================================
+        triggerStartShiftBtn.addEventListener('click', () => {
+            startShiftModal.classList.remove('hidden');
+        });
+
+        skipStartShiftBtn.addEventListener('click', () => {
+            startShiftModal.classList.add('hidden');
+        });
+
+        confirmStartShiftBtn.addEventListener('click', () => {
             const odo = parseFloat(startOdometerInput.value);
 
             if (!odo || odo <= 0) {
@@ -542,26 +610,20 @@
                 return;
             }
 
-            confirmStartShiftBtn.innerText = "⏳ Starting Shift...";
-            confirmStartShiftBtn.disabled = true;
-
             localStorage.setItem('shiftStartTime', Date.now());
             localStorage.setItem('shiftStartOdo', odo);
             
             tripLedger = []; 
             localStorage.removeItem('tripLedger');
             updateShiftTrackerUI();
+            updateShiftStateUI();
 
             startShiftModal.classList.add('hidden');
-            displayStartOdo.innerText = odo;
-            
-            confirmStartShiftBtn.innerText = "🚀 Begin Shift";
-            confirmStartShiftBtn.disabled = false;
             startOdometerInput.value = "";
         });
 
         // ==========================================
-        // 5. MANUAL END SHIFT LOGIC (No Logout Loop)
+        // 6. MANUAL END SHIFT LOGIC (Stays on Home)
         // ==========================================
         triggerEndShiftBtn.addEventListener('click', () => {
             endShiftModal.classList.remove('hidden');
@@ -569,7 +631,7 @@
         });
 
         closeEndShiftBtn.addEventListener('click', () => endShiftModal.classList.add('hidden'));
-        
+
         confirmEndShiftBtn.addEventListener('click', async () => {
             const endOdo = parseFloat(endOdometerInput.value);
             const startOdo = parseFloat(localStorage.getItem('shiftStartOdo')) || 0;
@@ -590,7 +652,7 @@
         });
 
         // ==========================================
-        // 6. AUTO END SHIFT LOGIC (8 HOURS)
+        // 7. AUTO END SHIFT LOGIC (8 HOURS)
         // ==========================================
         async function autoCloseShift() {
             alert("⏰ 8 Hours have passed. Your shift has been automatically closed using calculated distances.");
@@ -618,24 +680,21 @@
             if (error) {
                 alert("Error saving shift: " + error.message);
             } else {
-                alert("Shift successfully saved to Cloud! Calculator has reset for your next workspace entry.");
+                alert("Shift successfully saved to Cloud!");
                 
                 // Clear local shift state
                 tripLedger = []; localStorage.removeItem('tripLedger');
                 localStorage.removeItem('shiftStartTime');
                 localStorage.removeItem('shiftStartOdo');
                 
-                // Update workspace UI without triggering login gates
+                // Update workspace UI and stay on home screen
                 updateShiftTrackerUI();
-                startOdometerInput.value = "";
-                
-                // Prompt user to immediately verify or create a clean entry parameters window
-                startShiftModal.classList.remove('hidden'); 
+                updateShiftStateUI();
             }
         }
 
         // ==========================================
-        // 7. EXPENSE SCANNER LOGIC
+        // 8. EXPENSE SCANNER LOGIC
         // ==========================================
         openExpenseScannerBtn.addEventListener('click', () => {
             expenseModal.classList.remove('hidden');
@@ -685,7 +744,7 @@
         });
 
         // ==========================================
-        // 8. TAX DASHBOARD & SPREADSHEET LOGIC
+        // 9. TAX DASHBOARD & SPREADSHEET LOGIC
         // ==========================================
         async function fetchCloudData() {
             document.getElementById('shiftLedgerContainer').innerHTML = '<p class="text-center text-xs font-bold text-gray-500 my-4">⏳ Fetching cloud data...</p>';
@@ -762,7 +821,6 @@
                         <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odo Start</th>
                         <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odo End</th>
                         <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odo Driven (KM)</th>
-                        <th class="py-3 px-3 font-bold text-center hide-on-print">Odo Proof</th>
                         <th class="py-3 px-3 font-bold text-center hide-on-print">Actions</th>
                     </tr>
                 </thead>
@@ -770,16 +828,13 @@
             `;
 
             if (filteredShifts.length === 0) {
-                shiftTableHTML += `<tr><td colspan="10" class="py-4 text-center text-xs text-gray-500 italic">No shifts found for this timeframe.</td></tr>`;
+                shiftTableHTML += `<tr><td colspan="9" class="py-4 text-center text-xs text-gray-500 italic">No shifts found for this timeframe.</td></tr>`;
             } else {
                 filteredShifts.forEach(shift => {
                     const gross = shift.total_profit || 0;
                     const odoTotal = shift.odo_total || 0;
                     const shiftDeduct = odoTotal * deductRate;
                     const net = gross - shiftDeduct;
-
-                    const startProof = shift.odo_start_url ? `<a href="${shift.odo_start_url}" target="_blank" class="text-blue-400 hover:underline">Start</a>` : `<span class="text-gray-600">N/A</span>`;
-                    const endProof = shift.odo_end_url ? `<a href="${shift.odo_end_url}" target="_blank" class="text-blue-400 hover:underline">End</a>` : `<span class="text-gray-600">Manual</span>`;
 
                     shiftTableHTML += `
                         <tr class="hover:bg-gray-800 transition-colors">
@@ -791,7 +846,6 @@
                             <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_start || 0}</td>
                             <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_end || 0}</td>
                             <td class="py-3 px-3 text-center font-bold text-amber-400 border-r border-gray-700/50">${odoTotal}</td>
-                            <td class="py-3 px-3 text-center border-r border-gray-700/50 hide-on-print">${startProof} | ${endProof}</td>
                             <td class="py-3 px-3 text-center space-x-3 hide-on-print">
                                 <button onclick="openEditShift('${shift.id}', '${gross}', '${shift.app_miles || 0}', '${shift.total_trips || 0}', '${shift.odo_start || 0}', '${shift.odo_end || 0}')" class="text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest text-[9px]">Edit</button>
                                 <button onclick="deleteCloudShift('${shift.id}')" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
@@ -917,7 +971,7 @@
         });
 
         // ==========================================
-        // 9. CALCULATOR & TIME PROFILE LOGIC
+        // 10. CALCULATOR & TIME PROFILE LOGIC
         // ==========================================
         function determineTimeProfile() {
             const now = new Date();
@@ -938,7 +992,7 @@
         function loadOptimumSettings() {
             const profile = determineTimeProfile();
             shiftProfileName.innerText = profile.name;
-            shiftProfileName.className = "text-sm font-black text-emerald-400";
+            shiftProfileName.className = "text-sm font-black text-blue-400";
             
             minTripProfitInput.value = profile.min.toFixed(2);
             targetPayInput.value = profile.km.toFixed(2);
