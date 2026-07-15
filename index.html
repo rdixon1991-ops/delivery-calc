@@ -470,7 +470,7 @@
             }]);
 
             if (dbError) {
-                expenseMessage.innerText = "Error saving deduction. Ensure RLS is disabled.";
+                expenseMessage.innerText = "Error: " + dbError.message;
                 expenseMessage.className = "text-xs font-bold mt-2 text-center h-4 text-rose-400";
             } else {
                 expenseModal.classList.add('hidden');
@@ -490,7 +490,8 @@
             const { data: expenses, error: expError } = await _supabase.from('other_deductions').select('*').eq('user_id', currentUser.id);
 
             if (shiftError || expError) {
-                historyList.innerHTML = `<p class="text-rose-400 text-center text-xs font-bold mt-10">Cloud Sync Error. Check RLS settings.</p>`;
+                const msg = shiftError ? shiftError.message : expError.message;
+                historyList.innerHTML = `<p class="text-rose-400 text-center text-xs font-bold mt-10">Cloud Sync Error: ${msg}</p>`;
                 return;
             }
 
@@ -552,7 +553,6 @@
                 return;
             }
 
-            // Generate Spreadsheet Table matching the user's image layout
             let tableHTML = `
             <table class="w-full text-left text-[11px] whitespace-nowrap min-w-max">
                 <thead class="bg-gray-900 sticky top-0 border-b-2 border-gray-700">
@@ -601,12 +601,16 @@
 
         closeHistoryBtn.addEventListener('click', () => historyModal.classList.add('hidden'));
 
-        // Delete Shift Function
+        // Delete Shift Function (Forcing Number ID)
         window.deleteCloudShift = async (id) => {
             if (confirm("Permanently delete this shift from the cloud?")) {
-                const { error } = await _supabase.from('delivery_logs').delete().eq('id', id);
-                if (error) alert("Error deleting shift. Check RLS settings.");
-                else fetchCloudData(); 
+                const cleanId = parseInt(id);
+                const { error } = await _supabase.from('delivery_logs').delete().eq('id', cleanId);
+                if (error) {
+                    alert("Delete Failed: " + error.message);
+                } else {
+                    fetchCloudData(); 
+                }
             }
         };
 
@@ -623,9 +627,9 @@
 
         cancelEditBtn.addEventListener('click', () => editShiftModal.classList.add('hidden'));
 
-        // Save Edit Function
+        // Save Edit Function (Forcing Number ID & Showing Errors)
         saveEditBtn.addEventListener('click', async () => {
-            const id = editShiftId.value;
+            const cleanId = parseInt(editShiftId.value);
             const newOdoStart = parseFloat(editShiftOdoStart.value) || 0;
             const newOdoEnd = parseFloat(editShiftOdoEnd.value) || 0;
             
@@ -637,12 +641,12 @@
                 total_trips: parseInt(editShiftTrips.value) || 0,
                 odo_start: newOdoStart, odo_end: newOdoEnd,
                 odo_total: newOdoEnd > newOdoStart ? (newOdoEnd - newOdoStart) : 0
-            }).eq('id', id);
+            }).eq('id', cleanId);
 
             saveEditBtn.innerText = "💾 Save";
 
             if (error) {
-                alert("Error updating shift.");
+                alert("Edit Failed: " + error.message);
             } else {
                 editShiftModal.classList.add('hidden');
                 fetchCloudData(); 
@@ -792,7 +796,7 @@
             }]);
 
             if (error) {
-                alert("Error saving shift: Check RLS settings.");
+                alert("Error saving shift: " + error.message);
             } else {
                 alert("Shift successfully saved! Daily totals reset.");
                 tripLedger = []; localStorage.removeItem('tripLedger');
