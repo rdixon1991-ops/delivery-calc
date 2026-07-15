@@ -15,7 +15,7 @@
     <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6 relative overflow-hidden">
         
         <!-- ========================================== -->
-        <!-- 1. THE LOGIN GATE (Shows First)            -->
+        <!-- 1. THE LOGIN GATE                          -->
         <!-- ========================================== -->
         <div id="authGate" class="space-y-6 py-6 text-center">
             <div>
@@ -28,28 +28,20 @@
                 <input type="password" id="passwordInput" name="password" autocomplete="current-password" placeholder="Password" required class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500">
                 
                 <div class="grid grid-cols-2 gap-3 pt-3">
-                    <button type="submit" id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-emerald-900/20">
-                        Log In
-                    </button>
-                    <button type="button" id="signupBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest">
-                        Sign Up
-                    </button>
+                    <button type="submit" id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-emerald-900/20">Log In</button>
+                    <button type="button" id="signupBtn" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest">Sign Up</button>
                 </div>
                 
-                <button type="button" id="forgotPasswordBtn" class="w-full text-blue-400 hover:text-blue-300 text-[10px] font-bold pt-4 transition-colors uppercase tracking-widest">
-                    Forgot Password?
-                </button>
-                
+                <button type="button" id="forgotPasswordBtn" class="w-full text-blue-400 hover:text-blue-300 text-[10px] font-bold pt-4 transition-colors uppercase tracking-widest">Forgot Password?</button>
                 <p id="authMessage" class="text-xs font-bold mt-2 h-4 text-emerald-400"></p>
             </form>
         </div>
 
         <!-- ========================================== -->
-        <!-- 2. THE MAIN APP (Hidden until logged in)   -->
+        <!-- 2. THE MAIN APP                            -->
         <!-- ========================================== -->
         <div id="mainAppWrapper" class="hidden space-y-5">
             
-            <!-- COMPACT DECISION BOX -->
             <div id="decisionBox" class="p-4 rounded-xl border transition-all duration-300 border-gray-750 relative overflow-hidden bg-cover bg-center bg-no-repeat">
                 <div id="decisionOverlay" class="absolute inset-0 bg-gray-950/90 transition-colors duration-300"></div>
                 <div class="relative z-10 grid grid-cols-2 gap-y-3 gap-x-4 text-left text-xs text-gray-300">
@@ -60,9 +52,7 @@
                         <div>Est. Hourly: <span id="payPerHour" class="font-bold text-white block mt-1">$0.00/HR</span></div>
                     </div>
                 </div>
-                <button id="saveTripBtn" class="hidden relative z-10 w-full mt-3 bg-blue-600/90 backdrop-blur hover:bg-blue-500 text-white font-black py-2.5 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all uppercase tracking-widest text-xs">
-                    💾 Save Trip
-                </button>
+                <button id="saveTripBtn" class="hidden relative z-10 w-full mt-3 bg-blue-600/90 backdrop-blur hover:bg-blue-500 text-white font-black py-2.5 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all uppercase tracking-widest text-xs">💾 Save Trip</button>
             </div>
 
             <!-- COLLAPSIBLE INPUT SETTINGS -->
@@ -85,9 +75,7 @@
                             <label class="text-xs font-bold text-gray-400 uppercase">3. Wage ($/HR)</label>
                             <input type="number" id="targetHourly" step="1.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
                         </div>
-                        <button id="saveManualTargetsBtn" class="w-full mt-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 rounded transition-colors uppercase tracking-widest">
-                            💾 Save Targets
-                        </button>
+                        <button id="saveManualTargetsBtn" class="w-full mt-2 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-2 rounded transition-colors uppercase tracking-widest">💾 Save Targets</button>
                     </div>
                     <div class="grid grid-cols-2 gap-3 mt-3">
                         <div>
@@ -108,31 +96,24 @@
                 </div>
             </div>
 
-            <!-- DROP-DOWN INPUTS -->
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Uber Offer ($)</label>
-                    <select id="uberOffer" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
-                        <option value="">Tap to select offer</option>
-                    </select>
+                    <select id="uberOffer" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">Tap to select offer</option></select>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">Distance (KM)</label>
-                        <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
-                            <option value="">KM</option>
-                        </select>
+                        <select id="tripDistance" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">KM</option></select>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">Time (Mins)</label>
-                        <select id="tripDuration" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
-                            <option value="">Mins</option>
-                        </select>
+                        <select id="tripDuration" class="w-full bg-gray-950 border-2 border-gray-700 rounded-xl py-3 px-3 text-xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">Mins</option></select>
                     </div>
                 </div>
             </div>
 
-            <!-- SHIFT TRACKER CARD WITH LEDGER & MILEAGE -->
+            <!-- SHIFT TRACKER -->
             <div class="bg-gray-900 rounded-xl border-2 border-gray-700 p-5 mt-6 shadow-lg">
                 <div class="flex justify-between items-end mb-3">
                     <div class="flex-1">
@@ -153,12 +134,8 @@
                     <div id="shiftProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
 
-                <!-- EXPORT CONTROLS -->
-                <button id="exportCloudBtn" class="w-full bg-blue-600/90 hover:bg-blue-500 text-white font-black py-3 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-colors text-sm uppercase tracking-widest mb-3 mt-4">
-                    ☁️ Push Shift to Cloud
-                </button>
+                <button id="exportCloudBtn" class="w-full bg-blue-600/90 hover:bg-blue-500 text-white font-black py-3 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.3)] transition-colors text-sm uppercase tracking-widest mb-3 mt-4">☁️ Push Shift to Cloud</button>
 
-                <!-- ODOMETER LOGGING -->
                 <div class="mt-5 pt-4 border-t border-gray-700">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Odometer Log</span>
@@ -173,19 +150,12 @@
 
             <!-- ACTIONS MENU -->
             <div class="grid grid-cols-2 gap-3 pt-2">
-                <button id="openExpenseScannerBtn" class="bg-amber-700/80 hover:bg-amber-600 text-white font-bold py-3 rounded-lg border border-amber-500 transition-colors text-xs uppercase tracking-widest shadow-lg shadow-amber-900/20">
-                    🧾 Log Expense
-                </button>
-                <button id="viewHistoryBtn" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-300 font-bold py-3 rounded-lg border border-emerald-600 transition-colors text-xs uppercase tracking-widest shadow-lg shadow-emerald-900/20">
-                    📊 Tax Dashboard
-                </button>
+                <button id="openExpenseScannerBtn" class="bg-amber-700/80 hover:bg-amber-600 text-white font-bold py-3 rounded-lg border border-amber-500 transition-colors text-xs uppercase tracking-widest shadow-lg shadow-amber-900/20">🧾 Log Expense</button>
+                <button id="viewHistoryBtn" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-300 font-bold py-3 rounded-lg border border-emerald-600 transition-colors text-xs uppercase tracking-widest shadow-lg shadow-emerald-900/20">📊 Tax Dashboard</button>
             </div>
             
-            <button id="logoutBtn" class="w-full bg-gray-900 hover:bg-rose-900/40 text-rose-400 hover:text-rose-300 text-[10px] font-bold py-2 rounded border border-rose-700/50 transition-colors uppercase tracking-widest mt-2">
-                Log Out (<span id="userEmailDisplay"></span>)
-            </button>
-
-        </div> <!-- End of mainAppWrapper -->
+            <button id="logoutBtn" class="w-full bg-gray-900 hover:bg-rose-900/40 text-rose-400 hover:text-rose-300 text-[10px] font-bold py-2 rounded border border-rose-700/50 transition-colors uppercase tracking-widest mt-2">Log Out (<span id="userEmailDisplay"></span>)</button>
+        </div>
 
         <!-- ========================================== -->
         <!-- 3. EXPENSE SCANNER MODAL                   -->
@@ -212,7 +182,6 @@
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Total Cost ($)</label>
                         <input type="number" id="expenseAmount" step="0.01" placeholder="0.00" class="w-full bg-gray-950 border border-gray-700 rounded-lg py-3 px-4 text-xl font-black text-white focus:outline-none focus:border-amber-500 text-center">
                     </div>
-                    
                     <div class="pt-2">
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-2 text-center">Receipt Scan</label>
                         <label class="w-full flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg cursor-pointer transition-colors shadow-lg shadow-blue-900/30">
@@ -221,30 +190,32 @@
                         </label>
                         <p id="receiptFileName" class="text-[10px] text-emerald-400 text-center mt-2 font-bold hidden">Receipt Attached!</p>
                     </div>
-
-                    <button id="submitExpenseBtn" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-amber-900/40">
-                        Save Deduction to Cloud
-                    </button>
+                    <button id="submitExpenseBtn" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-amber-900/40">Save Deduction to Cloud</button>
                     <p id="expenseMessage" class="text-xs font-bold mt-2 text-center h-4"></p>
                 </div>
             </div>
         </div>
 
         <!-- ========================================== -->
-        <!-- 4. TAX & CLOUD DASHBOARD MODAL             -->
+        <!-- 4. TAX & SPREADSHEET DASHBOARD             -->
         <!-- ========================================== -->
-        <div id="historyModal" class="hidden absolute inset-0 bg-gray-900 z-50 p-6 flex flex-col h-full">
-            <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-700">
-                <div>
-                    <h2 class="text-xl font-black text-emerald-400 uppercase tracking-widest">Tax Dashboard</h2>
+        <div id="historyModal" class="hidden absolute inset-0 bg-gray-900 z-50 p-4 flex flex-col h-full w-full">
+            <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-700 flex-wrap gap-2">
+                <h2 class="text-xl font-black text-emerald-400 uppercase tracking-widest">Tax Dashboard</h2>
+                <div class="flex space-x-2">
+                    <select id="taxTimeFilter" class="bg-gray-800 border border-gray-600 text-white text-xs font-bold rounded-lg px-2 py-2 outline-none focus:border-emerald-500">
+                        <option value="all">All-Time</option>
+                        <option value="day">Today</option>
+                        <option value="week">Past 7 Days</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                    <button id="closeHistoryBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-2 px-3 rounded-lg border border-gray-600 transition-colors text-xs uppercase">Close</button>
                 </div>
-                <button id="closeHistoryBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-2 px-4 rounded-lg border border-gray-600 transition-colors text-xs uppercase">
-                    Close
-                </button>
             </div>
             
-            <div class="bg-gray-850 p-4 rounded-xl border border-emerald-900/50 shadow-lg shadow-emerald-900/10 mb-4">
-                <h3 class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center mb-2">Year-to-Date Cloud Summary</h3>
+            <div class="bg-gray-850 p-4 rounded-xl border border-emerald-900/50 shadow-lg shadow-emerald-900/10 mb-4 shrink-0">
+                <h3 class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center mb-2">Cloud Summary <span id="summaryTimeframeLabel" class="text-emerald-400"></span></h3>
                 <div class="grid grid-cols-2 gap-4 border-b border-gray-700 pb-3 mb-3">
                     <div class="text-center border-r border-gray-700 pr-2">
                         <span class="block text-[10px] text-gray-400 uppercase">Gross Profit</span>
@@ -261,9 +232,10 @@
                 </div>
             </div>
 
-            <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Shift Ledger</h3>
-            <div id="historyList" class="flex-1 overflow-y-auto space-y-3 pr-2 pb-10">
-                <!-- Fetched past shifts will appear here -->
+            <!-- SPREADSHEET TABLE -->
+            <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 shrink-0">Spreadsheet Ledger</h3>
+            <div id="historyList" class="flex-1 overflow-x-auto overflow-y-auto pb-10 border border-gray-700 rounded-lg bg-gray-850">
+                <!-- Fetched spreadsheet rows will appear here -->
             </div>
         </div>
 
@@ -274,7 +246,6 @@
             <div class="bg-gray-850 border border-gray-700 rounded-2xl p-6 shadow-2xl">
                 <h2 class="text-xl font-black text-blue-400 uppercase tracking-widest mb-4">Edit Cloud Shift</h2>
                 <input type="hidden" id="editShiftId">
-                
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -286,12 +257,10 @@
                             <input type="number" id="editShiftDist" step="0.1" class="w-full bg-gray-950 border border-gray-700 rounded py-2 px-3 text-sm font-bold text-white text-center focus:outline-none focus:border-blue-500">
                         </div>
                     </div>
-                    
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Total Trips</label>
                         <input type="number" id="editShiftTrips" class="w-full bg-gray-950 border border-gray-700 rounded py-2 px-3 text-sm font-bold text-white text-center focus:outline-none focus:border-blue-500">
                     </div>
-
                     <div class="grid grid-cols-2 gap-3 pt-2 border-t border-gray-700">
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Odometer Start</label>
@@ -302,10 +271,9 @@
                             <input type="number" id="editShiftOdoEnd" class="w-full bg-gray-950 border border-gray-700 rounded py-2 px-3 text-sm font-bold text-white text-center focus:outline-none focus:border-blue-500">
                         </div>
                     </div>
-
                     <div class="grid grid-cols-2 gap-3 mt-6">
                         <button id="cancelEditBtn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-lg text-xs uppercase tracking-widest transition-colors">Cancel</button>
-                        <button id="saveEditBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg text-xs uppercase tracking-widest shadow-lg shadow-blue-900/30 transition-colors">💾 Save Edits</button>
+                        <button id="saveEditBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg text-xs uppercase tracking-widest shadow-lg shadow-blue-900/30 transition-colors">💾 Save</button>
                     </div>
                 </div>
             </div>
@@ -372,6 +340,8 @@
         const historyModal = document.getElementById('historyModal');
         const closeHistoryBtn = document.getElementById('closeHistoryBtn');
         const historyList = document.getElementById('historyList');
+        const taxTimeFilter = document.getElementById('taxTimeFilter');
+        const summaryTimeframeLabel = document.getElementById('summaryTimeframeLabel');
         const dashGross = document.getElementById('dashGross');
         const dashDeductions = document.getElementById('dashDeductions');
         const dashNet = document.getElementById('dashNet');
@@ -386,7 +356,6 @@
         const submitExpenseBtn = document.getElementById('submitExpenseBtn');
         const expenseMessage = document.getElementById('expenseMessage');
 
-        // Edit Modal Elements
         const editShiftModal = document.getElementById('editShiftModal');
         const editShiftId = document.getElementById('editShiftId');
         const editShiftProfit = document.getElementById('editShiftProfit');
@@ -399,6 +368,8 @@
 
         let currentTripProfit = 0; 
         let tripLedger = JSON.parse(localStorage.getItem('tripLedger')) || [];
+        let globalShifts = [];
+        let globalExpenses = [];
 
         // ==========================================
         // 3. AUTHENTICATION LOGIC
@@ -425,7 +396,7 @@
             authMessage.innerText = "Logging in...";
             authMessage.className = "text-xs font-bold mt-2 h-4 text-blue-400";
             try {
-                const { data, error } = await _supabase.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
+                const { error } = await _supabase.auth.signInWithPassword({ email: emailInput.value, password: passwordInput.value });
                 if (error) throw error;
                 authMessage.innerText = "";
                 emailInput.value = ""; passwordInput.value = "";
@@ -442,7 +413,7 @@
             if(!email || !password) return;
             authMessage.innerText = "Creating account...";
             authMessage.className = "text-xs font-bold mt-2 h-4 text-emerald-400";
-            const { data, error } = await _supabase.auth.signUp({ email, password });
+            const { error } = await _supabase.auth.signUp({ email, password });
             if (!error) {
                 emailInput.value = ""; passwordInput.value = "";
                 checkUser();
@@ -469,10 +440,7 @@
         });
 
         closeExpenseBtn.addEventListener('click', () => expenseModal.classList.add('hidden'));
-
-        receiptImage.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) receiptFileName.classList.remove('hidden');
-        });
+        receiptImage.addEventListener('change', (e) => { if (e.target.files.length > 0) receiptFileName.classList.remove('hidden'); });
 
         submitExpenseBtn.addEventListener('click', async () => {
             const amount = parseFloat(expenseAmount.value);
@@ -502,7 +470,7 @@
             }]);
 
             if (dbError) {
-                expenseMessage.innerText = "Error saving deduction.";
+                expenseMessage.innerText = "Error saving deduction. Ensure RLS is disabled.";
                 expenseMessage.className = "text-xs font-bold mt-2 text-center h-4 text-rose-400";
             } else {
                 expenseModal.classList.add('hidden');
@@ -513,81 +481,132 @@
         });
 
         // ==========================================
-        // 5. TAX DASHBOARD & CLOUD EDIT LOGIC
+        // 5. TAX DASHBOARD & SPREADSHEET LOGIC
         // ==========================================
-        async function loadCloudHistory() {
+        async function fetchCloudData() {
             historyList.innerHTML = '<p class="text-center text-xs font-bold text-gray-500 mt-10">⏳ Fetching cloud data...</p>';
-            const deductRate = parseFloat(taxDeductRateInput.value) || 0.70;
-
+            
             const { data: shifts, error: shiftError } = await _supabase.from('delivery_logs').select('*').eq('user_id', currentUser.id).order('id', { ascending: false }); 
             const { data: expenses, error: expError } = await _supabase.from('other_deductions').select('*').eq('user_id', currentUser.id);
 
             if (shiftError || expError) {
-                historyList.innerHTML = `<p class="text-rose-400 text-center text-xs font-bold mt-10">Cloud Sync Error.</p>`;
+                historyList.innerHTML = `<p class="text-rose-400 text-center text-xs font-bold mt-10">Cloud Sync Error. Check RLS settings.</p>`;
                 return;
             }
 
+            globalShifts = shifts || [];
+            globalExpenses = expenses || [];
+            renderSpreadsheet();
+        }
+
+        function renderSpreadsheet() {
+            const filterVal = taxTimeFilter.value;
+            summaryTimeframeLabel.innerText = `(${taxTimeFilter.options[taxTimeFilter.selectedIndex].text})`;
+            const deductRate = parseFloat(taxDeductRateInput.value) || 0.70;
+            const now = new Date();
+
+            // Filter Logic
+            const filteredShifts = globalShifts.filter(s => {
+                if (filterVal === 'all') return true;
+                const sDate = new Date(s.shift_date);
+                if (filterVal === 'day') return sDate.toDateString() === now.toDateString();
+                if (filterVal === 'week') {
+                    const diff = (now - sDate) / (1000 * 60 * 60 * 24);
+                    return diff <= 7 && diff >= 0;
+                }
+                if (filterVal === 'month') return sDate.getMonth() === now.getMonth() && sDate.getFullYear() === now.getFullYear();
+                if (filterVal === 'year') return sDate.getFullYear() === now.getFullYear();
+                return true;
+            });
+
+            const filteredExpenses = globalExpenses.filter(e => {
+                if (filterVal === 'all') return true;
+                const eDate = new Date(e.expense_date);
+                if (filterVal === 'day') return eDate.toDateString() === now.toDateString();
+                if (filterVal === 'week') {
+                    const diff = (now - eDate) / (1000 * 60 * 60 * 24);
+                    return diff <= 7 && diff >= 0;
+                }
+                if (filterVal === 'month') return eDate.getMonth() === now.getMonth() && eDate.getFullYear() === now.getFullYear();
+                if (filterVal === 'year') return eDate.getFullYear() === now.getFullYear();
+                return true;
+            });
+
+            // Calculate Summaries
             let totalGross = 0; let totalVehicleDeduction = 0; let totalOtherDeductions = 0;
             
-            shifts.forEach(shift => {
+            filteredShifts.forEach(shift => {
                 totalGross += shift.total_profit || 0;
                 totalVehicleDeduction += (shift.odo_total || 0) * deductRate;
             });
 
-            if (expenses) {
-                expenses.forEach(exp => totalOtherDeductions += parseFloat(exp.amount) || 0);
-            }
+            filteredExpenses.forEach(exp => totalOtherDeductions += parseFloat(exp.amount) || 0);
 
             const grandTotalDeductions = totalVehicleDeduction + totalOtherDeductions;
             dashGross.innerText = `$${totalGross.toFixed(2)}`;
             dashDeductions.innerText = `-$${grandTotalDeductions.toFixed(2)}`;
             dashNet.innerText = `$${(totalGross - grandTotalDeductions).toFixed(2)}`;
 
-            if (!shifts || shifts.length === 0) {
-                historyList.innerHTML = '<p class="text-center text-xs text-gray-500 italic mt-10">No completed shifts yet.</p>';
+            if (filteredShifts.length === 0) {
+                historyList.innerHTML = '<p class="text-center text-xs text-gray-500 italic mt-10 p-4">No completed shifts for this timeframe.</p>';
                 return;
             }
 
-            historyList.innerHTML = shifts.map(shift => {
-                const shiftVehDeduct = (shift.odo_total || 0) * deductRate;
-                return `
-                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-md">
-                    <div class="flex justify-between items-center mb-2 border-b border-gray-700 pb-2">
-                        <span class="text-xs font-bold text-gray-300 uppercase tracking-widest">${shift.shift_date}</span>
-                        <span class="text-lg font-black text-emerald-400">+$${(shift.total_profit || 0).toFixed(2)}</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 text-[10px] text-gray-400 uppercase tracking-widest mb-2">
-                        <div>Trips: <span class="text-white font-bold ml-1">${shift.total_trips || 0}</span></div>
-                        <div class="text-right">App Dist: <span class="text-white font-bold ml-1">${shift.app_miles || 0} KM</span></div>
-                    </div>
-                    <div class="bg-gray-900 rounded p-2 border border-gray-700 mb-2">
-                        <div class="flex justify-between text-[10px] text-gray-500 font-bold uppercase">
-                            <span>Odo: ${shift.odo_start || 0} &rarr; ${shift.odo_end || 0} (${shift.odo_total || 0}KM)</span>
-                            <span class="text-rose-400">Deduct: -$${shiftVehDeduct.toFixed(2)}</span>
-                        </div>
-                    </div>
-                    <div class="flex justify-end space-x-2 pt-2 border-t border-gray-700">
-                        <button onclick="openEditShift(${shift.id}, ${shift.total_profit || 0}, ${shift.app_miles || 0}, ${shift.total_trips || 0}, ${shift.odo_start || 0}, ${shift.odo_end || 0})" class="text-blue-400 hover:text-white text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 bg-gray-900 rounded border border-gray-600 hover:border-blue-500 transition-colors">Edit</button>
-                        <button onclick="deleteCloudShift(${shift.id})" class="text-rose-400 hover:text-white text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 bg-gray-900 rounded border border-gray-600 hover:border-rose-500 transition-colors">Delete</button>
-                    </div>
-                </div>
+            // Generate Spreadsheet Table matching the user's image layout
+            let tableHTML = `
+            <table class="w-full text-left text-[11px] whitespace-nowrap min-w-max">
+                <thead class="bg-gray-900 sticky top-0 border-b-2 border-gray-700">
+                    <tr class="text-gray-300">
+                        <th class="py-3 px-3 font-bold border-r border-gray-700">Date</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Total Trips</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Total Profit ($)</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">App Distance (KM)</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odometer Start</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odometer End</th>
+                        <th class="py-3 px-3 font-bold text-center border-r border-gray-700">Odometer Driven (KM)</th>
+                        <th class="py-3 px-3 font-bold text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+            `;
+
+            filteredShifts.forEach(shift => {
+                tableHTML += `
+                    <tr class="hover:bg-gray-800 transition-colors">
+                        <td class="py-3 px-3 border-r border-gray-700/50">${shift.shift_date}</td>
+                        <td class="py-3 px-3 text-center font-bold border-r border-gray-700/50">${shift.total_trips || 0}</td>
+                        <td class="py-3 px-3 text-center font-bold text-emerald-400 border-r border-gray-700/50">$${(shift.total_profit || 0).toFixed(2)}</td>
+                        <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.app_miles || 0}</td>
+                        <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_start || 0}</td>
+                        <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_end || 0}</td>
+                        <td class="py-3 px-3 text-center font-bold text-amber-400 border-r border-gray-700/50">${shift.odo_total || 0}</td>
+                        <td class="py-3 px-3 text-center space-x-3">
+                            <button onclick="openEditShift(${shift.id}, ${shift.total_profit || 0}, ${shift.app_miles || 0}, ${shift.total_trips || 0}, ${shift.odo_start || 0}, ${shift.odo_end || 0})" class="text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest text-[9px]">Edit</button>
+                            <button onclick="deleteCloudShift(${shift.id})" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
+                        </td>
+                    </tr>
                 `;
-            }).join('');
+            });
+
+            tableHTML += `</tbody></table>`;
+            historyList.innerHTML = tableHTML;
         }
+
+        taxTimeFilter.addEventListener('change', renderSpreadsheet);
 
         viewHistoryBtn.addEventListener('click', () => {
             historyModal.classList.remove('hidden');
-            loadCloudHistory();
+            fetchCloudData();
         });
 
         closeHistoryBtn.addEventListener('click', () => historyModal.classList.add('hidden'));
 
         // Delete Shift Function
         window.deleteCloudShift = async (id) => {
-            if (confirm("Are you sure you want to permanently delete this shift from the cloud?")) {
+            if (confirm("Permanently delete this shift from the cloud?")) {
                 const { error } = await _supabase.from('delivery_logs').delete().eq('id', id);
-                if (error) alert("Error deleting shift: " + error.message);
-                else loadCloudHistory(); // Refresh the list
+                if (error) alert("Error deleting shift. Check RLS settings.");
+                else fetchCloudData(); 
             }
         };
 
@@ -607,31 +626,26 @@
         // Save Edit Function
         saveEditBtn.addEventListener('click', async () => {
             const id = editShiftId.value;
-            const newProfit = parseFloat(editShiftProfit.value) || 0;
-            const newMiles = parseFloat(editShiftDist.value) || 0;
-            const newTrips = parseInt(editShiftTrips.value) || 0;
             const newOdoStart = parseFloat(editShiftOdoStart.value) || 0;
             const newOdoEnd = parseFloat(editShiftOdoEnd.value) || 0;
-            const newOdoTotal = newOdoEnd > newOdoStart ? (newOdoEnd - newOdoStart) : 0;
-
+            
             saveEditBtn.innerText = "⏳ Saving...";
             
             const { error } = await _supabase.from('delivery_logs').update({
-                total_profit: newProfit,
-                app_miles: newMiles,
-                total_trips: newTrips,
-                odo_start: newOdoStart,
-                odo_end: newOdoEnd,
-                odo_total: newOdoTotal
+                total_profit: parseFloat(editShiftProfit.value) || 0,
+                app_miles: parseFloat(editShiftDist.value) || 0,
+                total_trips: parseInt(editShiftTrips.value) || 0,
+                odo_start: newOdoStart, odo_end: newOdoEnd,
+                odo_total: newOdoEnd > newOdoStart ? (newOdoEnd - newOdoStart) : 0
             }).eq('id', id);
 
-            saveEditBtn.innerText = "💾 Save Edits";
+            saveEditBtn.innerText = "💾 Save";
 
             if (error) {
-                alert("Error updating shift: " + error.message);
+                alert("Error updating shift.");
             } else {
                 editShiftModal.classList.add('hidden');
-                loadCloudHistory(); // Refresh the dashboard live
+                fetchCloudData(); 
             }
         });
 
@@ -778,7 +792,7 @@
             }]);
 
             if (error) {
-                alert("Error saving shift: " + error.message);
+                alert("Error saving shift: Check RLS settings.");
             } else {
                 alert("Shift successfully saved! Daily totals reset.");
                 tripLedger = []; localStorage.removeItem('tripLedger');
