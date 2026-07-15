@@ -152,9 +152,15 @@
                 <span id="shiftProgressText">0%</span>
             </div>
 
-            <button id="resetShiftBtn" class="w-full mt-4 bg-gray-800 hover:bg-rose-900/50 text-gray-400 hover:text-rose-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
-                Reset Shift
-            </button>
+            <!-- Shift Actions Group -->
+            <div class="grid grid-cols-2 gap-3 mt-4">
+                <button id="undoLastBtn" class="bg-gray-800 hover:bg-amber-900/40 text-gray-400 hover:text-amber-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest disabled:opacity-45 disabled:pointer-events-none" disabled>
+                    ↰ Undo Last
+                </button>
+                <button id="resetShiftBtn" class="bg-gray-800 hover:bg-rose-900/50 text-gray-400 hover:text-rose-400 font-bold py-2 rounded border border-gray-700 transition-colors text-xs uppercase tracking-widest">
+                    Reset Shift
+                </button>
+            </div>
         </div>
 
     </div>
@@ -192,6 +198,7 @@
         
         // DOM Elements - Tracker
         const saveTripBtn = document.getElementById('saveTripBtn');
+        const undoLastBtn = document.getElementById('undoLastBtn');
         const resetShiftBtn = document.getElementById('resetShiftBtn');
         const shiftTotalDisplay = document.getElementById('shiftTotalDisplay');
         const shiftCountDisplay = document.getElementById('shiftCountDisplay');
@@ -203,24 +210,24 @@
         let shiftCount = parseInt(localStorage.getItem('shiftCount')) || 0;
         let currentTripProfit = 0; 
         let manualOverride = localStorage.getItem('manualOverride') === 'true';
+        
+        // Load trip history array from local storage to allow step-by-step Undos
+        let tripHistory = JSON.parse(localStorage.getItem('tripHistory')) || [];
 
         // --- TIME OF DAY LOGIC ---
         function determineTimeProfile() {
             const now = new Date();
-            const day = now.getDay(); // 0=Sun, 1=Mon... 5=Fri, 6=Sat
-            const hour = now.getHours(); // 0-23
+            const day = now.getDay(); 
+            const hour = now.getHours(); 
             
             let profile = { name: "Off-Peak", min: 4, km: 1.00, hr: 16 };
 
-            // Peak Dinner (Fri/Sat 5 PM - 9 PM)
             if ((day === 5 || day === 6) && (hour >= 17 && hour < 21)) {
                 profile = { name: "Peak Dinner Rush", min: 6, km: 1.50, hr: 24 };
             }
-            // Late Night (Fri/Sat 10 PM - 2 AM)
             else if ((day === 5 || day === 6) && (hour >= 22 || hour < 2)) {
                 profile = { name: "Late Night Rush", min: 5, km: 1.20, hr: 22 };
             }
-            // Standard Rush (Daily 11 AM - 2 PM, Mon-Thu 5 PM - 9 PM, Sun 5 PM - 9PM)
             else if ((hour >= 11 && hour < 14) || (hour >= 17 && hour < 21)) {
                 profile = { name: "Standard Rush", min: 5, km: 1.20, hr: 20 };
             }
@@ -243,7 +250,6 @@
         }
 
         // --- INITIALIZATION ---
-        // Dynamically populate Dropdowns
         for (let i = 1; i <= 100; i++) {
             let opt = document.createElement('option'); opt.value = i; opt.innerHTML = `$${i}.00`; uberOfferSelect.appendChild(opt);
             let opt2 = document.createElement('option'); opt2.value = i; opt2.innerHTML = `${i} KM`; tripDistanceSelect.appendChild(opt2);
@@ -252,7 +258,6 @@
             let opt = document.createElement('option'); opt.value = i; opt.innerHTML = `${i} Mins`; tripDurationSelect.appendChild(opt);
         }
 
-        // Setup Targets on Load
         if (localStorage.getItem('gasCost')) gasCostInput.value = localStorage.getItem('gasCost');
         if (localStorage.getItem('dailyTarget')) dailyTargetInput.value = localStorage.getItem('dailyTarget');
 
@@ -375,6 +380,9 @@
             
             shiftProgressBar.style.width = `${progressPercentage}%`;
             shiftProgressText.innerText = `${((shiftTotal / dailyTarget) * 100).toFixed(1)}%`;
+
+            // Enable/Disable undo button based on whether there is history to reverse
+            undoLastBtn.disabled = (tripHistory.length === 0);
         }
 
         // --- TRACKER ACTIONS ---
@@ -382,8 +390,13 @@
             if (currentTripProfit !== 0) {
                 shiftTotal += currentTripProfit;
                 shiftCount += 1;
+                
+                // Add exact profit to memory queue
+                tripHistory.push(parseFloat(currentTripProfit.toFixed(2)));
+                
                 localStorage.setItem('shiftTotal', shiftTotal);
                 localStorage.setItem('shiftCount', shiftCount);
+                localStorage.setItem('tripHistory', JSON.stringify(tripHistory));
                 
                 updateShiftTrackerUI();
 
@@ -396,12 +409,35 @@
             }
         });
 
+        // Action: Undo Last Saved Trip
+        undoLastBtn.addEventListener('click', () => {
+            if (tripHistory.length > 0) {
+                // Get the last trip profit
+                const lastTripProfit = tripHistory.pop();
+                
+                // Subtract values
+                shiftTotal = Math.max(0, shiftTotal - lastTripProfit);
+                shiftCount = Math.max(0, shiftCount - 1);
+                
+                // Save updated state
+                localStorage.setItem('shiftTotal', shiftTotal);
+                localStorage.setItem('shiftCount', shiftCount);
+                localStorage.setItem('tripHistory', JSON.stringify(tripHistory));
+                
+                updateShiftTrackerUI();
+                alert(`Removed last trip worth $${lastTripProfit.toFixed(2)} from your shift total.`);
+            }
+        });
+
+        // Action: Reset Shift
         resetShiftBtn.addEventListener('click', () => {
             if(confirm("Reset shift totals? Ensure you've logged this in your spreadsheet!")) {
                 shiftTotal = 0;
                 shiftCount = 0;
+                tripHistory = [];
                 localStorage.removeItem('shiftTotal');
                 localStorage.removeItem('shiftCount');
+                localStorage.removeItem('tripHistory');
                 updateShiftTrackerUI();
             }
         });
