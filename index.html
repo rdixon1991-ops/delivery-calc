@@ -562,7 +562,6 @@
             dashDeductions.innerText = `-$${grandTotalDeductions.toFixed(2)}`;
             dashNet.innerText = `$${(totalGross - grandTotalDeductions).toFixed(2)}`;
 
-            // Build Shift Ledger
             let shiftTableHTML = `
             <table class="w-full text-left text-[11px] whitespace-nowrap min-w-max">
                 <thead class="bg-gray-900 border-b-2 border-gray-700">
@@ -601,8 +600,8 @@
                             <td class="py-3 px-3 text-center border-r border-gray-700/50">${shift.odo_end || 0}</td>
                             <td class="py-3 px-3 text-center font-bold text-amber-400 border-r border-gray-700/50">${odoTotal}</td>
                             <td class="py-3 px-3 text-center space-x-3 hide-on-print">
-                                <button onclick="openEditShift(${shift.id}, ${gross}, ${shift.app_miles || 0}, ${shift.total_trips || 0}, ${shift.odo_start || 0}, ${shift.odo_end || 0})" class="text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest text-[9px]">Edit</button>
-                                <button onclick="deleteCloudShift(${shift.id})" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
+                                <button onclick="openEditShift('${shift.id}', '${gross}', '${shift.app_miles || 0}', '${shift.total_trips || 0}', '${shift.odo_start || 0}', '${shift.odo_end || 0}')" class="text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest text-[9px]">Edit</button>
+                                <button onclick="deleteCloudShift('${shift.id}')" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
                             </td>
                         </tr>
                     `;
@@ -611,7 +610,6 @@
             shiftTableHTML += `</tbody></table>`;
             document.getElementById('shiftLedgerContainer').innerHTML = shiftTableHTML;
 
-            // Build Expense Ledger
             let expenseTableHTML = `
             <table class="w-full text-left text-[11px] whitespace-nowrap min-w-max">
                 <thead class="bg-gray-900 border-b-2 border-gray-700">
@@ -638,7 +636,7 @@
                             <td class="py-3 px-3 text-center font-black text-rose-400 border-r border-gray-700/50">-$${(parseFloat(exp.amount) || 0).toFixed(2)}</td>
                             <td class="py-3 px-3 text-center border-r border-gray-700/50 hide-on-print">${receiptLink}</td>
                             <td class="py-3 px-3 text-center space-x-3 hide-on-print">
-                                <button onclick="deleteCloudExpense(${exp.id})" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
+                                <button onclick="deleteCloudExpense('${exp.id}')" class="text-rose-400 hover:text-rose-300 font-bold uppercase tracking-widest text-[9px]">Delete</button>
                             </td>
                         </tr>
                     `;
@@ -652,17 +650,23 @@
         viewHistoryBtn.addEventListener('click', () => { historyModal.classList.remove('hidden'); fetchCloudData(); });
         closeHistoryBtn.addEventListener('click', () => historyModal.classList.add('hidden'));
 
-        // Delete Functions
+        // SAFELY DELETING WITH TEXT STRINGS TO PREVENT ID TRUNCATION
         window.deleteCloudShift = async (id) => {
             if (confirm("Permanently delete this shift?")) {
-                const { error } = await _supabase.from('delivery_logs').delete().eq('id', parseInt(id));
-                if (error) alert("Delete Failed: " + error.message); else fetchCloudData(); 
+                const { error, data } = await _supabase.from('delivery_logs').delete().eq('id', id).select();
+                if (error) {
+                    alert("Delete Failed: " + error.message); 
+                } else if (data && data.length === 0) {
+                    alert("Delete Failed: Shift not found. Please refresh.");
+                } else {
+                    fetchCloudData(); 
+                }
             }
         };
 
         window.deleteCloudExpense = async (id) => {
             if (confirm("Permanently delete this expense?")) {
-                const { error } = await _supabase.from('other_deductions').delete().eq('id', parseInt(id));
+                const { error } = await _supabase.from('other_deductions').delete().eq('id', id);
                 if (error) alert("Delete Failed: " + error.message); else fetchCloudData(); 
             }
         };
@@ -695,15 +699,19 @@
 
         // Edit Shift Logic
         window.openEditShift = (id, profit, miles, trips, odoStart, odoEnd) => {
-            editShiftId.value = id; editShiftProfit.value = profit; editShiftDist.value = miles;
-            editShiftTrips.value = trips; editShiftOdoStart.value = odoStart; editShiftOdoEnd.value = odoEnd;
+            editShiftId.value = id; 
+            editShiftProfit.value = parseFloat(profit) || 0; 
+            editShiftDist.value = parseFloat(miles) || 0;
+            editShiftTrips.value = parseInt(trips) || 0; 
+            editShiftOdoStart.value = parseFloat(odoStart) || 0; 
+            editShiftOdoEnd.value = parseFloat(odoEnd) || 0;
             editShiftModal.classList.remove('hidden');
         };
 
         cancelEditBtn.addEventListener('click', () => editShiftModal.classList.add('hidden'));
 
         saveEditBtn.addEventListener('click', async () => {
-            const cleanId = parseInt(editShiftId.value);
+            const safeId = editShiftId.value;
             const newOdoStart = parseFloat(editShiftOdoStart.value) || 0;
             const newOdoEnd = parseFloat(editShiftOdoEnd.value) || 0;
             saveEditBtn.innerText = "⏳ Saving...";
@@ -712,7 +720,7 @@
                 total_profit: parseFloat(editShiftProfit.value) || 0, app_miles: parseFloat(editShiftDist.value) || 0,
                 total_trips: parseInt(editShiftTrips.value) || 0, odo_start: newOdoStart, odo_end: newOdoEnd,
                 odo_total: newOdoEnd > newOdoStart ? (newOdoEnd - newOdoStart) : 0
-            }).eq('id', cleanId);
+            }).eq('id', safeId);
 
             saveEditBtn.innerText = "💾 Save";
             if (error) alert("Edit Failed: " + error.message); else { editShiftModal.classList.add('hidden'); fetchCloudData(); }
