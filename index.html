@@ -53,7 +53,11 @@
             
             <div id="decisionBox" class="p-4 rounded-xl border transition-all duration-300 border-gray-750 relative overflow-hidden bg-cover bg-center bg-no-repeat">
                 <div id="decisionOverlay" class="absolute inset-0 bg-gray-950/90 transition-colors duration-300"></div>
-                <div class="relative z-10 grid grid-cols-2 gap-y-3 gap-x-4 text-left text-xs text-gray-300">
+                
+                <!-- NEW ACCEPT/DECLINE TEXT -->
+                <div id="decisionStatus" class="hidden relative z-10 text-center text-4xl font-black uppercase tracking-widest mt-2 mb-2 drop-shadow-md"></div>
+                
+                <div class="relative z-10 grid grid-cols-2 gap-y-3 gap-x-4 text-left text-xs text-gray-300 mt-2">
                     <div>Est. Gas Cost: <span id="estGas" class="font-bold text-gray-400 block text-sm mt-1">$0.00</span></div>
                     <div>Current Trip Profit: <span id="netProfit" class="font-black text-white block text-lg mt-0">$0.00</span></div>
                     <div class="col-span-2 pt-2 border-t border-gray-800/50 grid grid-cols-2 gap-2">
@@ -62,6 +66,17 @@
                     </div>
                 </div>
                 <button id="saveTripBtn" class="hidden relative z-10 w-full mt-3 bg-blue-600/90 backdrop-blur hover:bg-blue-500 text-white font-black py-2.5 rounded-lg border border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all uppercase tracking-widest text-xs">💾 Save Trip</button>
+            </div>
+
+            <!-- RESTORED SHIFT PROFILE HEADER -->
+            <div class="bg-gray-800 p-3 rounded-xl border border-gray-700 flex justify-between items-center mb-2">
+                <div>
+                    <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active Barrie Profile</span>
+                    <span id="shiftProfileName" class="text-sm font-black text-emerald-400">Detecting Time...</span>
+                </div>
+                <button id="resetOptimumBtn" class="bg-gray-900 border border-gray-600 text-gray-300 text-[10px] font-bold py-1.5 px-3 rounded hover:bg-emerald-900 hover:text-emerald-300 hover:border-emerald-500 transition-colors uppercase tracking-widest">
+                    ↺ Optimum
+                </button>
             </div>
 
             <!-- COLLAPSIBLE INPUT SETTINGS -->
@@ -312,6 +327,9 @@
         const authGate = document.getElementById('authGate');
         const mainAppWrapper = document.getElementById('mainAppWrapper');
 
+        const shiftProfileName = document.getElementById('shiftProfileName');
+        const resetOptimumBtn = document.getElementById('resetOptimumBtn');
+
         const minTripProfitInput = document.getElementById('minTripProfit');
         const targetPayInput = document.getElementById('targetPay');
         const targetHourlyInput = document.getElementById('targetHourly');
@@ -327,6 +345,7 @@
 
         const decisionBox = document.getElementById('decisionBox');
         const decisionOverlay = document.getElementById('decisionOverlay');
+        const decisionStatus = document.getElementById('decisionStatus');
         const estGasSpan = document.getElementById('estGas');
         const netProfitSpan = document.getElementById('netProfit');
         const payPerKmSpan = document.getElementById('payPerKm');
@@ -386,6 +405,7 @@
         let tripLedger = JSON.parse(localStorage.getItem('tripLedger')) || [];
         let globalShifts = [];
         let globalExpenses = [];
+        let manualOverride = false;
 
         // ==========================================
         // 3. AUTHENTICATION LOGIC
@@ -727,17 +747,60 @@
         });
 
         // ==========================================
-        // 6. CALCULATOR & ODOMETER LOGIC
+        // 6. CALCULATOR & TIME PROFILE LOGIC
         // ==========================================
+        function determineTimeProfile() {
+            const now = new Date();
+            const day = now.getDay(); 
+            const hour = now.getHours(); 
+            
+            let profile = { name: "Off-Peak", min: 4, km: 1.00, hr: 16 };
+            if ((day === 5 || day === 6) && (hour >= 17 && hour < 21)) {
+                profile = { name: "Peak Dinner Rush", min: 6, km: 1.50, hr: 24 };
+            } else if ((day === 5 || day === 6) && (hour >= 22 || hour < 2)) {
+                profile = { name: "Late Night Rush", min: 5, km: 1.20, hr: 22 };
+            } else if ((hour >= 11 && hour < 14) || (hour >= 17 && hour < 21)) {
+                profile = { name: "Standard Rush", min: 5, km: 1.20, hr: 20 };
+            }
+            return profile;
+        }
+
+        function loadOptimumSettings() {
+            const profile = determineTimeProfile();
+            shiftProfileName.innerText = profile.name;
+            shiftProfileName.className = "text-sm font-black text-emerald-400";
+            
+            minTripProfitInput.value = profile.min.toFixed(2);
+            targetPayInput.value = profile.km.toFixed(2);
+            targetHourlyInput.value = profile.hr.toFixed(2);
+            
+            manualOverride = false;
+            localStorage.setItem('manualOverride', 'false');
+            calculate();
+        }
+
+        resetOptimumBtn.addEventListener('click', () => {
+            loadOptimumSettings();
+            alert("Settings reset to Optimum for the current time.");
+        });
+
         function loadSettings() {
-            minTripProfitInput.value = localStorage.getItem('customMin') || 5.00;
-            targetPayInput.value = localStorage.getItem('customKm') || 1.20;
-            targetHourlyInput.value = localStorage.getItem('customHr') || 20.00;
             if (localStorage.getItem('gasCost')) gasCostInput.value = localStorage.getItem('gasCost');
             if (localStorage.getItem('dailyTarget')) dailyTargetInput.value = localStorage.getItem('dailyTarget');
             if (localStorage.getItem('taxDeductRate')) taxDeductRateInput.value = localStorage.getItem('taxDeductRate');
             if (localStorage.getItem('startOdometer')) startOdometerInput.value = localStorage.getItem('startOdometer');
             if (localStorage.getItem('endOdometer')) endOdometerInput.value = localStorage.getItem('endOdometer');
+
+            manualOverride = localStorage.getItem('manualOverride') === 'true';
+            if (manualOverride) {
+                shiftProfileName.innerText = "Custom Settings";
+                shiftProfileName.className = "text-sm font-black text-amber-400";
+                minTripProfitInput.value = localStorage.getItem('customMin') || 5.00;
+                targetPayInput.value = localStorage.getItem('customKm') || 1.20;
+                targetHourlyInput.value = localStorage.getItem('customHr') || 20.00;
+            } else {
+                loadOptimumSettings();
+            }
         }
 
         function updateOdometer() {
@@ -764,10 +827,14 @@
         toggleInputBtn.addEventListener('click', () => inputSettingsPanel.classList.toggle('hidden'));
 
         saveManualTargetsBtn.addEventListener('click', () => {
+            manualOverride = true;
+            localStorage.setItem('manualOverride', 'true');
             localStorage.setItem('customMin', minTripProfitInput.value);
             localStorage.setItem('customKm', targetPayInput.value);
             localStorage.setItem('customHr', targetHourlyInput.value);
             localStorage.setItem('taxDeductRate', taxDeductRateInput.value);
+            shiftProfileName.innerText = "Custom Settings";
+            shiftProfileName.className = "text-sm font-black text-amber-400";
             inputSettingsPanel.classList.add('hidden');
             calculate();
         });
@@ -780,6 +847,7 @@
             const minTripProfit = parseFloat(minTripProfitInput.value) || 0;
             const targetPayPerKm = parseFloat(targetPayInput.value) || 0;
             const targetHourly = parseFloat(targetHourlyInput.value) || 0;
+
             const uberOffer = parseFloat(uberOfferSelect.value) || 0;
             const tripDistance = parseFloat(tripDistanceSelect.value) || 0;
             const tripDuration = parseFloat(tripDurationSelect.value) || 0;
@@ -789,8 +857,10 @@
             updateShiftTrackerUI(); 
 
             if (uberOffer <= 0 || tripDistance <= 0 || tripDuration <= 0) {
-                decisionBox.className = "p-4 rounded-xl border border-gray-750 relative overflow-hidden";
+                decisionBox.className = "p-4 rounded-xl border border-gray-750 relative overflow-hidden bg-cover bg-center bg-no-repeat";
                 decisionOverlay.className = "absolute inset-0 bg-gray-950/90 transition-colors duration-300";
+                decisionStatus.classList.add('hidden');
+                decisionStatus.classList.remove('block');
                 saveTripBtn.classList.add('hidden');
                 return;
             }
@@ -807,13 +877,17 @@
             saveTripBtn.classList.remove('hidden');
 
             if (currentTripProfit >= minTripProfit && payPerKm >= targetPayPerKm && payPerHour >= targetHourly) {
-                decisionBox.className = "p-4 rounded-xl border-2 transition-all duration-200 border-emerald-400 shadow-lg relative overflow-hidden";
+                decisionBox.className = "p-4 rounded-xl border-2 transition-all duration-200 border-emerald-400 shadow-lg relative overflow-hidden bg-cover bg-center bg-no-repeat";
                 decisionOverlay.className = "absolute inset-0 bg-emerald-900/85 transition-colors duration-300 backdrop-blur-[2px]";
                 netProfitSpan.className = "font-black text-white block text-lg mt-0";
+                decisionStatus.innerText = "ACCEPT";
+                decisionStatus.className = "relative z-10 text-center text-4xl font-black uppercase tracking-widest mt-3 mb-1 drop-shadow-lg text-emerald-400 block";
             } else {
-                decisionBox.className = "p-4 rounded-xl border-2 transition-all duration-200 border-rose-400 shadow-lg relative overflow-hidden";
+                decisionBox.className = "p-4 rounded-xl border-2 transition-all duration-200 border-rose-400 shadow-lg relative overflow-hidden bg-cover bg-center bg-no-repeat";
                 decisionOverlay.className = "absolute inset-0 bg-rose-900/85 transition-colors duration-300 backdrop-blur-[2px]";
                 netProfitSpan.className = "font-black text-rose-200 block text-lg mt-0";
+                decisionStatus.innerText = "DECLINE";
+                decisionStatus.className = "relative z-10 text-center text-4xl font-black uppercase tracking-widest mt-3 mb-1 drop-shadow-lg text-rose-400 block";
             }
         }
 
@@ -848,6 +922,13 @@
             if (!currentUser) return;
             if (tripLedger.length === 0) { alert("No trips to save!"); return; }
 
+            // HARD STOP: MUST HAVE START ODOMETER
+            if (!startOdometerInput.value) {
+                alert("⚠️ Please enter your Start Odometer (KM) before pushing to the cloud.");
+                startOdometerInput.focus();
+                return;
+            }
+
             exportCloudBtn.innerText = "⏳ Pushing to Cloud...";
             const shiftTotal = tripLedger.reduce((sum, trip) => sum + trip.profit, 0);
             const shiftDistance = tripLedger.reduce((sum, trip) => sum + (trip.distance || 0), 0);
@@ -861,8 +942,9 @@
                 odo_start: startOdo, odo_end: endOdo, odo_total: odoTotal
             }]);
 
-            if (error) alert("Error saving shift: " + error.message);
-            else {
+            if (error) {
+                alert("Error saving shift: " + error.message);
+            } else {
                 alert("Shift successfully saved! Daily totals reset.");
                 tripLedger = []; localStorage.removeItem('tripLedger');
                 startOdometerInput.value = ""; endOdometerInput.value = "";
