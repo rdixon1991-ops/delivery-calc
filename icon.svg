@@ -1,96 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg class="w-32 h-32 mx-auto mb-4 drop-shadow-[0_0_20px_rgba(34,197,94,0.3)]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
-        <!-- Background Brushed Metal -->
-        <radialGradient id="bgMetal" cx="50%" cy="50%" r="75%">
-            <stop offset="0%" stop-color="#333538"/>
-            <stop offset="60%" stop-color="#141518"/>
-            <stop offset="100%" stop-color="#050506"/>
+        <!-- Dark Brushed Metal Background -->
+        <radialGradient id="metalBg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#475569" />
+            <stop offset="70%" stop-color="#0f172a" />
+            <stop offset="100%" stop-color="#020617" />
         </radialGradient>
-
-        <!-- High Contrast Chrome for Text and Icon -->
-        <linearGradient id="chrome" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#e6e6e6"/>
-            <stop offset="42%" stop-color="#ffffff"/>
-            <stop offset="45%" stop-color="#3a3c40"/>
-            <stop offset="50%" stop-color="#111111"/>
-            <stop offset="65%" stop-color="#6a6d75"/>
-            <stop offset="100%" stop-color="#d0d0d0"/>
+        <!-- Chrome Lettering -->
+        <linearGradient id="chromeText" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="35%" stop-color="#94a3b8"/>
+            <stop offset="50%" stop-color="#1e293b"/>
+            <stop offset="65%" stop-color="#cbd5e1"/>
+            <stop offset="100%" stop-color="#f8fafc"/>
         </linearGradient>
-
-        <!-- Neon Green Glowing Edge -->
-        <linearGradient id="neonGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#d4ff00"/>
-            <stop offset="50%" stop-color="#00ff33"/>
-            <stop offset="100%" stop-color="#00aa11"/>
-        </linearGradient>
-
-        <!-- Glow Filters -->
-        <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="12" result="blur1"/>
-            <feGaussianBlur stdDeviation="25" result="blur2"/>
+        <!-- Neon Green Glow -->
+        <filter id="neonGreen" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
             <feMerge>
-                <feMergeNode in="blur2"/>
-                <feMergeNode in="blur1"/>
-                <feMergeNode in="SourceGraphic"/>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
             </feMerge>
-        </filter>
-
-        <!-- 3D Chrome Bevel and Drop Shadow -->
-        <filter id="chrome3D" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="15" stdDeviation="10" flood-color="#000" flood-opacity="0.9"/>
-            <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000" flood-opacity="0.7"/>
-            <!-- Inner Bevel Highlight -->
-            <feComponentTransfer in="SourceAlpha" result="alpha"/>
-            <feGaussianBlur stdDeviation="2" result="blur"/>
-            <feOffset dy="-2" dx="-2"/>
-            <feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowDiff"/>
-            <feFlood flood-color="#ffffff" flood-opacity="0.8"/>
-            <feComposite in2="shadowDiff" operator="in"/>
-            <feComposite in2="SourceGraphic" operator="over"/>
-        </filter>
-
-        <!-- Inner Shadow for the background circle -->
-        <filter id="innerShadow">
-            <feOffset dx="0" dy="8"/>
-            <feGaussianBlur stdDeviation="6" result="offset-blur"/>
-            <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
-            <feFlood flood-color="black" flood-opacity="0.95" result="color"/>
-            <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
-            <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
         </filter>
     </defs>
 
-    <!-- Dark Metal Canvas -->
-    <rect width="512" height="512" fill="url(#bgMetal)"/>
-
-    <!-- Glowing Green Halo -->
-    <circle cx="256" cy="256" r="218" fill="none" stroke="url(#neonGreen)" stroke-width="14" filter="url(#greenGlow)"/>
-
-    <!-- Outer Chrome Ring -->
-    <circle cx="256" cy="256" r="225" fill="none" stroke="url(#chrome)" stroke-width="12" filter="url(#chrome3D)"/>
-    <circle cx="256" cy="256" r="211" fill="none" stroke="url(#chrome)" stroke-width="4" filter="url(#chrome3D)"/>
-
-    <!-- Inner Recessed Metal Area -->
-    <circle cx="256" cy="256" r="208" fill="url(#bgMetal)" filter="url(#innerShadow)"/>
-
-    <!-- Lens Flare / Starburst on top left ring -->
-    <g filter="url(#greenGlow)">
-        <path d="M100 50 L104 90 L144 94 L104 98 L100 138 L96 98 L56 94 L96 90 Z" fill="#d4ff00"/>
-        <circle cx="100" cy="94" r="6" fill="#ffffff"/>
-    </g>
-
-    <!-- Lower text integrated into the bottom ring -->
-    <text x="256" y="445" font-family="'Trebuchet MS', 'Arial Black', sans-serif" font-weight="900" font-size="40" fill="url(#chrome)" text-anchor="middle" letter-spacing="8" filter="url(#chrome3D)">CALC</text>
-
-    <!-- Top Text integrated into the upper ring -->
-    <text x="256" y="140" font-family="'Trebuchet MS', 'Arial Black', sans-serif" font-weight="900" font-size="95" fill="url(#chrome)" text-anchor="middle" letter-spacing="1" filter="url(#chrome3D)">profit</text>
-
-    <!-- Central Emblem Background Layer (Darker Drop Layer) -->
-    <path d="M 220 190 L 370 180 L 290 260 L 360 270 L 210 410 L 250 320 L 170 310 Z" fill="#111111" filter="url(#chrome3D)"/>
-
-    <!-- Central Emblem Main Chrome (Stylized geometric bird/bolt) -->
-    <path d="M 210 180 L 360 170 L 280 250 L 350 260 L 200 400 L 240 310 L 160 300 Z" fill="url(#chrome)" filter="url(#chrome3D)"/>
+    <!-- Outer Chrome Bezel -->
+    <circle cx="100" cy="100" r="96" fill="#0f172a" stroke="url(#chromeText)" stroke-width="4" filter="drop-shadow(0px 10px 10px rgba(0,0,0,0.8))"/>
     
-    <!-- Accent Highlight on Central Emblem -->
-    <path d="M 225 190 L 290 185 L 260 230 Z" fill="#ffffff" opacity="0.4"/>
+    <!-- Neon Green Ring -->
+    <circle cx="100" cy="100" r="88" fill="none" stroke="#22c55e" stroke-width="3" filter="url(#neonGreen)"/>
+    
+    <!-- Inner Metallic Plate -->
+    <circle cx="100" cy="100" r="84" fill="url(#metalBg)"/>
+
+    <!-- "OdoTrack" Text -->
+    <text x="100" y="85" font-family="sans-serif" font-weight="900" font-size="24" fill="url(#chromeText)" text-anchor="middle" letter-spacing="0.5" filter="drop-shadow(0px 4px 4px rgba(0,0,0,0.8))">ODOTRACK</text>
+    
+    <!-- "PRO" in Glowing Neon -->
+    <text x="75" y="125" font-family="sans-serif" font-weight="900" font-size="32" fill="#22c55e" text-anchor="middle" filter="url(#neonGreen)">PRO</text>
+    
+    <!-- "by trebsy" positioned to the right -->
+    <text x="120" y="125" font-family="sans-serif" font-style="italic" font-weight="bold" font-size="12" fill="url(#chromeText)" text-anchor="start" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.8))">by trebsy</text>
+
+    <!-- Abstract Speedometer Needle -->
+    <path d="M 50 160 Q 100 130 150 160" fill="none" stroke="url(#chromeText)" stroke-width="5" stroke-linecap="round"/>
+    <polygon points="100,165 96,175 100,135 104,175" fill="#22c55e" filter="url(#neonGreen)"/>
 </svg>
