@@ -16,8 +16,8 @@
             <div id="decisionText" class="text-4xl font-black my-2 text-gray-400">ENTER DATA</div>
             
             <div class="grid grid-cols-2 gap-y-3 gap-x-4 mt-4 text-left text-xs text-gray-300 border-t border-gray-800/50 pt-4">
-                <div>Est. Gas Cost: <span id="estGas" class="font-bold text-white block text-sm mt-1">$0.00</span></div>
-                <div>Total Trip Profit: <span id="netProfit" class="font-black text-emerald-400 block text-lg mt-0">$0.00</span></div>
+                <div>Est. Gas Cost: <span id="estGas" class="font-bold text-gray-400 block text-sm mt-1">$0.00</span></div>
+                <div>Total Trip Profit: <span id="netProfit" class="font-black text-white block text-lg mt-0">$0.00</span></div>
                 
                 <div class="col-span-2 pt-2 border-t border-gray-800/50 grid grid-cols-2 gap-2">
                     <div>Pay per KM: <span id="payPerKm" class="font-bold text-white block mt-1">$0.00/KM</span></div>
@@ -33,26 +33,43 @@
         <!-- 2. COLLAPSIBLE INPUT SETTINGS BUTTON -->
         <div>
             <button id="toggleInputBtn" class="w-full bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-gray-300 font-bold py-3 rounded-xl border border-gray-700 flex justify-between items-center px-5 transition-colors">
-                <span class="tracking-widest uppercase text-sm">⚙️ INPUT SETTINGS</span>
+                <span class="tracking-widest uppercase text-sm">⚙️ TRIPLE-FILTER TARGETS</span>
                 <span id="toggleIcon" class="text-xl">▼</span>
             </button>
 
             <!-- Hidden Input Panel -->
             <div id="inputSettingsPanel" class="hidden bg-gray-900 p-5 rounded-xl border border-gray-700 space-y-4 mt-2 shadow-inner">
                 
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Target Pay ($/KM)</label>
-                    <input type="number" id="targetPay" step="0.10" value="1.50" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-lg font-black text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <!-- The 3 Core Filters -->
+                <div class="space-y-3 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest mb-2 border-b border-gray-700 pb-1">My Minimum Goals</h3>
+                    
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-gray-400 uppercase">1. Min Profit / Trip ($)</label>
+                        <input type="number" id="minTripProfit" step="1.00" value="5.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-gray-400 uppercase">2. Target Pay ($/KM)</label>
+                        <input type="number" id="targetPay" step="0.10" value="1.50" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-gray-400 uppercase">3. Target Wage ($/HR)</label>
+                        <input type="number" id="targetHourly" step="1.00" value="22.00" class="w-20 bg-gray-900 border border-gray-600 rounded py-1 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Net Target for the Day ($)</label>
-                    <input type="number" id="dailyTarget" step="5.00" value="100.00" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-lg font-black text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">My Vehicle Gas Cost ($/KM)</label>
-                    <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-lg font-bold text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <!-- Secondary Goals -->
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Daily Target ($)</label>
+                        <input type="number" id="dailyTarget" step="5.00" value="100.00" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Vehicle Cost ($/KM)</label>
+                        <input type="number" id="gasCost" step="0.01" value="0.14" class="w-full bg-gray-800 border border-gray-700 rounded py-2 px-2 text-sm font-bold text-white text-center focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    </div>
                 </div>
             </div>
         </div>
@@ -105,8 +122,11 @@
     <script>
         // DOM Elements
         const gasCostInput = document.getElementById('gasCost');
+        const minTripProfitInput = document.getElementById('minTripProfit');
         const targetPayInput = document.getElementById('targetPay');
+        const targetHourlyInput = document.getElementById('targetHourly');
         const dailyTargetInput = document.getElementById('dailyTarget');
+        
         const uberOfferSelect = document.getElementById('uberOffer');
         const tripDistanceSelect = document.getElementById('tripDistance');
         const tripDurationSelect = document.getElementById('tripDuration');
@@ -128,56 +148,43 @@
         // Toggle Input Panel Logic
         toggleInputBtn.addEventListener('click', () => {
             inputSettingsPanel.classList.toggle('hidden');
-            if (inputSettingsPanel.classList.contains('hidden')) {
-                toggleIcon.innerText = '▼';
-            } else {
-                toggleIcon.innerText = '▲';
-            }
+            toggleIcon.innerText = inputSettingsPanel.classList.contains('hidden') ? '▼' : '▲';
         });
 
-        // Dynamically populate Offer Dropdown ($1 to $100)
+        // Dynamically populate Dropdowns
         for (let i = 1; i <= 100; i++) {
-            let opt = document.createElement('option');
-            opt.value = i;
-            opt.innerHTML = `$${i}.00`;
-            uberOfferSelect.appendChild(opt);
+            let opt = document.createElement('option'); opt.value = i; opt.innerHTML = `$${i}.00`; uberOfferSelect.appendChild(opt);
+            let opt2 = document.createElement('option'); opt2.value = i; opt2.innerHTML = `${i} KM`; tripDistanceSelect.appendChild(opt2);
         }
-
-        // Dynamically populate Distance Dropdown (1 to 100 KM)
-        for (let i = 1; i <= 100; i++) {
-            let opt = document.createElement('option');
-            opt.value = i;
-            opt.innerHTML = `${i} KM`;
-            tripDistanceSelect.appendChild(opt);
-        }
-
-        // Dynamically populate Duration Dropdown (5 to 120 minutes)
         for (let i = 5; i <= 120; i += 5) {
-            let opt = document.createElement('option');
-            opt.value = i;
-            opt.innerHTML = `${i} Mins`;
-            tripDurationSelect.appendChild(opt);
+            let opt = document.createElement('option'); opt.value = i; opt.innerHTML = `${i} Mins`; tripDurationSelect.appendChild(opt);
         }
 
-        // Load saved settings from local storage
-        if (localStorage.getItem('gasCost')) gasCostInput.value = localStorage.getItem('gasCost');
-        if (localStorage.getItem('targetPay')) targetPayInput.value = localStorage.getItem('targetPay');
-        if (localStorage.getItem('dailyTarget')) dailyTargetInput.value = localStorage.getItem('dailyTarget');
+        // Load saved settings
+        ['gasCost', 'minTripProfit', 'targetPay', 'targetHourly', 'dailyTarget'].forEach(id => {
+            if (localStorage.getItem(id)) document.getElementById(id).value = localStorage.getItem(id);
+        });
 
         function calculate() {
+            // Get Target Inputs
             const gasCost = parseFloat(gasCostInput.value) || 0;
-            const targetPay = parseFloat(targetPayInput.value) || 0;
+            const minTripProfit = parseFloat(minTripProfitInput.value) || 0;
+            const targetPayPerKm = parseFloat(targetPayInput.value) || 0;
+            const targetHourly = parseFloat(targetHourlyInput.value) || 0;
             const dailyTarget = parseFloat(dailyTargetInput.value) || 0;
+            
+            // Get Trip Inputs
             const uberOffer = parseFloat(uberOfferSelect.value) || 0;
             const tripDistance = parseFloat(tripDistanceSelect.value) || 0;
             const tripDuration = parseFloat(tripDurationSelect.value) || 0;
             const deadMilesMultiplier = deadMilesInput.checked ? 2 : 1;
 
-            // Save user settings locally
-            localStorage.setItem('gasCost', gasCost);
-            localStorage.setItem('targetPay', targetPay);
-            localStorage.setItem('dailyTarget', dailyTarget);
+            // Save settings locally
+            ['gasCost', 'minTripProfit', 'targetPay', 'targetHourly', 'dailyTarget'].forEach(id => {
+                localStorage.setItem(id, document.getElementById(id).value);
+            });
 
+            // Prevent calculation until all core data is entered
             if (uberOffer <= 0 || tripDistance <= 0 || tripDuration <= 0) {
                 decisionText.innerText = "ENTER DATA";
                 decisionText.className = "text-4xl font-black my-2 text-gray-400";
@@ -200,6 +207,12 @@
             const totalHours = (tripDuration * deadMilesMultiplier) / 60;
             const payPerHour = totalHours > 0 ? (netProfit / totalHours) : 0;
             
+            // Triple-Filter Pass/Fail Checks
+            const passedMinProfit = netProfit >= minTripProfit;
+            const passedKm = payPerKm >= targetPayPerKm;
+            const passedHourly = payPerHour >= targetHourly;
+            const passedAll = passedMinProfit && passedKm && passedHourly;
+
             // Calculate Daily Target Progress
             let progressText = "0%";
             if (dailyTarget > 0 && netProfit > 0) {
@@ -207,29 +220,34 @@
                 progressText = `+${progressPercentage.toFixed(1)}%`;
             }
 
-            // Update UI
+            // Status Emojis
+            const getIcon = (passed) => passed ? '<span class="ml-1 text-xs">✅</span>' : '<span class="ml-1 text-xs grayscale opacity-60">❌</span>';
+
+            // Update UI Strings
             estGasSpan.innerText = `-$${estGas.toFixed(2)}`;
-            netProfitSpan.innerText = `$${netProfit.toFixed(2)}`;
-            payPerKmSpan.innerText = `$${payPerKm.toFixed(2)}/KM`;
-            payPerHourSpan.innerText = `$${payPerHour.toFixed(2)}/HR`;
+            netProfitSpan.innerHTML = `$${netProfit.toFixed(2)}` + getIcon(passedMinProfit);
+            payPerKmSpan.innerHTML = `$${payPerKm.toFixed(2)}/KM` + getIcon(passedKm);
+            payPerHourSpan.innerHTML = `$${payPerHour.toFixed(2)}/HR` + getIcon(passedHourly);
             targetProgressSpan.innerText = progressText;
 
-            // Make Decision
-            if (payPerKm >= targetPay) {
+            // Make Final Decision
+            if (passedAll) {
                 decisionText.innerText = "ACCEPT";
                 decisionText.className = "text-4xl font-black my-2 text-white";
                 decisionLabel.className = "block text-xs font-bold text-emerald-200 uppercase tracking-widest";
                 decisionBox.className = "p-6 rounded-xl border-2 text-center transition-all duration-200 bg-emerald-600 border-emerald-400 shadow-lg shadow-emerald-900/30";
+                netProfitSpan.className = "font-black text-white block text-lg mt-0";
             } else {
                 decisionText.innerText = "DECLINE";
                 decisionText.className = "text-4xl font-black my-2 text-white";
                 decisionLabel.className = "block text-xs font-bold text-rose-200 uppercase tracking-widest";
                 decisionBox.className = "p-6 rounded-xl border-2 text-center transition-all duration-200 bg-rose-600 border-rose-400 shadow-lg shadow-rose-900/30";
+                netProfitSpan.className = "font-black text-rose-200 block text-lg mt-0";
             }
         }
 
         // Event Listeners
-        [gasCostInput, targetPayInput, dailyTargetInput, uberOfferSelect, tripDistanceSelect, tripDurationSelect, deadMilesInput].forEach(element => {
+        [gasCostInput, minTripProfitInput, targetPayInput, targetHourlyInput, dailyTargetInput, uberOfferSelect, tripDistanceSelect, tripDurationSelect, deadMilesInput].forEach(element => {
             element.addEventListener('input', calculate);
         });
     </script>
