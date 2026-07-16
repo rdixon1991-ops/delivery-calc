@@ -170,18 +170,16 @@
                 </div>
             </div>
 
-            <!-- INPUT SECTION WITH SCREENSHOT INTEGRATION -->
+            <!-- INPUT SECTION WITH SCREENSHOT PASTE INTEGRATION -->
             <div class="space-y-4">
                 <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="block text-sm font-semibold text-slate-300">Uber Offer ($)</label>
-                        <label class="text-xs bg-slate-800 border border-slate-700 hover:bg-slate-700 text-emerald-400 py-1 px-2.5 rounded-md cursor-pointer font-bold transition-all flex items-center">
-                            📷 Scan Screenshot
-                            <input type="file" id="offerScreenshotInput" accept="image/*" class="hidden">
-                        </label>
-                    </div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">Uber Offer ($)</label>
+                    
+                    <!-- NEW PASTE BAR -->
+                    <input type="text" id="pasteZoneInput" placeholder="📋 Tap here & Paste Screenshot..." class="w-full mb-2 bg-gray-950 border-2 border-dashed border-slate-600 rounded-lg py-3 px-4 text-sm font-bold text-emerald-400 text-center focus:outline-none focus:border-emerald-500 placeholder-slate-500 transition-colors">
+                    
                     <div class="relative">
-                        <select id="uberOffer" class="w-full bg-gray-950 border-2 border-slate-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">Tap to select or scan offer</option></select>
+                        <select id="uberOffer" class="w-full bg-gray-950 border-2 border-slate-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">Tap to select offer manually</option></select>
                         <div id="screenshotOcrStatus" class="hidden absolute left-4 bottom-1 text-[10px] font-bold text-emerald-400 animate-pulse"></div>
                     </div>
                 </div>
@@ -223,6 +221,7 @@
                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Shift Status</span>
                         <span id="shiftStatusBadge" class="text-xs font-black text-slate-500 flex items-center"><span id="shiftStatusDot" class="w-2 h-2 rounded-full bg-slate-500 mr-2"></span>INACTIVE</span>
                     </div>
+                    <!-- HIGH VISIBILITY WHITE/GREEN CHROME BAN FOR ODOMETER -->
                     <p class="text-sm text-slate-200 mb-3 font-semibold bg-gray-950 p-2 rounded-lg border border-slate-800" id="displayStartOdoContainer">Start Odometer: <span id="displayStartOdo" class="text-emerald-400 font-extrabold text-base ml-1">Not Started</span></p>
                     
                     <!-- DYNAMIC SHIFT BUTTONS -->
@@ -433,8 +432,11 @@
         const gasCostInput = document.getElementById('gasCost');
         const taxDeductRateInput = document.getElementById('taxDeductRate');
         const uberOfferSelect = document.getElementById('uberOffer');
-        const offerScreenshotInput = document.getElementById('offerScreenshotInput');
+        
+        // New Paste Input elements
+        const pasteZoneInput = document.getElementById('pasteZoneInput');
         const screenshotOcrStatus = document.getElementById('screenshotOcrStatus');
+        
         const tripDistanceSelect = document.getElementById('tripDistance');
         const tripDurationSelect = document.getElementById('tripDuration');
         const toggleInputBtn = document.getElementById('toggleInputBtn');
@@ -587,16 +589,34 @@
         checkUser();
 
         // ==========================================
-        // 4. UBER OFFER SCREENSHOT OCR READER
+        // 4. UBER OFFER CLIPBOARD PASTE SCANNER
         // ==========================================
-        offerScreenshotInput.addEventListener('change', async (e) => {
-            if (e.target.files.length === 0) return;
+        pasteZoneInput.addEventListener('paste', async (e) => {
+            e.preventDefault(); // Stop any actual text from being typed into the box
+            pasteZoneInput.blur(); // Dismiss mobile keyboard instantly
             
-            screenshotOcrStatus.innerText = "🔍 Reading layout...";
-            screenshotOcrStatus.classList.remove('hidden');
+            const items = (e.clipboardData || window.clipboardData).items;
+            let imageFile = null;
+            
+            for (let item of items) {
+                if (item.type.indexOf('image') === 0) {
+                    imageFile = item.getAsFile();
+                    break;
+                }
+            }
+            
+            if (!imageFile) {
+                screenshotOcrStatus.innerText = "⚠️ No image found in clipboard.";
+                screenshotOcrStatus.className = "absolute left-4 bottom-1 text-[10px] font-bold text-rose-400 block";
+                setTimeout(() => screenshotOcrStatus.classList.add('hidden'), 3000);
+                return;
+            }
+            
+            screenshotOcrStatus.innerText = "🔍 Reading pasted image...";
+            screenshotOcrStatus.className = "absolute left-4 bottom-1 text-[10px] font-bold text-emerald-400 animate-pulse block";
 
             try {
-                const result = await Tesseract.recognize(e.target.files[0], 'eng', {
+                const result = await Tesseract.recognize(imageFile, 'eng', {
                     tessedit_char_whitelist: '0123456789.$'
                 });
                 const text = result.data.text;
@@ -612,15 +632,19 @@
                         uberOfferSelect.value = roundedValue;
                         calculate();
                         screenshotOcrStatus.innerText = `✅ Auto-filled: $${roundedValue}.00`;
+                        screenshotOcrStatus.className = "absolute left-4 bottom-1 text-[10px] font-bold text-emerald-400 block";
                     } else {
                         screenshotOcrStatus.innerText = "⚠️ Amount out of tracking scope.";
+                        screenshotOcrStatus.className = "absolute left-4 bottom-1 text-[10px] font-bold text-rose-400 block";
                     }
                 } else {
                     screenshotOcrStatus.innerText = "⚠️ No matching offer layout located.";
+                    screenshotOcrStatus.className = "absolute left-4 bottom-1 text-[10px] font-bold text-rose-400 block";
                 }
             } catch (err) {
                 console.error(err);
                 screenshotOcrStatus.innerText = "❌ Scan error. Input manually.";
+                screenshotOcrStatus.className = "absolute left-4 bottom-1 text-[10px] font-bold text-rose-400 block";
             }
             
             setTimeout(() => screenshotOcrStatus.classList.add('hidden'), 5000);
