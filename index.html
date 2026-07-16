@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Prevents mobile browsers from zooming in on input taps -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OdoTrack Pro</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -27,11 +28,22 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4 pb-10 font-sans relative">
+<!-- Body locked to 100% Dynamic Viewport Height with overflow hidden to prevent bounce -->
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center h-[100dvh] w-full overflow-hidden overscroll-none p-4 font-sans relative">
 
-    <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6 relative overflow-hidden">
+    <!-- Main wrapper handles its own scrolling if necessary, hiding the scrollbar -->
+    <div class="w-full max-w-md bg-gray-850 rounded-2xl shadow-xl border border-gray-700 p-6 relative max-h-[96dvh] overflow-y-auto overscroll-contain no-scrollbar">
         
         <!-- ========================================== -->
         <!-- 1. THE LOGIN GATE                          -->
@@ -211,7 +223,6 @@
                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Shift Status</span>
                         <span id="shiftStatusBadge" class="text-xs font-black text-slate-500 flex items-center"><span id="shiftStatusDot" class="w-2 h-2 rounded-full bg-slate-500 mr-2"></span>INACTIVE</span>
                     </div>
-                    <!-- HIGH VISIBILITY WHITE/GREEN CHROME BAN FOR ODOMETER -->
                     <p class="text-sm text-slate-200 mb-3 font-semibold bg-gray-950 p-2 rounded-lg border border-slate-800" id="displayStartOdoContainer">Start Odometer: <span id="displayStartOdo" class="text-emerald-400 font-extrabold text-base ml-1">Not Started</span></p>
                     
                     <!-- DYNAMIC SHIFT BUTTONS -->
@@ -230,13 +241,12 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- START SHIFT MODAL (HIGH VISIBILITY)        -->
+        <!-- START SHIFT MODAL (FIXED FOR NO SCROLL)    -->
         <!-- ========================================== -->
-        <div id="startShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[70] p-6 flex flex-col justify-center">
+        <div id="startShiftModal" class="hidden fixed inset-0 bg-gray-900/95 backdrop-blur z-[70] p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-emerald-500/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
                 <div class="text-center mb-6">
                     <span class="text-4xl block mb-2">🚗</span>
-                    <!-- Swapped text-chrome out for clean solid emerald for crisp visibility -->
                     <h2 class="text-3xl font-black text-emerald-400 uppercase tracking-widest">Start Shift</h2>
                     <p class="text-[10px] text-slate-300 uppercase mt-1 tracking-widest font-bold">Log Your Starting Mileage</p>
                 </div>
@@ -244,7 +254,6 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-300 uppercase mb-2 text-center">Current Odometer (KM)</label>
-                        <!-- Added inputmode="decimal" for numeric pad layout -->
                         <input type="number" inputmode="decimal" id="startOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border-2 border-emerald-500/50 rounded-lg py-4 px-4 text-3xl font-black text-white focus:outline-none focus:border-emerald-500 text-center tracking-wide">
                     </div>
                     
@@ -257,9 +266,9 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- END SHIFT MODAL (HIGH VISIBILITY)          -->
+        <!-- END SHIFT MODAL (FIXED FOR NO SCROLL)      -->
         <!-- ========================================== -->
-        <div id="endShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[70] p-6 flex flex-col justify-center">
+        <div id="endShiftModal" class="hidden fixed inset-0 bg-gray-900/95 backdrop-blur z-[70] p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-rose-500/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(225,29,72,0.2)]">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-black text-rose-400 uppercase tracking-widest">End Shift</h2>
@@ -269,7 +278,6 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-300 uppercase mb-2 text-center">Final Odometer (KM)</label>
-                        <!-- Added inputmode="decimal" for numeric pad layout -->
                         <input type="number" inputmode="decimal" id="endOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border-2 border-rose-500/50 rounded-lg py-4 px-4 text-3xl font-black text-white focus:outline-none focus:border-rose-500 text-center tracking-wide">
                     </div>
                     <button id="confirmEndShiftBtn" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-rose-900/40 border border-rose-500">☁️ Sync to Cloud</button>
@@ -279,9 +287,9 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- EXPENSE MODAL                              -->
+        <!-- EXPENSE MODAL (FIXED FOR NO SCROLL)        -->
         <!-- ========================================== -->
-        <div id="expenseModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-50 p-6 flex flex-col justify-center">
+        <div id="expenseModal" class="hidden fixed inset-0 bg-gray-900/95 backdrop-blur z-50 p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-emerald-900/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-black text-emerald-400 uppercase tracking-widest">Log Expense</h2>
@@ -309,9 +317,9 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- TAX & SPREADSHEET DASHBOARD                -->
+        <!-- TAX & SPREADSHEET DASHBOARD (FIXED)        -->
         <!-- ========================================== -->
-        <div id="historyModal" class="hidden absolute inset-0 bg-gray-900 z-50 p-4 flex flex-col h-full w-full overflow-hidden">
+        <div id="historyModal" class="hidden fixed inset-0 bg-gray-900 z-50 p-4 flex flex-col h-full w-full overflow-hidden">
             <div class="flex justify-between items-center mb-4 pb-4 border-b border-slate-700 flex-wrap gap-2 shrink-0 hide-on-print">
                 <h2 class="text-xl font-black text-emerald-400 uppercase tracking-widest">Tax Dashboard</h2>
                 <div class="flex space-x-2">
@@ -358,9 +366,9 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- EDIT SHIFT CLOUD MODAL (HIGH VISIBILITY)   -->
+        <!-- EDIT SHIFT CLOUD MODAL (FIXED NO SCROLL)   -->
         <!-- ========================================== -->
-        <div id="editShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[60] p-6 flex flex-col justify-center">
+        <div id="editShiftModal" class="hidden fixed inset-0 bg-gray-900/95 backdrop-blur z-[60] p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-slate-700 rounded-2xl p-6 shadow-2xl">
                 <h2 class="text-xl font-black text-emerald-400 uppercase tracking-widest mb-4">Edit Cloud Shift</h2>
                 <input type="hidden" id="editShiftId">
@@ -382,7 +390,6 @@
                     <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-700">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Odometer Start</label>
-                            <!-- Swapped font parameters for high visibility text inside white brackets -->
                             <input type="number" inputmode="decimal" id="editShiftOdoStart" class="w-full bg-gray-950 border-2 border-emerald-500/40 rounded py-2 px-3 text-base font-extrabold text-white text-center focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
@@ -522,9 +529,12 @@
                 loadSettings();
                 updateShiftTrackerUI();
                 
+                // Keep modal hidden entirely until authentication is verified
                 const shiftStartTime = localStorage.getItem('shiftStartTime');
                 if (!shiftStartTime) {
                     startShiftModal.classList.remove('hidden');
+                } else {
+                    startShiftModal.classList.add('hidden');
                 }
                 updateShiftStateUI();
                 
@@ -533,6 +543,7 @@
                 currentUser = null;
                 authGate.classList.remove('hidden');
                 mainAppWrapper.classList.add('hidden');
+                startShiftModal.classList.add('hidden'); // Force modal hidden if logged out
             }
         }
 
@@ -590,15 +601,12 @@
                 });
                 const text = result.data.text;
                 
-                // Matches standard payouts like $14.50 or 14.50
                 const dollarMatches = text.match(/\$?\d+[.]\d{2}/g);
                 
                 if (dollarMatches && dollarMatches.length > 0) {
-                    // Extract the largest dollar amount found (usually the main core offer parameter)
                     let values = dollarMatches.map(val => parseFloat(val.replace('$', '')));
                     let highestOffer = Math.max(...values);
                     
-                    // Match to closest select index value round down
                     let roundedValue = Math.floor(highestOffer);
                     if (roundedValue >= 1 && roundedValue <= 100) {
                         uberOfferSelect.value = roundedValue;
@@ -653,6 +661,7 @@
         // 6. START SHIFT LOGIC & RESUME
         // ==========================================
         triggerStartShiftBtn.addEventListener('click', () => {
+            if (!currentUser) return; // Hard fail constraint protection
             startShiftModal.classList.remove('hidden');
         });
 
@@ -809,6 +818,7 @@
             renderSpreadsheet();
         }
 
+        // Keep core dashboard layouts crisp and readable
         function renderSpreadsheet() {
             const filterVal = taxTimeFilter.value;
             summaryTimeframeLabel.innerText = `(${taxTimeFilter.options[taxTimeFilter.selectedIndex].text})`;
