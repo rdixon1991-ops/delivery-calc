@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OdoTrack Pro</title>
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-    <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-title" content="OdoTrack Pro">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- PDF Export Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Lightweight Tesseract for Offer Screenshot Scan Only -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
         @media print {
             body * { visibility: hidden; }
@@ -18,7 +20,7 @@
             #historyModal { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #111827; }
             .hide-on-print { display: none !important; }
         }
-        /* Custom Chrome Text Gradient */
+        /* Custom Chrome Text Gradient - Reserved for Large Titles Only */
         .text-chrome {
             background: linear-gradient(to bottom, #ffffff 0%, #94a3b8 35%, #1e293b 50%, #cbd5e1 65%, #f8fafc 100%);
             -webkit-background-clip: text;
@@ -36,17 +38,15 @@
         <!-- ========================================== -->
         <div id="authGate" class="space-y-6 py-6 text-center">
             
-            <!-- CUSTOM TREBSY SVG LOGO (Enlarged) -->
+            <!-- CUSTOM TREBSY SVG LOGO -->
             <div class="mb-8 flex flex-col items-center">
                 <svg class="w-48 h-48 mx-auto mb-6 drop-shadow-[0_0_25px_rgba(34,197,94,0.35)]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
-                        <!-- Dark Brushed Metal Background -->
                         <radialGradient id="metalBg" cx="50%" cy="50%" r="50%">
                             <stop offset="0%" stop-color="#475569" />
                             <stop offset="70%" stop-color="#0f172a" />
                             <stop offset="100%" stop-color="#020617" />
                         </radialGradient>
-                        <!-- Chrome Lettering -->
                         <linearGradient id="chromeText" x1="0%" y1="0%" x2="0%" y2="100%">
                             <stop offset="0%" stop-color="#ffffff"/>
                             <stop offset="35%" stop-color="#94a3b8"/>
@@ -54,7 +54,6 @@
                             <stop offset="65%" stop-color="#cbd5e1"/>
                             <stop offset="100%" stop-color="#f8fafc"/>
                         </linearGradient>
-                        <!-- Neon Green Glow -->
                         <filter id="neonGreen" x="-20%" y="-20%" width="140%" height="140%">
                             <feGaussianBlur stdDeviation="3" result="blur" />
                             <feMerge>
@@ -63,30 +62,15 @@
                             </feMerge>
                         </filter>
                     </defs>
-
-                    <!-- Outer Chrome Bezel -->
                     <circle cx="100" cy="100" r="96" fill="#0f172a" stroke="url(#chromeText)" stroke-width="4" filter="drop-shadow(0px 10px 10px rgba(0,0,0,0.8))"/>
-                    
-                    <!-- Neon Green Ring -->
                     <circle cx="100" cy="100" r="88" fill="none" stroke="#22c55e" stroke-width="3" filter="url(#neonGreen)"/>
-                    
-                    <!-- Inner Metallic Plate -->
                     <circle cx="100" cy="100" r="84" fill="url(#metalBg)"/>
-
-                    <!-- "OdoTrack" Text -->
                     <text x="100" y="85" font-family="sans-serif" font-weight="900" font-size="24" fill="url(#chromeText)" text-anchor="middle" letter-spacing="0.5" filter="drop-shadow(0px 4px 4px rgba(0,0,0,0.8))">ODOTRACK</text>
-                    
-                    <!-- "PRO" in Glowing Neon -->
                     <text x="75" y="125" font-family="sans-serif" font-weight="900" font-size="32" fill="#22c55e" text-anchor="middle" filter="url(#neonGreen)">PRO</text>
-                    
-                    <!-- "by trebsy" positioned to the right -->
                     <text x="120" y="125" font-family="sans-serif" font-style="italic" font-weight="bold" font-size="12" fill="url(#chromeText)" text-anchor="start" filter="drop-shadow(0px 2px 2px rgba(0,0,0,0.8))">by trebsy</text>
-
-                    <!-- Abstract Speedometer Needle -->
                     <path d="M 50 160 Q 100 130 150 160" fill="none" stroke="url(#chromeText)" stroke-width="5" stroke-linecap="round"/>
                     <polygon points="100,165 96,175 100,135 104,175" fill="#22c55e" filter="url(#neonGreen)"/>
                 </svg>
-
                 <p class="text-xs text-slate-400 font-bold uppercase tracking-[0.3em] mt-2 drop-shadow-md">Professional Logbook</p>
             </div>
             
@@ -98,7 +82,6 @@
                     <button type="submit" id="loginBtn" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest shadow-lg shadow-emerald-900/20 border border-emerald-500/50">Log In</button>
                     <button type="button" id="signupBtn" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-3 rounded-lg transition-colors uppercase tracking-widest border border-slate-500/50">Sign Up</button>
                 </div>
-                
                 <button type="button" id="forgotPasswordBtn" class="w-full text-emerald-400 hover:text-emerald-300 text-[10px] font-bold pt-4 transition-colors uppercase tracking-widest">Forgot Password?</button>
                 <p id="authMessage" class="text-xs font-bold mt-2 h-4 text-emerald-400"></p>
             </form>
@@ -175,10 +158,20 @@
                 </div>
             </div>
 
+            <!-- INPUT SECTION WITH SCREENSHOT INTEGRATION -->
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-300 mb-2">Uber Offer ($)</label>
-                    <select id="uberOffer" class="w-full bg-gray-950 border-2 border-slate-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">Tap to select offer</option></select>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-semibold text-slate-300">Uber Offer ($)</label>
+                        <label class="text-xs bg-slate-800 border border-slate-700 hover:bg-slate-700 text-emerald-400 py-1 px-2.5 rounded-md cursor-pointer font-bold transition-all flex items-center">
+                            📷 Scan Screenshot
+                            <input type="file" id="offerScreenshotInput" accept="image/*" class="hidden">
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <select id="uberOffer" class="w-full bg-gray-950 border-2 border-slate-700 rounded-xl py-4 px-4 text-2xl font-black text-white focus:ring-4 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer"><option value="">Tap to select or scan offer</option></select>
+                        <div id="screenshotOcrStatus" class="hidden absolute left-4 bottom-1 text-[10px] font-bold text-emerald-400 animate-pulse"></div>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -218,7 +211,8 @@
                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Shift Status</span>
                         <span id="shiftStatusBadge" class="text-xs font-black text-slate-500 flex items-center"><span id="shiftStatusDot" class="w-2 h-2 rounded-full bg-slate-500 mr-2"></span>INACTIVE</span>
                     </div>
-                    <p class="text-xs text-slate-400 mb-3" id="displayStartOdoContainer">Start Odometer: <span id="displayStartOdo" class="text-chrome font-bold">Not Started</span></p>
+                    <!-- HIGH VISIBILITY WHITE/GREEN CHROME BAN FOR ODOMETER -->
+                    <p class="text-sm text-slate-200 mb-3 font-semibold bg-gray-950 p-2 rounded-lg border border-slate-800" id="displayStartOdoContainer">Start Odometer: <span id="displayStartOdo" class="text-emerald-400 font-extrabold text-base ml-1">Not Started</span></p>
                     
                     <!-- DYNAMIC SHIFT BUTTONS -->
                     <button id="triggerStartShiftBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3.5 rounded-lg border border-emerald-500 shadow-lg shadow-emerald-900/30 transition-colors text-sm uppercase tracking-widest">🚀 Start Shift</button>
@@ -236,25 +230,25 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- START SHIFT MODAL                          -->
+        <!-- START SHIFT MODAL (HIGH VISIBILITY)        -->
         <!-- ========================================== -->
         <div id="startShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[70] p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-emerald-500/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
                 <div class="text-center mb-6">
                     <span class="text-4xl block mb-2">🚗</span>
-                    <h2 class="text-2xl font-black text-chrome uppercase tracking-widest">Start Shift</h2>
-                    <p class="text-[10px] text-emerald-400 uppercase mt-1 tracking-widest">Log Your Starting Mileage</p>
+                    <!-- Swapped text-chrome out for clean solid emerald for crisp visibility -->
+                    <h2 class="text-3xl font-black text-emerald-400 uppercase tracking-widest">Start Shift</h2>
+                    <p class="text-[10px] text-slate-300 uppercase mt-1 tracking-widest font-bold">Log Your Starting Mileage</p>
                 </div>
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2 text-center">Current Odometer (KM)</label>
-                        <input type="number" inputmode="decimal" id="startOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-slate-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-emerald-500 text-center">
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-2 text-center">Current Odometer (KM)</label>
+                        <!-- Added inputmode="decimal" for numeric pad layout -->
+                        <input type="number" inputmode="decimal" id="startOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border-2 border-emerald-500/50 rounded-lg py-4 px-4 text-3xl font-black text-white focus:outline-none focus:border-emerald-500 text-center tracking-wide">
                     </div>
                     
                     <button id="confirmStartShiftBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-lg mt-2 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-emerald-900/40 border border-emerald-500">🚀 Begin Shift</button>
-                    
-                    <!-- RESUME BUTTON -->
                     <button id="skipStartShiftBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-lg mt-2 transition-colors uppercase tracking-widest text-xs border border-slate-600 shadow-inner">⏭️ Resume App (Home)</button>
                     
                     <p id="startShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
@@ -263,28 +257,29 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- END SHIFT MODAL                            -->
+        <!-- END SHIFT MODAL (HIGH VISIBILITY)          -->
         <!-- ========================================== -->
         <div id="endShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[70] p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-rose-500/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(225,29,72,0.2)]">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-black text-white uppercase tracking-widest">End Shift</h2>
+                    <h2 class="text-2xl font-black text-rose-400 uppercase tracking-widest">End Shift</h2>
                     <button id="closeEndShiftBtn" class="text-slate-400 hover:text-white font-bold text-xl">&times;</button>
                 </div>
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-rose-400 uppercase mb-2 text-center">Final Odometer (KM)</label>
-                        <input type="number" inputmode="decimal" id="endOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border border-slate-600 rounded-lg py-4 px-4 text-2xl font-black text-white focus:outline-none focus:border-rose-500 text-center">
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-2 text-center">Final Odometer (KM)</label>
+                        <!-- Added inputmode="decimal" for numeric pad layout -->
+                        <input type="number" inputmode="decimal" id="endOdometerInput" placeholder="Enter KM..." class="w-full bg-gray-950 border-2 border-rose-500/50 rounded-lg py-4 px-4 text-3xl font-black text-white focus:outline-none focus:border-rose-500 text-center tracking-wide">
                     </div>
-                    <button id="confirmEndShiftBtn" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-rose-900/40">☁️ Sync to Cloud</button>
+                    <button id="confirmEndShiftBtn" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-lg mt-4 transition-colors uppercase tracking-widest text-sm shadow-lg shadow-rose-900/40 border border-rose-500">☁️ Sync to Cloud</button>
                     <p id="endShiftMessage" class="text-xs font-bold mt-2 text-center h-4 text-rose-400"></p>
                 </div>
             </div>
         </div>
 
         <!-- ========================================== -->
-        <!-- EXPENSE SCANNER MODAL                      -->
+        <!-- EXPENSE MODAL                              -->
         <!-- ========================================== -->
         <div id="expenseModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-50 p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-emerald-900/50 rounded-2xl p-6 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
@@ -363,7 +358,7 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- EDIT SHIFT CLOUD MODAL                     -->
+        <!-- EDIT SHIFT CLOUD MODAL (HIGH VISIBILITY)   -->
         <!-- ========================================== -->
         <div id="editShiftModal" class="hidden absolute inset-0 bg-gray-900/95 backdrop-blur z-[60] p-6 flex flex-col justify-center">
             <div class="bg-gray-850 border border-slate-700 rounded-2xl p-6 shadow-2xl">
@@ -376,7 +371,7 @@
                             <input type="number" inputmode="decimal" id="editShiftProfit" step="0.01" class="w-full bg-gray-950 border border-slate-700 rounded py-2 px-3 text-sm font-bold text-white text-center focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">App Dist (KM)</label>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">App Dist (KM)</label>
                             <input type="number" inputmode="decimal" id="editShiftDist" step="0.1" class="w-full bg-gray-950 border border-slate-700 rounded py-2 px-3 text-sm font-bold text-white text-center focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
@@ -387,16 +382,17 @@
                     <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-700">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Odometer Start</label>
-                            <input type="number" inputmode="decimal" id="editShiftOdoStart" class="w-full bg-gray-950 border border-slate-700 rounded py-2 px-3 text-sm font-bold text-white text-center focus:outline-none focus:border-emerald-500">
+                            <!-- Swapped font parameters for high visibility text inside white brackets -->
+                            <input type="number" inputmode="decimal" id="editShiftOdoStart" class="w-full bg-gray-950 border-2 border-emerald-500/40 rounded py-2 px-3 text-base font-extrabold text-white text-center focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Odometer End</label>
-                            <input type="number" inputmode="decimal" id="editShiftOdoEnd" class="w-full bg-gray-950 border border-slate-700 rounded py-2 px-3 text-sm font-bold text-white text-center focus:outline-none focus:border-emerald-500">
+                            <input type="number" inputmode="decimal" id="editShiftOdoEnd" class="w-full bg-gray-950 border-2 border-emerald-500/40 rounded py-2 px-3 text-base font-extrabold text-white text-center focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3 mt-6">
                         <button id="cancelEditBtn" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg text-xs uppercase tracking-widest transition-colors">Cancel</button>
-                        <button id="saveEditBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg text-xs uppercase tracking-widest shadow-lg shadow-emerald-900/30 transition-colors">💾 Save</button>
+                        <button id="saveEditBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-lg text-xs uppercase tracking-widest shadow-lg shadow-emerald-900/30 transition-colors">💾 Save</button>
                     </div>
                 </div>
             </div>
@@ -430,6 +426,8 @@
         const gasCostInput = document.getElementById('gasCost');
         const taxDeductRateInput = document.getElementById('taxDeductRate');
         const uberOfferSelect = document.getElementById('uberOffer');
+        const offerScreenshotInput = document.getElementById('offerScreenshotInput');
+        const screenshotOcrStatus = document.getElementById('screenshotOcrStatus');
         const tripDistanceSelect = document.getElementById('tripDistance');
         const tripDurationSelect = document.getElementById('tripDuration');
         const toggleInputBtn = document.getElementById('toggleInputBtn');
@@ -578,7 +576,50 @@
         checkUser();
 
         // ==========================================
-        // 4. SHIFT STATE UI CONTROLLER
+        // 4. UBER OFFER SCREENSHOT OCR READER
+        // ==========================================
+        offerScreenshotInput.addEventListener('change', async (e) => {
+            if (e.target.files.length === 0) return;
+            
+            screenshotOcrStatus.innerText = "🔍 Reading layout...";
+            screenshotOcrStatus.classList.remove('hidden');
+
+            try {
+                const result = await Tesseract.recognize(e.target.files[0], 'eng', {
+                    tessedit_char_whitelist: '0123456789.$'
+                });
+                const text = result.data.text;
+                
+                // Matches standard payouts like $14.50 or 14.50
+                const dollarMatches = text.match(/\$?\d+[.]\d{2}/g);
+                
+                if (dollarMatches && dollarMatches.length > 0) {
+                    // Extract the largest dollar amount found (usually the main core offer parameter)
+                    let values = dollarMatches.map(val => parseFloat(val.replace('$', '')));
+                    let highestOffer = Math.max(...values);
+                    
+                    // Match to closest select index value round down
+                    let roundedValue = Math.floor(highestOffer);
+                    if (roundedValue >= 1 && roundedValue <= 100) {
+                        uberOfferSelect.value = roundedValue;
+                        calculate();
+                        screenshotOcrStatus.innerText = `✅ Auto-filled: $${roundedValue}.00`;
+                    } else {
+                        screenshotOcrStatus.innerText = "⚠️ Amount out of tracking scope.";
+                    }
+                } else {
+                    screenshotOcrStatus.innerText = "⚠️ No matching offer layout located.";
+                }
+            } catch (err) {
+                console.error(err);
+                screenshotOcrStatus.innerText = "❌ Scan error. Input manually.";
+            }
+            
+            setTimeout(() => screenshotOcrStatus.classList.add('hidden'), 5000);
+        });
+
+        // ==========================================
+        // 5. SHIFT STATE UI CONTROLLER
         // ==========================================
         function updateShiftStateUI() {
             const shiftStartTime = localStorage.getItem('shiftStartTime');
@@ -587,7 +628,7 @@
             if (shiftStartTime && shiftStartOdo) {
                 shiftStatusBadge.className = "text-xs font-black text-emerald-400 flex items-center";
                 shiftStatusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>ACTIVE';
-                displayStartOdo.innerText = shiftStartOdo;
+                displayStartOdo.innerText = `${shiftStartOdo} KM`;
                 
                 triggerStartShiftBtn.classList.add('hidden');
                 triggerEndShiftBtn.classList.remove('hidden');
@@ -609,7 +650,7 @@
         }
 
         // ==========================================
-        // 5. START SHIFT LOGIC & RESUME
+        // 6. START SHIFT LOGIC & RESUME
         // ==========================================
         triggerStartShiftBtn.addEventListener('click', () => {
             startShiftModal.classList.remove('hidden');
@@ -640,7 +681,7 @@
         });
 
         // ==========================================
-        // 6. MANUAL END SHIFT LOGIC (Stays on Home)
+        // 7. MANUAL END SHIFT LOGIC (Stays on Home)
         // ==========================================
         triggerEndShiftBtn.addEventListener('click', () => {
             endShiftModal.classList.remove('hidden');
@@ -669,7 +710,7 @@
         });
 
         // ==========================================
-        // 7. AUTO END SHIFT LOGIC (8 HOURS)
+        // 8. AUTO END SHIFT LOGIC (8 HOURS)
         // ==========================================
         async function autoCloseShift() {
             alert("⏰ 8 Hours have passed. Your shift has been automatically closed using calculated distances.");
@@ -699,19 +740,17 @@
             } else {
                 alert("Shift successfully saved to Cloud!");
                 
-                // Clear local shift state
                 tripLedger = []; localStorage.removeItem('tripLedger');
                 localStorage.removeItem('shiftStartTime');
                 localStorage.removeItem('shiftStartOdo');
                 
-                // Update workspace UI and stay on home screen
                 updateShiftTrackerUI();
                 updateShiftStateUI();
             }
         }
 
         // ==========================================
-        // 8. EXPENSE LOGIC
+        // 9. EXPENSE LOGIC
         // ==========================================
         openExpenseScannerBtn.addEventListener('click', () => {
             expenseModal.classList.remove('hidden');
@@ -751,7 +790,7 @@
         });
 
         // ==========================================
-        // 9. TAX DASHBOARD & SPREADSHEET LOGIC
+        // 10. TAX DASHBOARD & SPREADSHEET LOGIC
         // ==========================================
         async function fetchCloudData() {
             document.getElementById('shiftLedgerContainer').innerHTML = '<p class="text-center text-xs font-bold text-slate-500 my-4">⏳ Fetching cloud data...</p>';
@@ -975,7 +1014,7 @@
         });
 
         // ==========================================
-        // 10. CALCULATOR & TIME PROFILE LOGIC
+        // 11. CALCULATOR & TIME PROFILE LOGIC
         // ==========================================
         function determineTimeProfile() {
             const now = new Date();
